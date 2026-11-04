@@ -21,8 +21,7 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
+  --font-sans: var(--font-brand), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -36,8 +35,7 @@
     background: var(--color-page);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    /* Jost's stylistic set 1 gives the single-storey "a" of Futura, the brand font. */
-    font-feature-settings: "ss01" 1;
+    /* Upright only: never let the browser fake an italic or a bold the font does not have. */
     font-synthesis: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -54,20 +52,19 @@
 }
 
 @layer components {
-  /* Type scale. Headlines are Jost (the brand's Futura stand-in); one accent phrase per headline uses .accent. */
-  /* The user's standing cap for display type is about 60px; presence comes from weight, tracking and space. */
+  /* Type scale in the one brand face. Display type caps at about 60px; presence comes from weight, tracking and space. */
   .t-display {
-    font-size: clamp(2.3rem, 1.3rem + 3.2vw, 3.75rem);
-    line-height: 1.02;
-    letter-spacing: -0.04em;
+    font-size: clamp(2.15rem, 1.25rem + 3.2vw, 3.75rem);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
     font-weight: 500;
     color: #fff;
     text-wrap: balance;
   }
   .t-h2 {
     font-size: clamp(2rem, 1.45rem + 1.35vw, 3rem);
-    line-height: 1.06;
-    letter-spacing: -0.035em;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
     font-weight: 500;
     color: #fff;
     text-wrap: balance;
@@ -75,7 +72,7 @@
   .t-h3 {
     font-size: clamp(1.375rem, 1.2rem + 0.45vw, 1.75rem);
     line-height: 1.2;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.015em;
     font-weight: 500;
     color: #fff;
   }
@@ -98,34 +95,34 @@
   }
 
   /*
-    The accent phrase the client liked in v1: Instrument Serif italic with a white-to-sky gradient. It appears only
-    in the hero and the closing contact section (Heading serif prop). Repeating it in every headline is a known tell
-    of generated pages, so all other headlines are two-tone instead (.tone).
+    One typeface, upright only (no italics anywhere). Headlines are two-tone: the title in white, the continuation
+    dimmed (.tone). The hero and the closing contact section instead set their continuation in the client's
+    white-to-sky gradient (.accent), same face, a step lighter.
   */
   .tone {
     color: rgb(234 241 250 / 0.42);
   }
   .accent {
-    font-feature-settings: normal;
-    font-family: var(--font-serif);
-    font-style: italic;
     font-weight: 400;
-    font-size: 1.1em;
-    line-height: 0.9;
-    letter-spacing: -0.01em;
-    padding-right: 0.06em;
-    background: linear-gradient(100deg, #ffffff 0%, #dcecff 40%, #69bff8 100%);
+    /*
+      The gradient is painted only inside the element's box, so the box is extended to cover descenders (g, p)
+      and the negative margin keeps the layout unchanged. Each wrapped line gets the full gradient (clone).
+    */
+    padding: 0.06em 0.04em 0.18em 0;
+    margin-block: -0.06em -0.18em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    background: linear-gradient(100deg, #ffffff 0%, #dcecff 38%, #69bff8 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
-  /* Large figures (step numbers, metrics) in the serif, so numbers read as editorial rather than dashboard. */
+  /* Large figures (step numbers, metrics): the same face, light, with lining tabular digits so they align. */
   .num {
-    font-family: var(--font-serif);
-    font-weight: 400;
-    letter-spacing: -0.01em;
-    font-variant-numeric: lining-nums;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    font-variant-numeric: lining-nums tabular-nums;
   }
 
   /* The one card surface used everywhere: deep navy glass without blur (blur costs frames on integrated graphics). */

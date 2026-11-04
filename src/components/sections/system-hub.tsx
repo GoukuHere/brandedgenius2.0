@@ -177,7 +177,7 @@ export function SystemSection() {
                   ROW_START[i % 4]
                 )}
               >
-                <h3 className="text-[17px] leading-snug font-medium text-white">{node.title}</h3>
+                <h3 className="text-[16px] leading-snug font-medium text-white hyphens-auto sm:text-[17px]">{node.title}</h3>
                 {/* A no-break space keeps each dot on its tool's line when the list wraps. */}
                 <p className="mt-1.5 text-[14px] leading-relaxed text-silver">{node.tools.join(" · ")}</p>
               </div>

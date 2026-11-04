@@ -1,12 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif, Jost } from "next/font/google";
+import localFont from "next/font/local";
 import { MotionProvider } from "@/components/system/motion-provider";
 import { PageBackground } from "@/components/system/page-background";
 import "./globals.css";
 
-// next/font downloads both families at build time and serves them from this site, so no visitor request goes to Google.
-const jost = Jost({ variable: "--font-jost", subsets: ["latin"], display: "swap" });
-const serif = Instrument_Serif({ variable: "--font-instrument", weight: "400", style: ["normal", "italic"], subsets: ["latin"], display: "swap" });
+/*
+  The one brand face: General Sans (Indian Type Foundry, via Fontshare), upright only, as a variable font covering
+  weights 200 to 700. Self-hosted through next/font, so no visitor request goes to a font service.
+  Licence: ITF Free Font License 2.0 (free for commercial use, self-hosting on websites allowed), see fonts/GeneralSans-FFL.txt.
+*/
+const brand = localFont({
+  src: "./fonts/GeneralSans-Variable.woff2",
+  variable: "--font-brand",
+  weight: "200 700",
+  style: "normal",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "KI-Automatisierung, die Ergebnisse schafft | Branded Genius",
@@ -20,7 +29,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={`${jost.variable} ${serif.variable}`}>
+    <html lang="de" className={brand.variable}>
       <body>
         <PageBackground />
         <MotionProvider>{children}</MotionProvider>

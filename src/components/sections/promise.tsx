@@ -51,7 +51,7 @@ export function PromiseSection() {
           <ul
             ref={rowRef}
             role="list"
-            className="mt-14 grid grid-cols-2 gap-x-5 gap-y-12 md:mt-20 md:gap-x-6 lg:grid-cols-4"
+            className="mt-14 grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 sm:gap-y-12 md:mt-20 md:gap-x-6 lg:grid-cols-4"
           >
             {PROMISE.figures.map((figure, index) => (
               <Figure key={figure.value} value={figure.value} label={figure.label} index={index} progress={cascade} />
@@ -82,10 +82,10 @@ function Figure({
     <motion.li style={{ opacity, y }}>
       <div aria-hidden className="hairline" />
       {/*
-        One line always: "3–6 Monate" measures 3.91em in Instrument Serif, which fits a 375px phone column at 40px and
-        a 1024px four-column row at 48px; 56px takes over from xl, where the columns are 286px wide.
+        One line always. In General Sans light, "3–6 Monate" is about 4.95em wide: one column on phones, two from
+        640px (44px), four from 1024px at 40px (columns about 218px) and 52px from 1280px (columns about 282px).
       */}
-      <p className="num mt-6 text-[40px] leading-[1] whitespace-nowrap text-white md:text-[48px] xl:text-[56px]">
+      <p className="num mt-6 text-[40px] leading-[1] whitespace-nowrap text-white md:text-[44px] lg:text-[40px] xl:text-[52px]">
         {value}
       </p>
       <p className="t-small mt-3">{label}</p>

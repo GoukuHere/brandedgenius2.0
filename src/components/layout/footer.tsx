@@ -36,7 +36,7 @@ export function Footer() {
               {FOOTER.cta}
             </PrimaryLink>
           </div>
-          <div className="grid gap-10 sm:grid-cols-2 lg:col-span-5 lg:col-start-8">
+          <div className="grid gap-10 sm:grid-cols-2 lg:col-span-6 lg:col-start-7 xl:col-span-5 xl:col-start-8">
             <Column title={FOOTER.discover.title} links={FOOTER.discover.links} />
             <Column title={FOOTER.connect.title} links={FOOTER.connect.links} />
           </div>

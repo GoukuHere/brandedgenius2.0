@@ -214,8 +214,8 @@ function CaseBody({ item }: { item: CaseStudy }) {
           {item.metrics.map((metric, i) => (
             <li key={metric.label}>
               {i > 0 ? <div aria-hidden className="hairline my-4 lg:my-6" /> : null}
-              <div className="grid grid-cols-[7rem_minmax(0,1fr)] items-center gap-x-4 lg:grid-cols-1 lg:items-start lg:gap-y-2">
-                <p className="num text-[48px] leading-none text-white lg:text-[64px]">{metric.value}</p>
+              <div className="grid grid-cols-[8rem_minmax(0,1fr)] items-center gap-x-4 lg:grid-cols-1 lg:items-start lg:gap-y-2">
+                <p className="num text-[44px] leading-none text-white lg:text-[64px]">{metric.value}</p>
                 <p className="t-small">{metric.label}</p>
               </div>
             </li>

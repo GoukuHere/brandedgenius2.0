@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
   The four looping line drawings from v1 (services-stack.tsx), one per service. Each scene is a pure function of
   time: draw(t) returns the frame at t seconds, and steps names what the drawing is acting out at that moment.
   The timings and choreography are v1's. What changed for v2: everything is drawn to be read on the navy panel
-  (outlines in white at 95%, connectors and details in sky, strokes about 1.5x heavier, labels in Jost at 24 to 30
+  (outlines in white at 95%, connectors and details in sky, strokes about 1.5x heavier, labels in the page face at 24 to 30
   units instead of 19 in a dim monospace), a few labels moved so the larger type never touches a line, and the
   caption under the drawing is gone because the section lists the steps beside it.
 */
@@ -58,7 +58,7 @@ const draw = (p: number) => ({ pathLength: 1, strokeDasharray: "1 1", strokeDash
 const line = { fill: "none", stroke: WHITE, strokeOpacity: 0.95, strokeWidth: 3.75, strokeLinecap: "round", strokeLinejoin: "round" } as const;
 /** Connectors and fine detail: sky, so the hierarchy comes from colour instead of dimming. */
 const hair = { ...line, stroke: SKY, strokeOpacity: 0.85, strokeWidth: 3 } as const;
-/** Labels: Jost, inherited from the page. */
+/** Labels: the page face (General Sans), inherited. */
 const label = { fill: WHITE, fillOpacity: 0.92, fontSize: 26, fontWeight: 500 } as const;
 
 function Person({ at, color = WHITE, s = 1, opacity = 1 }: { at: Pt; color?: string; s?: number; opacity?: number }) {

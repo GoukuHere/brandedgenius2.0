@@ -161,7 +161,8 @@ export const SERVICES = {
     },
     {
       id: "marketing",
-      title: "KI-Marketing & Vertriebsautomatisierung",
+      // The soft hyphen lets the long compound break as "Vertriebs-automatisierung" wherever it runs out of room.
+      title: "KI-Marketing & Vertriebs­automatisierung",
       text: "Automatisierte Marketing- und Vertriebsprozesse für Leadgenerierung, Follow-ups, CRM, personalisierte Kommunikation und effizientere Conversion-Prozesse.",
       cta: "Wachstum automatisieren",
     },

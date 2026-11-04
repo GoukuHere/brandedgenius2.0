@@ -79,14 +79,15 @@ export function Hero() {
         <div className="-mt-10 max-w-[600px] sm:-mt-16 lg:mt-0">
           {/* "KI-Automatisierung," is 7.8em wide; the display scale keeps it on one line down to a 360px phone. */}
           <h1 className="t-display">
-            <span className="block overflow-hidden pb-[0.06em]">
+            {/* Each line is masked for the rise; the padding (taken back by the negative margin) keeps descenders whole. */}
+            <span className="-mb-[0.12em] block overflow-hidden pb-[0.12em]">
               <motion.span className="block whitespace-nowrap" {...line(0.25)}>
                 {HERO.title}
               </motion.span>
             </span>
-            <span className="block overflow-hidden pb-[0.12em]">
-              <motion.span className="accent block" {...line(0.38)}>
-                {HERO.accent}
+            <span className="-mb-[0.12em] block overflow-hidden pb-[0.2em]">
+              <motion.span className="block" {...line(0.38)}>
+                <span className="accent">{HERO.accent}</span>
               </motion.span>
             </span>
           </h1>

@@ -123,8 +123,8 @@ export function CompareSection() {
               delay={0.35}
               className="pointer-events-none absolute top-1/2 left-1/2 z-10 hidden size-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/12 bg-page md:grid"
             >
-              {/* Lowercase serif sits low in its line box; 1.5px lifts the x-height to the optical centre. */}
-              <span aria-hidden className="accent -translate-y-[1.5px] text-[20px]">
+              {/* Lowercase sits low in its line box; 1px lifts the x-height to the optical centre. */}
+              <span aria-hidden className="accent -translate-y-px text-[17px] font-medium tracking-[-0.01em]">
                 vs
               </span>
             </Reveal>
