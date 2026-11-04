@@ -1,0 +1,189 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+  Branded Genius v2 design tokens. Colours come only from the client's brand guide (Royal #004BA0, Sky #69BFF8,
+  grey #969595) plus the navy they sit on and white. The whole page shares ONE background (see PageBackground),
+  so no section sets its own background colour.
+*/
+@theme {
+  --color-page: #050a14;
+  --color-deep: #081224;
+  --color-panel: #0b1a31;
+  --color-panel-hi: #10223f;
+  --color-royal: #004ba0;
+  --color-royal-bright: #1a6fe0;
+  --color-sky: #69bff8;
+  --color-ice: #dcecff;
+  --color-silver: #969595;
+  --color-ink: #eaf1fa;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@theme inline {
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    /* Jost's stylistic set 1 gives the single-storey "a" of Futura, the brand font. */
+    font-feature-settings: "ss01" 1;
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: rgb(105 191 248 / 0.3);
+    color: #fff;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-sky);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Type scale. Headlines are Jost (the brand's Futura stand-in); one accent phrase per headline uses .accent. */
+  /* The user's standing cap for display type is about 60px; presence comes from weight, tracking and space. */
+  .t-display {
+    font-size: clamp(2.3rem, 1.3rem + 3.2vw, 3.75rem);
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    font-weight: 500;
+    color: #fff;
+    text-wrap: balance;
+  }
+  .t-h2 {
+    font-size: clamp(2rem, 1.45rem + 1.35vw, 3rem);
+    line-height: 1.06;
+    letter-spacing: -0.035em;
+    font-weight: 500;
+    color: #fff;
+    text-wrap: balance;
+  }
+  .t-h3 {
+    font-size: clamp(1.375rem, 1.2rem + 0.45vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: #fff;
+  }
+  .t-lead {
+    font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);
+    line-height: 1.6;
+    color: rgb(234 241 250 / 0.72);
+    text-wrap: pretty;
+  }
+  .t-body {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: rgb(234 241 250 / 0.7);
+    text-wrap: pretty;
+  }
+  .t-small {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-silver);
+  }
+
+  /*
+    The accent phrase the client liked in v1: Instrument Serif italic with a white-to-sky gradient. It appears only
+    in the hero and the closing contact section (Heading serif prop). Repeating it in every headline is a known tell
+    of generated pages, so all other headlines are two-tone instead (.tone).
+  */
+  .tone {
+    color: rgb(234 241 250 / 0.42);
+  }
+  .accent {
+    font-feature-settings: normal;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.1em;
+    line-height: 0.9;
+    letter-spacing: -0.01em;
+    padding-right: 0.06em;
+    background: linear-gradient(100deg, #ffffff 0%, #dcecff 40%, #69bff8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Large figures (step numbers, metrics) in the serif, so numbers read as editorial rather than dashboard. */
+  .num {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    font-variant-numeric: lining-nums;
+  }
+
+  /* The one card surface used everywhere: deep navy glass without blur (blur costs frames on integrated graphics). */
+  .surface {
+    border-radius: 24px;
+    border: 1px solid rgb(255 255 255 / 0.07);
+    background: linear-gradient(180deg, rgb(16 34 63 / 0.62), rgb(8 18 36 / 0.62));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.05),
+      0 30px 60px -40px rgb(0 0 0 / 0.8);
+  }
+  .surface-hover {
+    transition:
+      border-color 0.4s var(--ease-out-expo),
+      background-color 0.4s var(--ease-out-expo),
+      transform 0.4s var(--ease-out-expo);
+  }
+  .surface-hover:hover {
+    border-color: rgb(105 191 248 / 0.28);
+  }
+
+  /*
+    The hero film's edges dissolve into the page background. Phones: fade the bottom. Desktop: fade the left edge
+    (towards the headline) and the top and bottom, intersected so the corners fade too.
+  */
+  .hero-film {
+    -webkit-mask-image: linear-gradient(180deg, black 62%, transparent 100%);
+    mask-image: linear-gradient(180deg, black 62%, transparent 100%);
+  }
+  @media (min-width: 1024px) {
+    .hero-film {
+      -webkit-mask-image:
+        linear-gradient(90deg, transparent 0%, black 30%, black 100%),
+        linear-gradient(180deg, transparent 0%, black 12%, black 74%, transparent 100%);
+      -webkit-mask-composite: source-in;
+      mask-image:
+        linear-gradient(90deg, transparent 0%, black 30%, black 100%),
+        linear-gradient(180deg, transparent 0%, black 12%, black 74%, transparent 100%);
+      mask-composite: intersect;
+    }
+  }
+
+  /* Hairline divider in the brand's light blue. */
+  .hairline {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(105 191 248 / 0.28), transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
