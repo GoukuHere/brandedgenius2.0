@@ -11,6 +11,7 @@ import { PartnersSection } from "@/components/sections/partners";
 import { ProblemSection } from "@/components/sections/problem";
 import { ProcessSection } from "@/components/sections/process";
 import { PromiseSection } from "@/components/sections/promise";
+import { ServicesSection } from "@/components/sections/services";
 import { SolutionSection } from "@/components/sections/solution";
 import { SystemSection } from "@/components/sections/system-hub";
 import { VoicesSection } from "@/components/sections/voices";
@@ -30,7 +31,7 @@ export default function Home() {
         <PromiseSection />
         <SolutionSection />
         <SystemSection />
-        {/* ServicesSection goes here once its builder finishes. */}
+        <ServicesSection />
         <CasesSection />
         <Marquee />
         <ProcessSection />

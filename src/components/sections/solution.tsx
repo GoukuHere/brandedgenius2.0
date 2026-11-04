@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "motion/react";
+import { motion, type Variants } from "motion/react";
 import { Container, Heading, PrimaryLink, SecondaryLink, Section } from "@/components/system/primitives";
 import { Reveal } from "@/components/system/reveal";
 import { LINKS, SOLUTION } from "@/content/site";
@@ -28,8 +28,8 @@ const rise: Variants = {
 const RAIL = "pointer-events-none absolute top-[4.5px] left-[5px] h-px";
 
 export function SolutionSection() {
-  const reduce = useReducedMotion();
-  const initial = reduce ? false : "hidden";
+  // Same markup on the server and in the browser; MotionProvider skips the movement for reduced motion.
+  const initial = "hidden";
 
   return (
     <Section id="loesung">

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, Jost } from "next/font/google";
+import { MotionProvider } from "@/components/system/motion-provider";
 import { PageBackground } from "@/components/system/page-background";
 import "./globals.css";
 
@@ -22,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="de" className={`${jost.variable} ${serif.variable}`}>
       <body>
         <PageBackground />
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

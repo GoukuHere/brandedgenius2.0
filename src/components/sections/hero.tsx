@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion, useTransform } from "motion/react";
+import { motion, useTransform } from "motion/react";
 import Image from "next/image";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { PrimaryLink, SecondaryLink } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { HERO, LINKS, MEDIA } from "@/content/site";
@@ -13,10 +13,18 @@ const EASE = [0.16, 1, 0.3, 1] as const;
   The client's own hero film: Roman alone, then two robots materialise beside him. It plays once and stays on the
   last frame, so the reveal is the moment and the hero then rests. The film has a near-black navy background, so
   its edges dissolve into the page background instead of showing a video rectangle.
+
+  Reduced motion is handled without changing the markup (so the server HTML always matches): MotionProvider skips
+  the movement, CSS (motion-reduce:) shows the film's last frame as a still and cancels the scroll drift, and an
+  effect stops playback.
 */
 export function Hero() {
   const section = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
+  const film = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) film.current?.pause();
+  }, []);
 
   // While the hero scrolls away, the film drifts up a little slower than the page and dims.
   const progress = useSectionProgress(section, ["start start", "end start"]);
@@ -24,12 +32,12 @@ export function Hero() {
   const filmOpacity = useTransform(progress, [0, 0.85], [1, 0.3]);
 
   const line = (delay: number) => ({
-    initial: reduce ? false : { y: "105%" },
+    initial: { y: "105%" },
     animate: { y: "0%" },
     transition: { duration: 1.1, delay, ease: EASE },
   });
   const fade = (delay: number) => ({
-    initial: reduce ? false : { opacity: 0, y: 18 },
+    initial: { opacity: 0, y: 18 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.9, delay, ease: EASE },
   });
@@ -37,35 +45,39 @@ export function Hero() {
   return (
     <section ref={section} id="top" className="relative overflow-hidden">
       <motion.div
-        style={reduce ? undefined : { y: filmY, opacity: filmOpacity }}
-        className="hero-film pointer-events-none relative mx-auto mt-24 aspect-[5/4] w-full sm:aspect-video lg:absolute lg:top-[12svh] lg:right-[-7vw] lg:mt-0 lg:w-[64vw] lg:max-w-[1240px]"
+        style={{ y: filmY, opacity: filmOpacity }}
+        className="hero-film pointer-events-none relative mx-auto mt-24 aspect-[5/4] w-full motion-reduce:!transform-none motion-reduce:!opacity-100 sm:aspect-video lg:absolute lg:top-[12svh] lg:right-[-7vw] lg:mt-0 lg:w-[64vw] lg:max-w-[1240px]"
       >
         <motion.div
-          initial={reduce ? false : { opacity: 0, scale: 1.04 }}
+          initial={{ opacity: 0, scale: 1.04 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.6, delay: 0.1, ease: EASE }}
           className="absolute inset-0"
         >
-          {reduce ? (
-            <Image src="/media/hero-final.webp" alt="" fill priority sizes="(min-width: 1024px) 64vw, 100vw" className="object-cover" />
-          ) : (
-            <video
-              className="absolute inset-0 h-full w-full object-cover"
-              src={MEDIA.heroVideo}
-              poster={MEDIA.heroPoster}
-              autoPlay
-              muted
-              playsInline
-              preload="auto"
-              aria-label="Roman Tränkle, Gründer von Branded Genius, mit zwei KI-Robotern"
-            />
-          )}
+          <video
+            ref={film}
+            className="absolute inset-0 h-full w-full object-cover"
+            src={MEDIA.heroVideo}
+            poster={MEDIA.heroPoster}
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            aria-label="Roman Tränkle, Gründer von Branded Genius, mit zwei KI-Robotern"
+          />
+          <Image
+            src="/media/hero-final.webp"
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 64vw, 100vw"
+            className="hidden object-cover motion-reduce:block"
+          />
         </motion.div>
       </motion.div>
 
       <div className="relative mx-auto flex w-full max-w-[1280px] flex-col px-5 pb-20 md:px-8 lg:min-h-[100svh] lg:justify-center lg:pt-28 lg:pb-24">
         <div className="-mt-10 max-w-[600px] sm:-mt-16 lg:mt-0">
-          {/* "KI-Automatisierung," is 7.8em wide; this scale keeps it on one line down to a 360px phone. */}
+          {/* "KI-Automatisierung," is 7.8em wide; the display scale keeps it on one line down to a 360px phone. */}
           <h1 className="t-display">
             <span className="block overflow-hidden pb-[0.06em]">
               <motion.span className="block whitespace-nowrap" {...line(0.25)}>

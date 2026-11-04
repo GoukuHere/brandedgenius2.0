@@ -147,9 +147,9 @@ export function CasesSection() {
                   <motion.div
                     key={active.area}
                     className="col-start-1 row-start-1"
-                    initial={{ opacity: 0, y: reduce ? 0 : 12 }}
-                    animate={{ opacity: 1, y: 0, transition: { duration: reduce ? 0.2 : 0.45, ease: EASE } }}
-                    exit={{ opacity: 0, y: reduce ? 0 : -12, transition: { duration: 0.2, ease: EASE } }}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } }}
+                    exit={{ opacity: 0, y: -12, transition: { duration: 0.2, ease: EASE } }}
                   >
                     <CaseBody item={active} />
                   </motion.div>

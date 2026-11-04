@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "motion/react";
+import { motion, type Variants } from "motion/react";
 import type { ReactNode } from "react";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -8,6 +8,8 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 /**
  * The standard entrance for content: a short rise and fade, once, when it scrolls into view. Use it for headings,
  * paragraphs and blocks. For lists, wrap the list in <RevealGroup> and each item in <RevealItem> for a stagger.
+ * Reduced motion is handled page-wide by MotionProvider (the rise is skipped, the fade stays), so the markup is
+ * the same on the server and in the browser.
  */
 export function Reveal({
   children,
@@ -22,12 +24,11 @@ export function Reveal({
   y?: number;
   as?: "div" | "li" | "p" | "span" | "section";
 }) {
-  const reduce = useReducedMotion();
   const Tag = motion[as];
   return (
     <Tag
       className={className}
-      initial={reduce ? false : { opacity: 0, y }}
+      initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -10% 0px" }}
       transition={{ duration: 0.8, delay, ease: EASE }}
@@ -44,10 +45,9 @@ const item: Variants = {
 };
 
 export function RevealGroup({ children, className, as = "div" }: { children: ReactNode; className?: string; as?: "div" | "ul" | "ol" }) {
-  const reduce = useReducedMotion();
   const Tag = motion[as];
   return (
-    <Tag className={className} variants={group} initial={reduce ? false : "hidden"} whileInView="shown" viewport={{ once: true, margin: "0px 0px -10% 0px" }}>
+    <Tag className={className} variants={group} initial="hidden" whileInView="shown" viewport={{ once: true, margin: "0px 0px -10% 0px" }}>
       {children}
     </Tag>
   );
