@@ -1,159 +1,155 @@
 "use client";
 
 import { Check, X } from "lucide-react";
-import { useMotionValue, useMotionValueEvent, useSpring } from "motion/react";
-import { useEffect, useId, useRef, useSyncExternalStore } from "react";
+import { AnimatePresence, motion, useMotionValueEvent } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { Reveal } from "@/components/system/reveal";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { Compare } from "@/components/ui/compare";
+import { TextMorph } from "@/components/ui/text-morph";
 import { COMPARE } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 /*
-  Vorher / Nachher (v4). One wide panel split by a divider: left of it the classic way (a flat dark surface, grey
-  type, crosses), right of it the Branded Genius way (the section's one lit glass object, white type, sky checks).
-  The five points of both ways share the same rows (the layers share one grid through subgrid), so each point
-  stands level with its counterpart. The divider never cuts through words; only the panel's edges clip a list as
-  it slides in or out.
+  Vorher / Nachher, "Rewritten". The developer found the v4 slider cheap and chose this: the classic way is rewritten,
+  line by line, into the Branded Genius way as the reader scrolls.
 
-  - lg and up: each list takes at most 46% of the panel's inner width. The classic list stays at the left. The
-    Branded Genius list is anchored to the divider (its left edge 40px right of it) and slides in from the panel's
-    right edge. The scroll sweep runs from 100 to 50 and ends with both ways side by side, the divider in the
-    middle. The reader can still drag from 0 to 100: below 50 the Branded Genius way covers the classic one, above
-    50 it slides back out.
-  - below lg: both lists are full width and both are anchored (a push): the classic list's right edge and the
-    Branded Genius list's left edge sit about 24px either side of the divider. The sweep runs from 100 to 0 and
-    ends on the Branded Genius way.
+  One glass panel holds five large lines and the result line, all in the classic way at first (silver, a bare X).
+  As each line passes the reading line (about 60% down the screen) it morphs into its Branded Genius counterpart:
+  the letters the two sentences share glide to their new places and the others fade out and in, in a light
+  left-to-right wave (Text Morph, after Motion Primitives). The text turns white, the X spins away, a sky check
+  lands with one ring pulse, a faint band of sky light passes once across the row, and a sky line draws under it.
+  The result line turns last. Scrolling back rewrites
+  it all back, in reverse order.
 
-  The sweep is scrubbed by the scroll (smoothed by a spring) and reversible, while the panel crosses the middle of
-  the screen. The moment the reader drags, taps or uses the keys, the divider is theirs and stops following the
-  scroll. Reduced motion: no sweep; the divider rests where the sweep ends (50 on lg, 0 below). Both lists are
-  always in the DOM.
+  Above the lines, the two titles sit at either end of a track with "VS" in its middle; the track fills with sky as
+  the lines are rewritten, and the lit title moves from the classic way to the Branded Genius way.
+
+  Every resting state is whole, readable text: no word is ever cut. Screen readers get both full lists in a visually
+  hidden block (the animated lines are hidden from them). Reduced motion: MotionProvider turns the glides and spins
+  into instant swaps; the rewrite itself still follows the scroll.
 */
 
 type Way = typeof COMPARE.classic;
-type Kind = "classic" | "ours";
-type Mode = "rest" | "sweep" | "reader";
 
 const CLASSIC: Way = COMPARE.classic;
 const OURS: Way = COMPARE.ours;
-// The word between the two titles, as on the original ("VS").
-const VS = COMPARE.vs;
-// The five points of a way, then its result line.
-const ROWS = CLASSIC.points.length + 1;
+const PAIRS = CLASSIC.points.map((point, i) => ({ before: point, after: OURS.points[i] }));
+// The five points and the result line.
+const STEPS = PAIRS.length + 1;
 
-/* The sweep runs while the panel moves from its top at 70% of the screen to its bottom at 45%. */
-const OFFSET: Parameters<typeof useSectionProgress>[1] = ["start 0.7", "end 0.45"];
+const EASE = [0.16, 1, 0.3, 1] as const;
 
-/* Where the sweep ends, and where the divider rests for reduced motion: side by side on lg, the Branded Genius way below. */
-const restAt = (wide: boolean) => (wide ? 50 : 0);
-const sweepAt = (progress: number, wide: boolean) => 100 - (100 - restAt(wide)) * Math.min(1, Math.max(0, progress));
+// The rewrite runs while the lines cross the screen: from the list's top at 70% of the viewport to its bottom at 50%.
+const OFFSET = ["start 0.7", "end 0.5"] as const;
 
-/*
-  lg and up, read through useSyncExternalStore so hydration stays exact: the server renders for wide screens, and
-  a narrower screen switches right after hydration (that only changes how the classic list moves).
-*/
-const WIDE = "(min-width: 1024px)";
-function subscribeWide(onChange: () => void) {
-  const query = window.matchMedia(WIDE);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-}
-const isWide = () => window.matchMedia(WIDE).matches;
-const isWideOnServer = () => true;
-
-/*
-  Horizontal padding lives on the content, not on the layers: an anchored list moves by the divider's share of its
-  own (full panel) width. The titles above the panel line up with the lists inside it: the classic title over the
-  classic list, the Branded Genius title over its list where the sweep leaves it on lg (40px right of the middle).
-*/
-const TITLES_X = "px-5 sm:px-6 lg:px-12";
-const CLASSIC_X = "px-5 sm:px-6 lg:px-12";
-const OURS_X = "px-5 sm:px-6 lg:pr-12 lg:pl-10";
-/* On lg each list (points and result) takes at most 46% of the panel's inner width, so the two fit side by side. */
-const COLUMN = "lg:max-w-[46%]";
-const LAYER_Y = "py-2 sm:py-3 lg:py-4";
+const countAt = (p: number) => Math.min(STEPS, Math.max(0, Math.floor(p * STEPS + 0.5)));
 
 export function CompareSection() {
-  const classicId = useId();
-  const oursId = useId();
-  const panelRef = useRef<HTMLDivElement>(null);
-  const mode = useRef<Mode>("rest");
-  const wide = useSyncExternalStore(subscribeWide, isWide, isWideOnServer);
-  // Fully classic on the server and at hydration, where no word is cut on any layout; after mount the sweep (or,
-  // for reduced motion, the rest position) takes over.
-  const position = useMotionValue(100);
+  const listRef = useRef<HTMLDivElement>(null);
+  const progress = useSectionProgress(listRef, [...OFFSET]);
+  // How many lines are rewritten (0 to 6).
+  const [done, setDone] = useState(0);
 
-  const progress = useSectionProgress(panelRef, OFFSET);
-  const smooth = useSpring(progress, { stiffness: 140, damping: 30, mass: 0.5, skipInitialAnimation: true });
-
-  useMotionValueEvent(smooth, "change", (p) => {
-    if (mode.current === "sweep") position.set(sweepAt(p, wide));
+  useMotionValueEvent(progress, "change", (p) => {
+    const next = countAt(p);
+    setDone((current) => (current === next ? current : next));
   });
-
-  // After mount, and again whenever the layout switches at lg: follow the scroll, or rest for reduced motion.
+  // A reload part-way down the page starts at the right line (read once the first frame has measured the scroll).
   useEffect(() => {
-    if (mode.current === "reader") return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    mode.current = reduce ? "rest" : "sweep";
-    position.set(reduce ? restAt(wide) : sweepAt(smooth.get(), wide));
-  }, [wide, position, smooth]);
+    const frame = requestAnimationFrame(() => setDone(countAt(progress.get())));
+    return () => cancelAnimationFrame(frame);
+  }, [progress]);
 
-  // The reader moved the divider: from now on it is theirs.
-  function takeOver() {
-    mode.current = "reader";
-  }
+  // The track between the titles: the left half fills over the first three lines, the right half over the rest.
+  const share = done / STEPS;
+  const finished = done === STEPS;
 
   return (
     // The Versprechen follows straight on (on the original it is the last row of this section), so the bottom
-    // padding is shorter than the shared rhythm.
+    // padding is shorter than the shared rhythm (none at all where the Versprechen pins).
     <Section id="unterschied" className="pb-12 md:pb-16 lg:[@media(min-height:720px)]:pb-0">
       <Container>
-        <Reveal>
-          <Heading
-            title={COMPARE.title}
-            accent={COMPARE.accent}
-            variant="outline"
-            className="max-w-[920px] text-[length:clamp(2.125rem,1.25rem+2.2vw,3.25rem)]"
-          />
+        <Reveal className="max-w-[920px]">
+          <Heading title={COMPARE.title} accent={COMPARE.accent} variant="outline" />
           <p className="t-lead mt-6 max-w-[600px]">{COMPARE.text}</p>
         </Reveal>
 
-        <Reveal className="mt-14 md:mt-20" y={32}>
-          {/* Two halves with "VS" on the centre line, right above where the divider comes to rest on lg. */}
-          <div className={cn("relative grid grid-cols-2 items-center", TITLES_X)}>
-            <h3 id={classicId} className="pr-6 text-[17px] leading-snug text-silver sm:text-[20px]">
-              {CLASSIC.title}
-            </h3>
-            <span aria-hidden className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[13px] leading-none text-silver">
-              {VS}
-            </span>
-            <h3 id={oursId} className="pl-6 text-right text-[17px] leading-snug font-medium text-white sm:text-[20px] lg:pl-10 lg:text-left">
-              <span aria-hidden className="mr-2.5 inline-block size-2 -translate-y-px rounded-full bg-sky align-middle" />
-              {OURS.title}
-            </h3>
-          </div>
+        <Reveal delay={0.1} className="mt-12 md:mt-16">
+          <div className="glass rounded-[32px] px-5 pt-6 pb-8 sm:px-8 md:rounded-[40px] md:px-12 md:pt-9 md:pb-12">
+            {/* The two ways at the ends of a track that fills as the lines are rewritten. */}
+            <div aria-hidden className="flex items-center gap-2.5 sm:gap-5">
+              <span
+                className={cn(
+                  // Phones: the titles may wrap to two lines so the row fits; from sm they stay on one line.
+                  "max-w-[36%] min-w-0 text-[13px] leading-tight text-balance transition-colors duration-500 sm:max-w-none sm:shrink-0 sm:text-[17px]",
+                  finished ? "text-silver" : "text-white"
+                )}
+              >
+                {CLASSIC.title}
+              </span>
+              <span className="relative h-px min-w-4 flex-1 bg-white/12">
+                <motion.span
+                  initial={false}
+                  animate={{ scaleX: Math.min(1, share * 2) }}
+                  transition={{ duration: 0.6, ease: EASE }}
+                  className="absolute inset-0 origin-left bg-sky"
+                />
+              </span>
+              <span className={cn("shrink-0 text-[12px] font-medium transition-colors duration-500", done > 0 ? "text-sky" : "text-silver")}>
+                {COMPARE.vs}
+              </span>
+              <span className="relative h-px min-w-4 flex-1 bg-white/12">
+                <motion.span
+                  initial={false}
+                  animate={{ scaleX: Math.max(0, share * 2 - 1) }}
+                  transition={{ duration: 0.6, ease: EASE }}
+                  className="absolute inset-0 origin-left bg-sky"
+                />
+              </span>
+              <span
+                className={cn(
+                  "max-w-[36%] min-w-0 text-right text-[13px] leading-tight font-medium text-balance transition-colors duration-500 sm:max-w-none sm:shrink-0 sm:text-[17px]",
+                  finished ? "text-white" : "text-silver"
+                )}
+              >
+                {OURS.title}
+              </span>
+            </div>
 
-          <div ref={panelRef} className="mt-5 md:mt-6">
-            <Compare
-              value={position}
-              onValueChange={takeOver}
-              rows={ROWS}
-              anchorAfter
-              anchorBefore={!wide}
-              label="Vergleich der zwei Wege"
-              valueText={(v) => `${CLASSIC.title} ${v} %, ${OURS.title} ${100 - v} %`}
-              className="rounded-[32px] shadow-[0_40px_80px_-40px_rgb(0_0_0/0.85)] lg:min-h-[520px]"
-              beforeClassName={cn("rounded-[32px] bg-[rgb(6_11_20)] shadow-[inset_0_0_0_1px_rgb(255_255_255/0.07)]", LAYER_Y)}
-              afterClassName={cn(
-                // Opaque under the glass sheen, so no classic word ever shows through.
-                "glass glass-lit rounded-[32px] bg-panel bg-[linear-gradient(180deg,rgb(220_236_255/0.075)_0%,rgb(220_236_255/0.02)_42%,rgb(220_236_255/0.012)_100%)]",
-                LAYER_Y
-              )}
-              before={<WayRows way={CLASSIC} kind="classic" labelledBy={classicId} />}
-              after={<WayRows way={OURS} kind="ours" labelledBy={oursId} />}
-            />
+            <div ref={listRef} aria-hidden className="mt-6 md:mt-8">
+              <ol className="border-t border-white/[0.08]">
+                {PAIRS.map((pair, i) => (
+                  <Line key={pair.after} on={done > i} before={pair.before} after={pair.after} />
+                ))}
+              </ol>
+              <div className="grid grid-cols-[36px_minmax(0,1fr)] gap-x-4 pt-7 md:grid-cols-[48px_minmax(0,1fr)] md:gap-x-6 md:pt-9">
+                <span />
+                <TextMorph
+                  className={cn(
+                    "text-[18px] leading-[1.35] font-medium tracking-[-0.012em] transition-colors duration-500 md:text-[22px] lg:text-[24px]",
+                    finished ? "text-white" : "text-silver"
+                  )}
+                >
+                  {finished ? OURS.result : CLASSIC.result}
+                </TextMorph>
+              </div>
+            </div>
+
+            {/* What screen readers get: both ways, complete. */}
+            <div className="sr-only">
+              {[CLASSIC, OURS].map((way) => (
+                <div key={way.title}>
+                  <h3>{way.title}</h3>
+                  <ul>
+                    {way.points.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                  <p>{way.result}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </Reveal>
       </Container>
@@ -161,53 +157,89 @@ export function CompareSection() {
   );
 }
 
-/**
- * One way's five points and its result, as rows of the panel's shared grid. Both ways render the same row
- * structure (padding, type size, hairlines), so each point sits level with its counterpart.
- */
-function WayRows({ way, kind, labelledBy }: { way: Way; kind: Kind; labelledBy: string }) {
-  const ours = kind === "ours";
-  const Icon = ours ? Check : X;
-  const hairline = ours ? "border-white/10" : "border-white/[0.07]";
-  const padX = ours ? OURS_X : CLASSIC_X;
-
+/** One line: the classic statement, or its Branded Genius counterpart once rewritten. */
+function Line({ on, before, after }: { on: boolean; before: string; after: string }) {
   return (
-    <>
-      <ul
-        role="list"
-        aria-labelledby={labelledBy}
-        className={cn("grid grid-cols-[minmax(0,1fr)] grid-rows-subgrid", padX)}
-        style={{ gridRow: `span ${way.points.length}` }}
+    <li className="relative grid grid-cols-[36px_minmax(0,1fr)] items-start gap-x-4 overflow-hidden py-5 md:grid-cols-[48px_minmax(0,1fr)] md:gap-x-6 md:py-6">
+      <Mark on={on} />
+      <TextMorph
+        className={cn(
+          "text-[22px] leading-[1.22] tracking-[-0.02em] transition-colors duration-500 sm:text-[26px] md:text-[32px] lg:text-[36px] xl:text-[40px]",
+          on ? "text-white" : "text-silver"
+        )}
       >
-        {way.points.map((point, i) => (
-          <li key={point} className={cn("flex items-center gap-3.5 py-4 sm:gap-4 sm:py-5", COLUMN, i > 0 && cn("border-t", hairline))}>
-            <Icon aria-hidden strokeWidth={1.5} className={cn("size-[18px] shrink-0", ours ? "text-sky" : "text-silver")} />
-            <span
-              className={cn(
-                "min-w-0 text-[20px] leading-[1.3] tracking-[-0.012em] text-pretty sm:text-[22px] md:text-[24px] xl:text-[26px]",
-                ours ? "text-white" : "text-silver"
-              )}
-            >
-              {point}
-            </span>
-          </li>
-        ))}
-      </ul>
+        {on ? after : before}
+      </TextMorph>
+      {/* One light pass across the row as it is rewritten (decorative; hidden for reduced motion). */}
+      <AnimatePresence>
+        {on && (
+          <motion.span
+            key="scan"
+            aria-hidden
+            // The band is a third of the row wide, so -100% to 300% of its own width crosses the whole row.
+            initial={{ x: "-100%", opacity: 0 }}
+            animate={{ x: "300%", opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 1.1, ease: [0.45, 0, 0.2, 1] }}
+            className="pointer-events-none absolute inset-y-1 left-0 w-1/3 bg-[linear-gradient(90deg,transparent,rgb(105_191_248/0.14),transparent)] motion-reduce:hidden"
+          />
+        )}
+      </AnimatePresence>
+      {/* The row's hairline, and the sky line that draws over it once the row is rewritten. */}
+      <span aria-hidden className="absolute inset-x-0 bottom-0 h-px bg-white/[0.08]" />
+      <motion.span
+        aria-hidden
+        initial={false}
+        animate={{ scaleX: on ? 1 : 0, opacity: on ? 1 : 0 }}
+        transition={{ duration: 0.8, ease: EASE }}
+        className="absolute inset-x-0 bottom-0 h-px origin-left bg-[linear-gradient(90deg,#69bff8,rgb(105_191_248/0.15))] shadow-[0_0_14px_rgb(105_191_248/0.55)]"
+      />
+    </li>
+  );
+}
 
-      <div className={cn("grid grid-cols-[minmax(0,1fr)]", padX)}>
-        <p className={cn("flex items-center border-t pt-5 pb-3 sm:pt-6", COLUMN, hairline)}>
-          <span
-            className={cn(
-              "min-w-0 text-balance",
-              ours
-                ? "text-[18px] leading-[1.4] font-medium tracking-[-0.01em] text-white sm:text-[20px] xl:text-[22px]"
-                : "text-[16px] leading-[1.45] text-silver sm:text-[18px]"
-            )}
+/* The mark before a line: a bare silver X that spins away, a bare sky check that lands with one ring pulse. */
+function Mark({ on }: { on: boolean }) {
+  // The ring pulse below plays once each time the line is rewritten (it mounts with the check).
+  return (
+    <span className="relative mt-[0.2em] grid size-9 place-items-center md:mt-[0.3em] md:size-12">
+      <AnimatePresence initial={false} mode="popLayout">
+        {on ? (
+          <motion.span
+            key="check"
+            initial={{ scale: 0.3, opacity: 0, rotate: -60 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            exit={{ scale: 0.3, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 320, damping: 18, delay: 0.08 }}
+            className="grid place-items-center text-sky"
           >
-            {way.result}
-          </span>
-        </p>
-      </div>
-    </>
+            <Check strokeWidth={2} className="size-6 md:size-7" />
+          </motion.span>
+        ) : (
+          <motion.span
+            key="x"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.3, opacity: 0, rotate: 120, transition: { duration: 0.25 } }}
+            transition={{ duration: 0.3 }}
+            className="grid place-items-center text-silver"
+          >
+            <X strokeWidth={1.5} className="size-6 md:size-7" />
+          </motion.span>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {on && (
+          <motion.span
+            key="pulse"
+            aria-hidden
+            initial={{ scale: 0.6, opacity: 0.8 }}
+            animate={{ scale: 1.9, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.9, ease: EASE }}
+            className="pointer-events-none absolute inset-0 rounded-full border border-sky motion-reduce:hidden"
+          />
+        )}
+      </AnimatePresence>
+    </span>
   );
 }

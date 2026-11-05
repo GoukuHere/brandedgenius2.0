@@ -38,7 +38,7 @@ arc, the CTA and the footer.
   glass only where the spec says so.
 - Components in src/components/ui: MagicCard and BorderBeam (Magic UI); AnimatedBeam (21st.dev/Magic UI);
   TextEffect, TextLoop, Tilt, InView, Accordion, AnimatedBackground, TransitionPanel and MorphingDialog (Motion
-  Primitives); Compare (21st.dev/Aceternity, rewritten in brand by the Compare builder).
+  Primitives); TextMorph (after Motion Primitives, adapted for long sentences; the Vorher/Nachher rewrite).
 - Pinned scroll stages only where the spec says so, only on lg screens at least 720px tall
   (`lg:[@media(min-height:720px)]:...` in CSS). Phones and short screens get a simple stacked version with all
   content visible.
