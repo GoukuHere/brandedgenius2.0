@@ -10,9 +10,10 @@ import { HERO, LINKS, MEDIA } from "@/content/site";
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /*
-  The client's own hero film: Roman alone, then two robots materialise beside him. It plays once and stays on the
-  last frame, so the reveal is the moment and the hero then rests. The film has a near-black navy background, so
-  its edges dissolve into the page background instead of showing a video rectangle.
+  The client's own hero film: Roman alone, then two robots materialise beside him. It loops while the hero is on
+  screen and pauses once it scrolls away, so it never decodes in the background further down the page. The film
+  has a near-black navy background, so its edges dissolve into the page background instead of showing a video
+  rectangle.
 
   Reduced motion is handled without changing the markup (so the server HTML always matches): MotionProvider skips
   the movement, CSS (motion-reduce:) shows the film's last frame as a still and cancels the scroll drift, and an
@@ -23,7 +24,18 @@ export function Hero() {
   const film = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) film.current?.pause();
+    const video = film.current;
+    if (!video) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      video.pause();
+      return;
+    }
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) video.play().catch(() => {});
+      else video.pause();
+    });
+    io.observe(video);
+    return () => io.disconnect();
   }, []);
 
   // While the hero scrolls away, the film drifts up a little slower than the page and dims.
@@ -60,6 +72,7 @@ export function Hero() {
             src={MEDIA.heroVideo}
             poster={MEDIA.heroPoster}
             autoPlay
+            loop
             muted
             playsInline
             preload="auto"
