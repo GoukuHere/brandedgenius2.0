@@ -196,12 +196,11 @@ export function CasesSection() {
       <Container>
         <Reveal y={12} className="xl:grid xl:grid-cols-[minmax(0,1fr)_400px] xl:items-end xl:gap-x-16">
           <div id={HEADING_ID}>
-            {/* The outlined continuation gets its own line; 36px on phones keeps its 1.25px stroke legible. */}
+            {/* The continuation (the white-to-sky phrase) gets its own line. */}
             <Heading
-              variant="outline"
               title={CASES.title}
               accent={CASES.accent}
-              className="max-w-[760px] text-[2.25rem] md:text-[2.75rem] xl:text-[3rem] [&>.outline-text]:block"
+              className="max-w-[760px] text-[2.25rem] md:text-[2.75rem] xl:text-[3rem] [&>.accent]:block"
             />
           </div>
           <p className="t-lead mt-6 max-w-[580px] xl:mt-0">{CASES.text}</p>

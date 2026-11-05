@@ -179,7 +179,7 @@ export function SystemSection() {
     <Section id="system">
       <Container>
         <Reveal>
-          <Heading title={SYSTEM.title} accent={SYSTEM.accent} variant="outline" className="max-w-[880px]" />
+          <Heading title={SYSTEM.title} accent={SYSTEM.accent} className="max-w-[880px]" />
           <p className="t-lead mt-6 max-w-[620px]">{SYSTEM.text}</p>
           <PrimaryLink href={LINKS.analysis} className="mt-9">
             {SYSTEM.cta}

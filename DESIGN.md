@@ -11,10 +11,15 @@ The v5 rules (tokens in globals.css):
   (PageBackground). A flat black without them was tried first; the developer asked for the background back
   (2026-11-06), so never drop these layers. Then "more darker, not that much blue shade": the light is a hint
   (0.12 at the top right, 0.04 to 0.05 elsewhere), never a navy wash.
-- Text: off-white #f1f1ee (`--color-white` and `--color-ink`, so every `text-white` follows). Secondary text and
-  the quiet half of headlines in the client's grey #969595 (`.tone`; the v4 `.outline-text` now renders the same).
-- Sky #69BFF8 only in small doses: dots, lines, progress, active states, small icons. Never a tinted area, a large
-  heading or a glow behind a section. Royal lives in the logo, the hero film and the main button's edge light.
+- Text: off-white #f1f1ee (`--color-white` and `--color-ink`, so every `text-white` follows). Secondary text in the
+  client's grey #969595.
+- Headlines: white and blue on EVERY heading, as in the hero: the title off-white, its continuation (`accent`, the
+  copy's own second phrase) in the white-to-sky gradient `.accent`, weight 400. The developer chose this over the
+  reference's white and grey (2026-11-06). `Heading` always renders it; a heading needs an `accent` in site.ts (the
+  same words split in two, never new words). Warum's word-by-word line takes one colour per word from the same
+  gradient (a gradient clipped to moving words can vanish in Chrome).
+- Sky #69BFF8 otherwise only in small doses: dots, lines, progress, active states, small icons. Never a tinted
+  area or a glow behind a section. Royal lives in the logo, the hero film and the main button's edge light.
 - Buttons: main = cream `bg-cream` (#ecebe6) with near-black text and a royal edge light (PrimaryLink); second =
   dark matte with a hairline and a sky light (SecondaryLink). The header uses the second style; the cream button
   leads in the content. Icon buttons fill cream on hover. 12px corners (`rounded-button`).

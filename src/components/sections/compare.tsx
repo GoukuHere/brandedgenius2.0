@@ -78,7 +78,7 @@ export function CompareSection() {
     <Section id="unterschied" className="pb-12 md:pb-16 lg:[@media(min-height:720px)]:pb-12">
       <Container>
         <Reveal className="max-w-[920px]">
-          <Heading title={COMPARE.title} accent={COMPARE.accent} variant="outline" />
+          <Heading title={COMPARE.title} accent={COMPARE.accent} />
           <p className="t-lead mt-6 max-w-[600px]">{COMPARE.text}</p>
         </Reveal>
 

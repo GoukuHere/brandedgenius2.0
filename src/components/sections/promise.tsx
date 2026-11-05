@@ -63,7 +63,6 @@ export function PromiseSection() {
               <Heading
                 title={TITLE}
                 accent={PROMISE.accent}
-                variant="outline"
                 className="max-w-[880px] text-[length:clamp(2.125rem,1.25rem+2.2vw,3.25rem)]"
               />
             </Reveal>

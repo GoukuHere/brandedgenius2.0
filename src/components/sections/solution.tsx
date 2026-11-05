@@ -148,7 +148,6 @@ export function SolutionSection() {
             <Heading
               title={SOLUTION.title}
               accent={SOLUTION.accent}
-              variant="outline"
               className="max-w-[600px] text-[36px] sm:text-[44px] lg:text-[48px] xl:text-[50px]"
             />
             <p className="t-lead mt-6 max-w-[520px]">{SOLUTION.text}</p>

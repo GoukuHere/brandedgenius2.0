@@ -104,7 +104,7 @@ export function ProblemSection() {
       <Container>
         <div className="lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-10">
           <Reveal className="lg:col-span-7">
-            <Heading title={PROBLEM.title} accent={PROBLEM.accent} variant="outline" />
+            <Heading title={PROBLEM.title} accent={PROBLEM.accent} />
           </Reveal>
           <Reveal className="mt-6 lg:col-span-5 lg:mt-0" delay={0.08}>
             <p className="t-lead">{PROBLEM.text}</p>

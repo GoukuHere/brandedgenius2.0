@@ -35,7 +35,7 @@ export function Footer() {
       <Container>
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <Heading title={FOOTER.title} accent={FOOTER.accent} variant="tone" />
+            <Heading title={FOOTER.title} accent={FOOTER.accent} />
             <p className="t-lead mt-4 max-w-[440px]">{FOOTER.text}</p>
           </div>
           <a

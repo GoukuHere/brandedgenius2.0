@@ -385,7 +385,8 @@ export const IMPACT = {
     { title: "Höhere Skalierbarkeit", text: "Automatisierte Workflows wachsen ohne zusätzliche Personalkosten flexibel mit Ihrem Geschäftsvolumen." },
   ],
   goal: {
-    title: "KI, die echten Business Impact schafft.",
+    title: "KI, die echten",
+    accent: "Business Impact schafft.",
     text: "Strategie, Automatisierung und messbare Wirkung für nachhaltiges und profitables Wachstum.",
     cta: "Lassen Sie uns Ihren Business Impact identifizieren.",
     ctaText: "Gemeinsam finden wir heraus, wo KI in Ihrem Unternehmen den größten Unterschied macht.",

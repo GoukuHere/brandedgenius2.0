@@ -36,6 +36,37 @@ import { WHY } from "@/content/site";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+/*
+  The headline's second line follows the page's white-and-blue headings (the `.accent` gradient: #f1f1ee, #dcecff at
+  38%, #69bff8). Its words slide in one by one, and a gradient clipped to moving words can drop them in Chrome, so
+  each word takes a solid colour from the gradient at its centre instead (the same sweep, word by word).
+*/
+const ACCENT_STOPS: [number, [number, number, number]][] = [
+  [0, [241, 241, 238]],
+  [0.38, [220, 236, 255]],
+  [1, [105, 191, 248]],
+];
+
+function accentColourAt(t: number) {
+  const at = Math.min(1, Math.max(0, t));
+  for (let i = 1; i < ACCENT_STOPS.length; i++) {
+    const [p1, c1] = ACCENT_STOPS[i];
+    const [p0, c0] = ACCENT_STOPS[i - 1];
+    if (at <= p1) {
+      const k = (at - p0) / (p1 - p0);
+      return `rgb(${c0.map((v, j) => Math.round(v + (c1[j] - v) * k)).join(" ")})`;
+    }
+  }
+  return "rgb(105 191 248)";
+}
+
+function accentWordStyle(segment: string, index: number, segments: string[]) {
+  if (!segment.trim()) return undefined;
+  const total = segments.join("").length;
+  const before = segments.slice(0, index).join("").length;
+  return { color: accentColourAt((before + segment.length / 2) / total) };
+}
+
 // Where the stage pins: desktops at least 720px tall, and portrait phones and tablets at least 560px tall.
 const PIN =
   "(prefers-reduced-motion: no-preference) and (width >= 64rem) and (height >= 45rem), " +
@@ -246,7 +277,8 @@ export function WhySection() {
                     delay={0.25}
                     variants={{ item: WORD }}
                     segmentTransition={{ duration: 0.8, ease: EASE }}
-                    className="outline-text block pb-[0.06em]"
+                    segmentStyle={accentWordStyle}
+                    className="block pb-[0.06em] font-normal"
                   >
                     {WHY.accent}
                   </TextEffect>

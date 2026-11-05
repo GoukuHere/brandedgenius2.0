@@ -33,6 +33,11 @@ export type TextEffectProps = {
   onAnimationComplete?: () => void;
   onAnimationStart?: () => void;
   segmentWrapperClassName?: string;
+  /**
+   * Branded Genius fork: a style for each segment (its text, its index and all segments, spaces included), e.g. a
+   * colour per word along a gradient. One gradient clipped to moving words can drop them while they move.
+   */
+  segmentStyle?: (segment: string, index: number, segments: string[]) => React.CSSProperties | undefined;
   containerTransition?: Transition;
   segmentTransition?: Transition;
   style?: React.CSSProperties;
@@ -116,10 +121,11 @@ const AnimationComponent: React.FC<{
   variants: Variants;
   per: 'line' | 'word' | 'char';
   segmentWrapperClassName?: string;
-}> = React.memo(({ segment, variants, per, segmentWrapperClassName }) => {
+  style?: React.CSSProperties;
+}> = React.memo(({ segment, variants, per, segmentWrapperClassName, style }) => {
   const content =
     per === 'line' ? (
-      <motion.span variants={variants} className='block'>
+      <motion.span variants={variants} className='block' style={style}>
         {segment}
       </motion.span>
     ) : per === 'word' ? (
@@ -127,11 +133,12 @@ const AnimationComponent: React.FC<{
         aria-hidden='true'
         variants={variants}
         className='inline-block whitespace-pre'
+        style={style}
       >
         {segment}
       </motion.span>
     ) : (
-      <motion.span className='inline-block whitespace-pre'>
+      <motion.span className='inline-block whitespace-pre' style={style}>
         {segment.split('').map((char, charIndex) => (
           <motion.span
             key={`char-${charIndex}`}
@@ -221,6 +228,7 @@ export function TextEffect({
   onAnimationComplete,
   onAnimationStart,
   segmentWrapperClassName,
+  segmentStyle,
   containerTransition,
   segmentTransition,
   style,
@@ -289,6 +297,7 @@ export function TextEffect({
               variants={computedVariants.item}
               per={per}
               segmentWrapperClassName={segmentWrapperClassName}
+              style={segmentStyle?.(segment, index, segments)}
             />
           ))}
         </MotionTag>

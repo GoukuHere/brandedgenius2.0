@@ -30,7 +30,7 @@ export function CtaSection() {
 
             <div className="grid gap-12 lg:grid-cols-12 lg:gap-x-8">
               <div className="lg:col-span-7">
-                <Heading title={CTA.title} accent={CTA.accent} variant="gradient" className="max-w-[640px]" />
+                <Heading title={CTA.title} accent={CTA.accent} className="max-w-[640px]" />
                 <p className="t-lead mt-6 max-w-[560px]">{CTA.text}</p>
                 <ul role="list" className="mt-8 flex flex-col gap-3">
                   {CTA.checks.map((check) => (

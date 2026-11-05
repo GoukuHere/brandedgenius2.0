@@ -73,7 +73,7 @@ export function ImpactSection({ id = "impact" }: { id?: string }) {
         </ul>
 
         <div className="mt-20">
-          <Heading as="h3" size="h2" title={IMPACT.goal.title} className="max-w-[760px]" />
+          <Heading as="h3" size="h2" title={IMPACT.goal.title} accent={IMPACT.goal.accent} className="max-w-[760px]" />
           <p className="t-lead mt-5 max-w-[620px]">{IMPACT.goal.text}</p>
 
           {/* As on the original: the sentence itself, with its arrow, opens the booking. */}

@@ -128,7 +128,7 @@ export function RealitySection() {
       <Container>
         <InView variants={RISE} transition={{ duration: 0.8, ease: EASE }} viewOptions={VIEW}>
           <div className="lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-10">
-            <Heading title={REALITY.title} accent={REALITY.accent} variant="outline" className="lg:col-span-7" />
+            <Heading title={REALITY.title} accent={REALITY.accent} className="lg:col-span-7" />
             <p className="t-lead mt-6 max-w-[520px] lg:col-span-4 lg:col-start-9 lg:mt-0">{REALITY.text}</p>
           </div>
         </InView>

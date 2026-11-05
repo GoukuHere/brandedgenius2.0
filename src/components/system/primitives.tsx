@@ -31,9 +31,9 @@ function keepCompounds(text: string): ReactNode {
 }
 
 /**
- * A headline in the brand face. v3 default: the whole sentence in solid white (`variant="solid"`). `variant="tone"`
- * dims the continuation (only where the copy has a natural second clause); `variant="gradient"` (or the older
- * `serif` prop) sets the continuation in the client's white-to-sky gradient, reserved for the hero and the CTA.
+ * A headline in the brand face: the title in off-white and its continuation (`accent`, the copy's own second
+ * phrase) in the client's white-to-sky gradient, a step lighter, exactly as in the hero. Every heading on the page
+ * works this way since 2026-11-06 (the developer chose white and blue over the reference's white and grey).
  */
 export function Heading({
   title,
@@ -42,8 +42,6 @@ export function Heading({
   size = "h2",
   className,
   accentFirst = false,
-  serif = false,
-  variant,
 }: {
   title: string;
   accent?: string;
@@ -52,16 +50,9 @@ export function Heading({
   className?: string;
   /** Put the accent phrase before the title (when the copy reads that way). */
   accentFirst?: boolean;
-  /** Older name for variant="gradient". */
-  serif?: boolean;
-  /** "outline" (v4) set the continuation as an outline; since v5 it renders in the same quiet grey as "tone". */
-  variant?: "solid" | "tone" | "gradient" | "outline";
 }) {
   const cls = size === "display" ? "t-display" : size === "h3" ? "t-h3" : "t-h2";
-  const mode = variant ?? (serif ? "gradient" : "solid");
-  const accentEl = accent ? (
-    <span className={mode === "gradient" ? "accent" : mode === "tone" ? "tone" : mode === "outline" ? "outline-text" : undefined}>{keepCompounds(accent)}</span>
-  ) : null;
+  const accentEl = accent ? <span className="accent">{keepCompounds(accent)}</span> : null;
   return (
     <Tag className={cn(cls, className)}>
       {accentFirst && accentEl ? (

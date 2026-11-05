@@ -127,20 +127,11 @@
   }
 
   /*
-    One typeface, upright only (no italics anywhere). Headlines are two-tone, as in the v5 reference: the title in
-    off-white and the quiet half in the client's grey (.tone). The hero and the closing contact section instead set
-    their continuation in the client's white-to-sky gradient (.accent), same face, a step lighter.
+    One typeface, upright only (no italics anywhere). Every headline is white and blue, as in the hero: the title in
+    off-white and its continuation in the client's white-to-sky gradient (.accent), same face, a step lighter. The
+    developer chose this over the v5 reference's white and grey (2026-11-06); v4's outlined continuation and v3's
+    dimmed one (.outline-text, .tone) are gone.
   */
-  .tone {
-    color: var(--color-silver);
-  }
-  /*
-    v4 set a heading's continuation as an outline. v5 retires the outline: the class stays (seven headings and two
-    sections use it) and now sets the same quiet grey as .tone.
-  */
-  .outline-text {
-    color: var(--color-silver);
-  }
   /* Large outlined numbers, in the client's grey since v5 (sky stays for small accents). */
   .ghost-num {
     font-weight: 300;
