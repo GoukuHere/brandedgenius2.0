@@ -226,7 +226,7 @@ function Hub() {
   return (
     <div className="relative z-10 pl-10 lg:col-start-2 lg:row-start-1 lg:self-center lg:pl-0">
       <PhoneNode dot={52.5} first />
-      <div data-hub className="glass glass-lit rounded-[28px] p-6 lg:px-7 lg:py-10 lg:text-center">
+      <div data-hub className="glass glass-lit rounded-panel p-6 lg:px-7 lg:py-10 lg:text-center">
         <BorderBeam colorFrom={SKY} colorTo={ROYAL} duration={12} size={160} />
         {/* eslint-disable-next-line @next/next/no-img-element -- a small static vector mark; next/image adds nothing */}
         <img src="/brand/mark.svg" alt="" width={89} height={56} className="block h-14 w-auto lg:mx-auto" />
@@ -281,7 +281,7 @@ function GroupCard({
     >
       <PhoneNode dot={27.5} last={i === COUNT - 1} />
       <motion.div style={{ x, opacity: dock }} className="lg:motion-safe:will-change-transform">
-        <div className="glass rounded-[20px] px-5 py-4">
+        <div className="glass rounded-panel px-5 py-4">
           {/* The sky edge while this group is on the active route. */}
           <span
             aria-hidden
@@ -298,7 +298,7 @@ function GroupCard({
               onFocus={() => onPin(i)}
               onBlur={() => onRelease(i)}
               onClick={() => onPin(i)}
-              className="hidden cursor-pointer text-left after:absolute after:inset-0 after:rounded-[20px] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-sky lg:inline"
+              className="hidden cursor-pointer text-left after:absolute after:inset-0 after:rounded-panel focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-sky lg:inline"
             >
               {group.title}
             </button>

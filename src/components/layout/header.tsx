@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { useEffect, useState } from "react";
-import { PrimaryLink } from "@/components/system/primitives";
+import { PrimaryLink, SecondaryLink } from "@/components/system/primitives";
 import { HEADER, LINKS, NAV } from "@/content/site";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "./brand-logo";
@@ -16,6 +16,8 @@ const EASE = [0.16, 1, 0.3, 1] as const;
   and "KI-Potenzialanalyse anfragen" in the phone menu; all three open the client's hosted contact form.
   Buttons have slightly curved corners (2026-11-06), so the bar's 20px corner is concentric with the button inside
   it: the button's 12px plus its 8px inset. A pill bar around a 12px button would pinch the gap at the corner.
+  v5: as in the developer's reference, the header's button is the dark second style, so the cream main button
+  leads in the content; the phone menu keeps the cream one.
 */
 export function Header() {
   const { scrollY } = useScroll();
@@ -47,7 +49,7 @@ export function Header() {
         transition={{ duration: 0.8, delay: 0.15, ease: EASE }}
         className={cn(
           "mx-auto flex max-w-[1280px] items-center justify-between gap-6 rounded-[20px] border pr-2 pl-5 transition-[height,background-color,border-color] duration-500 md:pl-6",
-          scrolled || open ? "glass glass-blur h-[60px] border-transparent" : "h-16 border-white/[0.06] bg-[#06101f]/40 md:h-[68px]"
+          scrolled || open ? "glass glass-blur h-[60px] border-transparent" : "h-16 border-white/[0.06] bg-page/40 md:h-[68px]"
         )}
       >
         <a href="#top" aria-label="Branded Genius, zum Seitenanfang" className="block h-8 shrink-0 md:h-9">
@@ -70,12 +72,12 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <PrimaryLink href={LINKS.contact} className="hidden h-11 px-5 text-[14px] sm:inline-flex md:h-12 md:px-6 md:text-[15px]">
+          <SecondaryLink href={LINKS.contact} className="hidden h-11 px-5 text-[14px] sm:inline-flex md:h-12 md:px-6 md:text-[15px]">
             {HEADER.cta}
-          </PrimaryLink>
-          <PrimaryLink href={LINKS.contact} className="h-11 px-4 text-[14px] sm:hidden">
+          </SecondaryLink>
+          <SecondaryLink href={LINKS.contact} className="h-11 px-4 text-[14px] sm:hidden">
             {HEADER.mobileCta}
-          </PrimaryLink>
+          </SecondaryLink>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -99,7 +101,7 @@ export function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
-            className="glass absolute inset-x-3 top-[80px] rounded-[20px] bg-[#06101f]/95 p-6 md:inset-x-6 lg:hidden"
+            className="glass absolute inset-x-3 top-[80px] rounded-[20px] bg-[#161616] p-6 md:inset-x-6 lg:hidden"
           >
             <ul className="space-y-1">
               {NAV.map((item) => (

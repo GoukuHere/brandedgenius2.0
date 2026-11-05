@@ -47,7 +47,7 @@ export function ImpactSection({ id = "impact" }: { id?: string }) {
           {/* The one glass surface. On desktop it stretches to the left column's height and pins the result to its foot. */}
           <article
             aria-label={IMPACT.live.label}
-            className="glass glass-lit flex flex-col justify-between gap-12 rounded-[32px] p-8 md:p-10 lg:col-span-7 lg:gap-16"
+            className="glass glass-lit flex flex-col justify-between gap-12 rounded-panel p-8 md:p-10 lg:col-span-7 lg:gap-16"
           >
             <div>
               <h3 className="t-h3">{IMPACT.live.title}</h3>
@@ -89,7 +89,7 @@ export function ImpactSection({ id = "impact" }: { id?: string }) {
               </span>
               <span
                 aria-hidden
-                className="grid size-12 shrink-0 place-items-center rounded-button border border-white/20 transition-[background-color,border-color,color] duration-200 ease-out group-hover:border-sky group-hover:bg-sky group-hover:text-page group-focus-visible:border-sky group-focus-visible:bg-sky group-focus-visible:text-page"
+                className="grid size-12 shrink-0 place-items-center rounded-button border border-white/20 transition-[background-color,border-color,color] duration-200 ease-out group-hover:border-cream group-hover:bg-cream group-hover:text-page group-focus-visible:border-cream group-focus-visible:bg-cream group-focus-visible:text-page"
               >
                 <ArrowUpRight
                   strokeWidth={1.5}

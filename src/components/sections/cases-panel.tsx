@@ -59,7 +59,7 @@ export const CasePanel = memo(function CasePanel({ item, index, x, slot, reduced
         aria-label={`${index + 1} von ${COUNT}: ${item.name}`}
         onFocus={(event) => onFocusPanel(index, event)}
         style={{ opacity, scale }}
-        className="w-full rounded-[28px] motion-reduce:transform-none! motion-reduce:opacity-100! lg:rounded-[36px]"
+        className="w-full rounded-panel motion-reduce:transform-none! motion-reduce:opacity-100! lg:rounded-panel"
       >
         <MagicCard className="glass h-full rounded-[inherit]" gradientSize={320} gradientOpacity={0}>
           {/* Stacked, the rows pack to the top (a shorter case leaves its spare height at the foot); side by side, the one row fills the panel. */}

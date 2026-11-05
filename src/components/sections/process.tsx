@@ -206,7 +206,7 @@ const ProcessStep = memo(function ProcessStep({
         )}
       >
         <h3 className="flex items-baseline gap-4 lg:row-start-2">
-          <span className={cn("num shrink-0 text-[36px] leading-none lg:text-[40px]", FADE, active ? "text-sky" : "text-sky/70")}>
+          <span className={cn("num shrink-0 text-[36px] leading-none lg:text-[40px]", FADE, active ? "text-sky" : "text-silver")}>
             {String(index + 1).padStart(2, "0")}
           </span>
           <span className={cn("t-h3 min-w-0 break-words lg:text-[28px]", FADE, active ? "text-white" : "text-white/60")}>{step.title}</span>

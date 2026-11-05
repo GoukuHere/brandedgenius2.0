@@ -79,7 +79,7 @@ export function PromiseSection() {
               className="mt-12 grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:gap-4 md:mt-16 lg:grid-cols-4 lg:[@media(min-height:720px)]:sr-only"
             >
               {FIGURES.map((figure) => (
-                <motion.li key={figure.value} variants={item} className="glass @container rounded-[24px] p-5 sm:p-6">
+                <motion.li key={figure.value} variants={item} className="glass @container rounded-panel p-5 sm:p-6">
                   {/* One line always: at most 40px, smaller in a narrow card ("3–6 Monate" is about 5em wide). */}
                   <p className="num text-[length:min(40px,18cqi)] leading-none whitespace-nowrap text-white">{figure.value}</p>
                   <p className="t-small mt-3 text-pretty">{figure.label}</p>

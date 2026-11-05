@@ -100,7 +100,7 @@ export function WorkshopSection() {
         <Reveal className="grid gap-y-10 lg:grid-cols-12 lg:gap-x-8">
           <div className="lg:col-span-6">
             <Heading title={WORKSHOP.title} accent={WORKSHOP.accent} />
-            <p className="mt-4 text-[20px] leading-[1.4] font-medium tracking-[-0.01em] text-sky">{WORKSHOP.tagline}</p>
+            <p className="mt-4 text-[20px] leading-[1.4] font-medium tracking-[-0.01em] text-silver">{WORKSHOP.tagline}</p>
             <p className="t-lead mt-4 max-w-[560px]">{WORKSHOP.text}</p>
           </div>
 
@@ -148,7 +148,7 @@ export function WorkshopSection() {
                       onKeyDown={(event) => onKey(event, i)}
                       onPointerEnter={(event) => hoverOpen(i, event.pointerType)}
                       onPointerLeave={cancelHover}
-                      className="flex w-full cursor-pointer items-baseline text-left after:absolute after:inset-0 after:rounded-[24px] focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-sky"
+                      className="flex w-full cursor-pointer items-baseline text-left after:absolute after:inset-0 after:rounded-panel focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-sky"
                     >
                       <span aria-hidden className="num w-8 shrink-0 text-silver">
                         {pad(i + 1)}

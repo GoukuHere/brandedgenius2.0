@@ -328,7 +328,7 @@ function ArcCard({
           <MorphingDialogTrigger
             triggerRef={triggerRef}
             className="frame group block aspect-[9/16] w-full bg-deep shadow-[0_40px_80px_-30px_rgb(0_0_0/0.9)] select-none focus-visible:outline-offset-[-4px]"
-            style={{ borderRadius: 24 }}
+            style={{ borderRadius: 16 }}
           >
             <Image src={voice.img} alt="" fill sizes={SIZES} draggable={false} className="object-cover object-top" />
             {/* Dims the portrait on the sides; a shade, not opacity, so the cards behind never show through. */}
@@ -347,7 +347,7 @@ function ArcCard({
           <MorphingDialogContainer>
             <MorphingDialogContent
               className="relative aspect-[9/16] h-[min(85vh,calc(100svh_-_9rem),160vw)] overflow-visible"
-              style={{ borderRadius: 24 }}
+              style={{ borderRadius: 16 }}
             >
               <Player voice={voice} returnTo={triggerRef} />
             </MorphingDialogContent>
@@ -362,7 +362,7 @@ function ArcCard({
           tabIndex={-1}
           onClick={onSelect}
           aria-label={`Kundenstimme von ${voice.name} anzeigen`}
-          className="absolute inset-0 z-10 cursor-pointer rounded-[24px]"
+          className="absolute inset-0 z-10 cursor-pointer rounded-panel"
         />
       )}
     </motion.div>
@@ -424,7 +424,7 @@ function Player({ voice, returnTo }: { voice: Voice; returnTo: RefObject<HTMLBut
       >
         <X aria-hidden strokeWidth={1.5} className="size-5" />
       </MorphingDialogClose>
-      <div className="absolute inset-0 overflow-hidden rounded-[24px] bg-deep">
+      <div className="absolute inset-0 overflow-hidden rounded-panel bg-deep">
         <Image src={voice.img} alt="" fill sizes={SIZES} draggable={false} className="object-cover object-top" />
         {ready && (
           <iframe

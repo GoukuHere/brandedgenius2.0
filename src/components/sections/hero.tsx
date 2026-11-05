@@ -105,7 +105,7 @@ export function Hero() {
             </span>
           </h1>
           {/* As on the original: the label follows the headline and introduces the paragraph (not an eyebrow above the h1). */}
-          <motion.p className="mt-7 text-[15px] font-medium text-sky" {...fade(0.55)}>
+          <motion.p className="mt-7 text-[15px] font-medium text-silver" {...fade(0.55)}>
             {HERO.label}
           </motion.p>
           <motion.p className="t-lead mt-3 max-w-[520px]" {...fade(0.6)}>

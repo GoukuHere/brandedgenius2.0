@@ -30,7 +30,7 @@ export function MagicCard({
   gradientSize = 260,
   gradientFrom = "#69bff8",
   gradientTo = "#004ba0",
-  gradientColor = "rgb(105 191 248 / 0.10)",
+  gradientColor = "rgb(241 241 238 / 0.05)",
   gradientOpacity = 1,
 }: MagicCardProps) {
   const mouseX = useMotionValue(-gradientSize)

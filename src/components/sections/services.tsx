@@ -125,7 +125,7 @@ function Plate({
         <motion.div
           style={{ scale, opacity: dim }}
           className={cn(
-            "glass origin-top rounded-[28px] bg-[#090f1c]! p-5 sm:p-7 md:rounded-[36px] lg:p-10 motion-reduce:!transform-none lg:[@media(min-height:720px)]:will-change-transform",
+            "glass origin-top rounded-panel bg-[#191919]! p-5 sm:p-7 lg:p-10 motion-reduce:!transform-none lg:[@media(min-height:720px)]:will-change-transform",
             front && "glass-lit"
           )}
         >

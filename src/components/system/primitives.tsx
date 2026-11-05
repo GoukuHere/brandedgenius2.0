@@ -54,7 +54,7 @@ export function Heading({
   accentFirst?: boolean;
   /** Older name for variant="gradient". */
   serif?: boolean;
-  /** "outline" (v4) sets the continuation as an outline; display sizes only. */
+  /** "outline" (v4) set the continuation as an outline; since v5 it renders in the same quiet grey as "tone". */
   variant?: "solid" | "tone" | "gradient" | "outline";
 }) {
   const cls = size === "display" ? "t-display" : size === "h3" ? "t-h3" : "t-h2";
@@ -84,8 +84,10 @@ const external = (href?: string) => (href?.startsWith("http") ? { target: "_blan
 
 /*
   The two buttons are React Bits' SpecularButton (components/ui/specular-button.tsx): a thin edge light follows the
-  pointer when it comes near. Primary keeps the brand's royal-blue gradient with an ice-white light; secondary is
-  clear glass with a sky light. Both keep the lifting arrow.
+  pointer when it comes near. Both keep the lifting arrow.
+  v5 (2026-11-06), after the developer's reference: the main button is cream (#ecebe6) with near-black text and a
+  royal edge light; the second is dark and matte with a hairline and a sky light. As in the reference, the header
+  uses the second style, so the cream button leads in the content.
   Corners are slightly curved, never a pill (the developer's reference, 2026-11-06). BUTTON_RADIUS is the same 12px
   as `--radius-button` in globals.css: the edge light is drawn along the same curve, so the shader needs the number.
 */
@@ -93,7 +95,7 @@ export const BUTTON_RADIUS = 12;
 
 const ARROW = "size-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5";
 
-/** The brand's blue gradient button, as on brandedgenius.de, with a specular edge light. Primary action only. */
+/** The cream main button with a royal edge light. Primary action only. */
 export function PrimaryLink({ children, className, size = "md", href, ...props }: LinkProps) {
   return (
     <SpecularButton
@@ -102,16 +104,13 @@ export function PrimaryLink({ children, className, size = "md", href, ...props }
       {...props}
       size={size}
       radius={BUTTON_RADIUS}
-      tint="#1a6fe0"
-      tintOpacity={0}
-      lineColor="#dcecff"
-      baseColor="#5f9ee8"
-      textColor="#ffffff"
-      idleIntensity={0.45}
-      className={cn(
-        "group bg-[linear-gradient(180deg,#2a86ea_0%,#0f5fc4_55%,#004ba0_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_14px_34px_-14px_rgb(26_111_224/0.85)] hover:brightness-110",
-        className
-      )}
+      tint="#ecebe6"
+      tintOpacity={1}
+      lineColor="#004ba0"
+      baseColor="#c4c3bd"
+      textColor="#141414"
+      idleIntensity={0.4}
+      className={cn("group shadow-[0_12px_28px_-14px_rgb(0_0_0/0.9)] hover:bg-[#f7f7f4]", className)}
     >
       {children}
       <ArrowUpRight className={ARROW} />
@@ -119,7 +118,7 @@ export function PrimaryLink({ children, className, size = "md", href, ...props }
   );
 }
 
-/** The quiet second action: clear glass with a sky edge light. */
+/** The quiet second action: dark matte with a hairline and a sky edge light. */
 export function SecondaryLink({ children, className, size = "md", href, ...props }: LinkProps) {
   return (
     <SpecularButton
@@ -128,13 +127,13 @@ export function SecondaryLink({ children, className, size = "md", href, ...props
       {...props}
       size={size}
       radius={BUTTON_RADIUS}
-      tint="#dcecff"
-      tintOpacity={0.04}
+      tint="#ffffff"
+      tintOpacity={0.045}
       lineColor="#69bff8"
-      baseColor="#3a4c66"
-      textColor="#ffffff"
-      idleIntensity={0.32}
-      className={cn("group hover:bg-white/[0.07]", className)}
+      baseColor="#555555"
+      textColor="#f1f1ee"
+      idleIntensity={0.3}
+      className={cn("group hover:bg-white/[0.08]", className)}
     >
       {children}
       <ArrowUpRight className={ARROW} />
@@ -149,7 +148,7 @@ export function TextLink({ children, className, href, ...props }: LinkProps) {
       href={href}
       {...external(href)}
       {...props}
-      className={cn("group inline-flex cursor-pointer items-center gap-1.5 text-[15px] font-medium text-sky transition-colors duration-200 hover:text-white", className)}
+      className={cn("group inline-flex cursor-pointer items-center gap-1.5 text-[15px] font-medium text-white transition-colors duration-200 hover:text-sky", className)}
     >
       {children}
       <ArrowUpRight className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

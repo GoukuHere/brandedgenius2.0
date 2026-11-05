@@ -42,10 +42,10 @@ function turnAt(progress: number) {
   return 0;
 }
 
-/* A 1px sky grid, pure CSS, fading out towards the card's middle. */
+/* A 1px off-white grid (v5: neutral, the blue stays in the small accents), pure CSS, fading out towards the card's middle. */
 const GRID: CSSProperties = {
   backgroundImage:
-    "linear-gradient(to right, rgb(105 191 248 / 0.18) 1px, transparent 1px), linear-gradient(to bottom, rgb(105 191 248 / 0.18) 1px, transparent 1px)",
+    "linear-gradient(to right, rgb(241 241 238 / 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgb(241 241 238 / 0.07) 1px, transparent 1px)",
   backgroundSize: "28px 28px",
   backgroundPosition: "center top",
   maskImage: "linear-gradient(to bottom, transparent 0%, #000 62%)",
@@ -92,7 +92,7 @@ export function PromiseCard({ progress, step }: { progress: MotionValue<number>;
     <div className="[perspective:1200px]">
       <motion.div style={{ rotateX, rotateY, transformStyle: "preserve-3d" }} className="will-change-transform motion-reduce:transform-none!">
         <Tilt rotationFactor={8} springOptions={TILT_SPRING} className="motion-reduce:transform-none!">
-          <div className="glass glass-lit relative aspect-[380/480] w-[clamp(300px,24vw,380px)] overflow-hidden rounded-[32px]">
+          <div className="glass glass-lit relative aspect-[380/480] w-[clamp(300px,24vw,380px)] overflow-hidden rounded-panel">
             <motion.div
               className="absolute inset-x-0 bottom-0 h-1/2"
               style={GRID}

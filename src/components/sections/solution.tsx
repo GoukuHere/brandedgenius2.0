@@ -174,7 +174,7 @@ export function SolutionSection() {
             <div className="@container mt-4">
               <ol role="list" className="grid gap-3 @min-[400px]:grid-cols-2">
                 {SOLUTION.cards.map((card, i) => (
-                  <li key={card.title} className="glass rounded-[20px] p-5">
+                  <li key={card.title} className="glass rounded-panel p-5">
                     <p className="text-[16px] leading-snug font-medium text-white">
                       <span aria-hidden className="mr-2 text-[13px] font-normal text-sky">
                         {pad(i)}

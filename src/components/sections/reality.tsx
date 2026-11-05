@@ -173,7 +173,7 @@ export function RealitySection() {
                     <span
                       className={cn(
                         "num w-6 shrink-0 text-[14px] transition-colors duration-300",
-                        on ? "text-sky" : "text-sky/50"
+                        on ? "text-sky" : "text-silver"
                       )}
                     >
                       {numberOf(index)}
@@ -207,9 +207,9 @@ export function RealitySection() {
             <Tilt
               rotationFactor={4}
               springOptions={{ stiffness: 220, damping: 24, mass: 0.6 }}
-              className="rounded-[28px] motion-reduce:!transform-none"
+              className="rounded-panel motion-reduce:!transform-none"
             >
-              <div className="frame aspect-[16/10] w-full rounded-[28px] bg-deep shadow-[0_40px_80px_-40px_rgb(0_0_0/0.9)]">
+              <div className="frame aspect-[16/10] w-full rounded-panel bg-deep shadow-[0_40px_80px_-40px_rgb(0_0_0/0.9)]">
                 {ITEMS.map((item, index) => (
                   <PanelPhoto key={item.img} item={item} index={index} layer={layerOf(index)} duration={reveal} />
                 ))}

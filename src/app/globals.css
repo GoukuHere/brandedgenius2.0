@@ -3,22 +3,31 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Branded Genius v3 design tokens. Colours come only from the client's brand guide (Royal #004BA0, Sky #69BFF8,
-  grey #969595) plus the near-black navy they sit on and white. The whole page shares ONE background (see
-  PageBackground), so no section sets its own background colour.
+  Branded Genius v5 design tokens (2026-11-06, "black"): after the developer's reference (the 21st.dev Stipple Orb
+  Landing, lagoon theme, dark mode), neutrals do the work and the brand blue is a small accent.
+  - One flat black page (#111), matte panels a step lighter, white hairlines at 8%.
+  - Warm off-white text (--color-white and --color-ink are both #f1f1ee, so every `text-white` follows), and the
+    client's own grey #969595 for secondary text and the quiet half of headlines.
+  - Sky #69BFF8 only in small doses (dots, lines, progress, active states); royal in the logo, the hero film and the
+    main button's edge light. The main button is cream (#ecebe6) with near-black text.
+  Still ONE background for the whole page (see PageBackground); no section sets its own.
 */
 @theme {
-  --color-page: #040a13;
-  --color-deep: #081224;
-  --color-panel: #0b1a31;
-  --color-panel-hi: #10223f;
+  --color-page: #111111;
+  --color-deep: #161616;
+  --color-panel: #1a1a1a;
+  --color-panel-hi: #222222;
+  --color-cream: #ecebe6;
+  --color-white: #f1f1ee;
   --color-royal: #004ba0;
   --color-royal-bright: #1a6fe0;
   --color-sky: #69bff8;
   --color-ice: #dcecff;
   --color-silver: #969595;
-  --color-ink: #eaf1fa;
+  --color-ink: #f1f1ee;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Panels, cards and photos: 16px, one step up from the 12px buttons they hold. */
+  --radius-panel: 16px;
   /* Every button and icon button: slightly curved, never a pill (the developer's reference, 2026-11-06: a 50px
      button with 12px corners). `rounded-button` in markup; BUTTON_RADIUS in primitives.tsx for SpecularButton. */
   --radius-button: 12px;
@@ -80,7 +89,7 @@
     line-height: 1.04;
     letter-spacing: -0.03em;
     font-weight: 500;
-    color: #fff;
+    color: var(--color-ink);
     text-wrap: balance;
   }
   .t-h2 {
@@ -88,7 +97,7 @@
     line-height: 1.08;
     letter-spacing: -0.025em;
     font-weight: 500;
-    color: #fff;
+    color: var(--color-ink);
     text-wrap: balance;
   }
   .t-h3 {
@@ -96,18 +105,18 @@
     line-height: 1.2;
     letter-spacing: -0.015em;
     font-weight: 500;
-    color: #fff;
+    color: var(--color-ink);
   }
   .t-lead {
     font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);
     line-height: 1.6;
-    color: rgb(234 241 250 / 0.72);
+    color: rgb(241 241 238 / 0.74);
     text-wrap: pretty;
   }
   .t-body {
     font-size: 1.0625rem;
     line-height: 1.65;
-    color: rgb(234 241 250 / 0.7);
+    color: rgb(241 241 238 / 0.72);
     text-wrap: pretty;
   }
   .t-small {
@@ -117,29 +126,28 @@
   }
 
   /*
-    One typeface, upright only (no italics anywhere). Headlines are two-tone: the title in white, the continuation
-    dimmed (.tone). The hero and the closing contact section instead set their continuation in the client's
-    white-to-sky gradient (.accent), same face, a step lighter.
+    One typeface, upright only (no italics anywhere). Headlines are two-tone, as in the v5 reference: the title in
+    off-white and the quiet half in the client's grey (.tone). The hero and the closing contact section instead set
+    their continuation in the client's white-to-sky gradient (.accent), same face, a step lighter.
   */
   .tone {
-    color: rgb(234 241 250 / 0.42);
+    color: var(--color-silver);
   }
   /*
-    v4 devices (inspired by the reference the developer chose): a short continuation phrase in a heading set as
-    an outline instead of a fill (contrast without italics or a second colour), and large outlined numbers.
-    Only on display sizes (40px and up), where a 1.25px stroke stays clearly legible.
+    v4 set a heading's continuation as an outline. v5 retires the outline: the class stays (seven headings and two
+    sections use it) and now sets the same quiet grey as .tone.
   */
   .outline-text {
-    color: transparent;
-    -webkit-text-stroke: 1.25px rgb(234 241 250 / 0.78);
+    color: var(--color-silver);
   }
+  /* Large outlined numbers, in the client's grey since v5 (sky stays for small accents). */
   .ghost-num {
     font-weight: 300;
     font-variant-numeric: tabular-nums;
     line-height: 0.9;
     letter-spacing: -0.04em;
     color: transparent;
-    -webkit-text-stroke: 1px rgb(105 191 248 / 0.5);
+    -webkit-text-stroke: 1px rgb(150 149 149 / 0.55);
   }
   .accent {
     font-weight: 400;
@@ -151,7 +159,7 @@
     margin-block: -0.06em -0.18em;
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
-    background: linear-gradient(100deg, #ffffff 0%, #dcecff 38%, #69bff8 100%);
+    background: linear-gradient(100deg, #f1f1ee 0%, #dcecff 38%, #69bff8 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -165,22 +173,17 @@
   }
 
   /*
-    v3 glass, one material for the whole page (budget: fewer than 20 glass surfaces). Lit from above only: a
-    neutral rim that is brightest along the top edge, a faint ice-blue fill, grey grain and black shadows. It reads
-    as glass through its edge and depth; never put glass inside glass. Backdrop blur (.glass-blur) only on the
-    header and the one case panel. `.glass-lit` marks the single featured object on screen (a sky-tinted top edge).
+    The panel material. Since v5 it is matte, as in the reference: a faint white fill over the black (about #191919
+    on the page, a step lighter when nested, so a chip inside a panel still reads), a 1px white hairline at 8% and a
+    soft black shadow. No rim light, no grain, no tint. The class keeps its v3 name so every panel follows.
+    `.glass-lit` marks the one featured panel (a slightly brighter hairline); `.glass-blur` is the header only.
   */
   .glass {
     position: relative;
     isolation: isolate;
-    border-radius: 28px;
-    background:
-      linear-gradient(180deg, rgb(220 236 255 / 0.05) 0%, rgb(220 236 255 / 0.012) 45%, rgb(220 236 255 / 0.01) 100%),
-      rgb(8 14 28 / 0.55);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.07),
-      0 1px 0 rgb(0 0 0 / 0.5),
-      0 30px 60px -30px rgb(0 0 0 / 0.9);
+    border-radius: var(--radius-panel);
+    background-color: rgb(255 255 255 / 0.035);
+    box-shadow: 0 24px 48px -28px rgb(0 0 0 / 0.85);
   }
   .glass::before {
     content: "";
@@ -188,37 +191,24 @@
     inset: 0;
     z-index: -1;
     border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.18) 0%, rgb(255 255 255 / 0.07) 18%, rgb(255 255 255 / 0.03) 55%, rgb(255 255 255 / 0.05) 100%);
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-  .glass::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.035;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
     pointer-events: none;
   }
   .glass-lit::before {
-    background: linear-gradient(180deg, rgb(105 191 248 / 0.55) 0%, rgb(105 191 248 / 0.16) 16%, rgb(255 255 255 / 0.04) 55%, rgb(255 255 255 / 0.06) 100%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.1),
+      inset 0 0 0 1px rgb(255 255 255 / 0.11);
   }
   .glass-blur {
-    -webkit-backdrop-filter: blur(18px) saturate(140%);
-    backdrop-filter: blur(18px) saturate(140%);
+    background-color: rgb(17 17 17 / 0.8);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    backdrop-filter: blur(16px) saturate(120%);
   }
-  /* Photo frame: no glass on photos, just a hairline frame and the shared radius. */
+  /* Photo frame: a hairline frame and the shared panel radius. */
   .frame {
     position: relative;
     overflow: hidden;
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
   }
   /* The hairline sits above the photo; an inset shadow on the frame itself would be painted under it. */
   .frame::after {
@@ -240,12 +230,13 @@
   }
 
   /*
-    The hero film's edges dissolve into the page background. Phones: fade the bottom. Desktop: fade the left edge
-    (towards the headline) and the top and bottom, intersected so the corners fade too.
+    The hero film's edges dissolve into the page background. The film's own backdrop is a dark navy, so on the v5
+    black every edge that meets the page fades. Phones: the top and the bottom. Desktop: the left edge (towards
+    the headline) and the top and bottom, intersected so the corners fade too.
   */
   .hero-film {
-    -webkit-mask-image: linear-gradient(180deg, black 62%, transparent 100%);
-    mask-image: linear-gradient(180deg, black 62%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 16%, black 62%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0%, black 16%, black 62%, transparent 100%);
   }
   @media (min-width: 1024px) {
     .hero-film {
@@ -260,10 +251,18 @@
     }
   }
 
-  /* Hairline divider in the brand's light blue. */
+  /* Hairline divider that fades at both ends. */
   .hairline {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgb(105 191 248 / 0.28), transparent);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.1), transparent);
+  }
+
+  /*
+    v5: a full-width hairline between page sections, as in the reference. Not under the hero (the reference has none
+    there either, and the hero's last row sits close to its foot): the first line is above the third block.
+  */
+  main > * + * + * {
+    border-top: 1px solid rgb(255 255 255 / 0.07);
   }
 }
 

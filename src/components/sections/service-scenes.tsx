@@ -33,11 +33,11 @@ const VIEW = { x: 10, y: 24, w: 1280, h: 488 };
 /** CSS aspect ratio of a drawing, for placeholders that must take the same space. */
 export const SCENE_ASPECT = `${VIEW.w} / ${VIEW.h}`;
 
-// Brand colours only: white, Sky, and the page navys for fills that sit on the panel.
-const WHITE = "#ffffff";
+// Brand colours only: off-white, Sky, and the v5 blacks for fills that sit on the plate.
+const WHITE = "#f1f1ee";
 const SKY = "#69bff8";
-const NODE = "#081224"; // --color-deep: fill behind nodes, so lines pass under them
-const ON_SKY = "#050a14"; // --color-page: marks drawn on a sky fill
+const NODE = "#191919"; // the plate's own matte fill, so lines pass under the nodes
+const ON_SKY = "#111111"; // --color-page: marks drawn on a sky fill
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const prog = (t: number, a: number, b: number) => clamp((t - a) / (b - a));

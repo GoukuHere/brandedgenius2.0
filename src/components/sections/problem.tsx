@@ -159,7 +159,7 @@ function ProblemCard({ k, item, p }: { k: number; item: Problem; p: MotionValue<
       <div className="h-full *:h-full lg:*:transform-none! lg:*:opacity-100!">
         <InView variants={PHONE_IN} transition={PHONE_IN_TRANSITION} viewOptions={{ once: true, margin: "0px 0px -12% 0px" }}>
           <motion.div style={{ x, rotate, opacity }} className="h-full lg:motion-safe:will-change-transform">
-            <MagicCard className="glass h-full rounded-[24px] p-6" gradientSize={240} gradientFrom={SKY} gradientTo={ROYAL} gradientOpacity={0.7}>
+            <MagicCard className="glass h-full rounded-panel p-6" gradientSize={240} gradientFrom={SKY} gradientTo={ROYAL} gradientOpacity={0.7}>
               <span aria-hidden className="ghost-num block text-[56px]">
                 {String(k + 1).padStart(2, "0")}
               </span>

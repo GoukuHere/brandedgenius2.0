@@ -1,4 +1,30 @@
-# v4 (2026-11-06): READ THIS FIRST. It overrides the v3 brief below for the nine sections being redone.
+# v5 (2026-11-06): "black". READ THIS FIRST. It overrides the colour and material rules below.
+
+The developer showed the 21st.dev Stipple Orb Landing in its lagoon theme, dark mode
+(https://21stdev-my-components-one.vercel.app/#stipple-orb-landing/lagoon), as "super premium" for how it pairs one
+brand colour with black, approved a plan and said go. Measured there: a flat #111 page, off-white #f1f1ee text, warm
+greys for the quiet half of headlines, matte #1d1d1c cards with white 8% hairlines, full-width hairlines between
+sections, a cream #ecebe6 main button with dark text, and the teal accent on about 1% of the screen.
+
+The v5 rules (tokens in globals.css):
+- ONE flat black background, `--color-page` #111 (PageBackground has no glow or lines now). It replaces the client's
+  arventas.de navy; if the client wants navy back, add one faint royal glow to PageBackground (noted there).
+- Text: off-white #f1f1ee (`--color-white` and `--color-ink`, so every `text-white` follows). Secondary text and
+  the quiet half of headlines in the client's grey #969595 (`.tone`; the v4 `.outline-text` now renders the same).
+- Sky #69BFF8 only in small doses: dots, lines, progress, active states, small icons. Never a tinted area, a large
+  heading or a glow behind a section. Royal lives in the logo, the hero film and the main button's edge light.
+- Buttons: main = cream `bg-cream` (#ecebe6) with near-black text and a royal edge light (PrimaryLink); second =
+  dark matte with a hairline and a sky light (SecondaryLink). The header uses the second style; the cream button
+  leads in the content. Icon buttons fill cream on hover. 12px corners (`rounded-button`).
+- Panels: `.glass` is now matte (white 3.5% fill, white 8% hairline, soft black shadow; no rim light, grain or
+  tint), 16px corners (`rounded-panel`, also photos via `.frame`). Opaque stacks use #191919. A chip inside a panel
+  is a step lighter (white 4.5%) with its own hairline. Only the header blurs.
+- Full-width hairlines (white 7%) between the page's sections (`main > * + *`) and above the footer.
+- One texture: FooterStipple, a still field of sky dots at the foot of the page, drawn once on a canvas, never
+  animated, faint behind the footer text. No orbs anywhere (the developer's rule).
+- Left out on purpose: the reference's orb, its dashboard widgets with invented numbers, its uppercase mono labels.
+
+# v4 (2026-11-06): It overrides the v3 brief below for the nine sections being redone.
 
 ## Why v4
 The developer marked nine v3 sections as "cheap": Problem, Die Realität, Vorher/Nachher, Versprechen, Lösung,

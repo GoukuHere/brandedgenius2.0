@@ -75,7 +75,7 @@ export function CompareSection() {
   });
 
   return (
-    <Section id="unterschied" className="pb-12 md:pb-16 lg:[@media(min-height:720px)]:pb-0">
+    <Section id="unterschied" className="pb-12 md:pb-16 lg:[@media(min-height:720px)]:pb-12">
       <Container>
         <Reveal className="max-w-[920px]">
           <Heading title={COMPARE.title} accent={COMPARE.accent} variant="outline" />
@@ -83,7 +83,7 @@ export function CompareSection() {
         </Reveal>
 
         <Reveal delay={0.1} className="mt-12 md:mt-16">
-          <div ref={panelRef} className="glass relative grid overflow-hidden rounded-[32px] md:rounded-[40px] lg:grid-cols-2">
+          <div ref={panelRef} className="glass relative grid overflow-hidden rounded-panel lg:grid-cols-2">
             {/* Left: the classic way, a pile that never settles. */}
             <div className="relative px-6 pt-8 pb-9 sm:px-10 md:pt-10 md:pb-11">
               <h3 className="flex items-center gap-2.5 text-[16px] font-medium text-silver">
@@ -115,7 +115,7 @@ export function CompareSection() {
             {/* Right: the Branded Genius way, the same pile pulled into order. */}
             <div
               ref={oursRef}
-              className="relative bg-[linear-gradient(180deg,rgb(105_191_248/0.07),transparent_45%)] px-6 pt-10 pb-9 sm:px-10 md:pb-11 lg:pt-10"
+              className="relative px-6 pt-10 pb-9 sm:px-10 md:pb-11 lg:pt-10"
             >
               <h3 className="flex items-center gap-2.5 text-[16px] font-medium text-white">
                 <Check aria-hidden strokeWidth={2} className="size-4 text-sky" />
@@ -145,8 +145,9 @@ export function CompareSection() {
 }
 
 /*
-  One chip. Classic: a dim glass chip held in the pile (offset and tilted), drifting slightly while the panel is on
+  One chip. Classic: a dim matte chip held in the pile (offset and tilted), drifting slightly while the panel is on
   screen, its ring open. Ours: the same pile position at first, pulled straight as `order` goes to 1, its dot filling.
+  The chip is a step lighter than the panel with its own hairline (v5 matte; no panel inside a panel).
 */
 function Chip({
   index,
@@ -184,7 +185,7 @@ function Chip({
           animate={drift ? { rotate: [0, 1.4, -0.8, 0], x: [0, 5, -3, 0] } : { rotate: 0, x: 0 }}
           transition={drift ? { duration: DRIFT[index], repeat: Infinity, ease: "easeInOut" } : { duration: 0.6 }}
           className={cn(
-            "glass inline-flex max-w-full items-center gap-3 rounded-[14px] px-4 py-3 text-[15px] leading-snug motion-reduce:!transform-none",
+            "inline-flex max-w-full items-center gap-3 rounded-[10px] bg-white/[0.045] px-4 py-3 text-[15px] leading-snug shadow-[inset_0_0_0_1px_rgb(241_241_238/0.08)] motion-reduce:!transform-none",
             ours ? "text-white" : "text-silver opacity-90"
           )}
         >
