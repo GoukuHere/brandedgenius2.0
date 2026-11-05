@@ -30,6 +30,12 @@ The v5 rules (tokens in globals.css):
 - One texture: FooterStipple, a still field of sky dots at the foot of the page, drawn once on a canvas, never
   animated, faint behind the footer text. No orbs anywhere (the developer's rule).
 - Left out on purpose: the reference's orb, its dashboard widgets with invented numbers, its uppercase mono labels.
+- Fallstudien (2026-11-06, the developer found v4's pinned sideways panels "not good at all"): after the reference's
+  success stories, matte case cards in a native snap scroller, two side by side from 1280px (one with the next
+  peeking below), the six areas above as navigation (cards in view marked) and arrows (beside the areas from lg,
+  under the cards below). Each card leads with its three results, then headline, text, quote, what was built, and
+  the tools and area at its foot (no label above the headline). No pin, no scroll hijack.
+- Header: the six links show from 1280px; below that, the menu button (at 1024px the links wrapped to two lines).
 
 # v4 (2026-11-06): It overrides the v3 brief below for the nine sections being redone.
 

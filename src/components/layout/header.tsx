@@ -56,7 +56,7 @@ export function Header() {
           <BrandLogo className="h-full" />
         </a>
 
-        <nav aria-label="Hauptnavigation" className="hidden lg:block">
+        <nav aria-label="Hauptnavigation" className="hidden xl:block">
           <ul className="flex items-center gap-0.5">
             {NAV.map((item) => (
               <li key={item.href}>
@@ -84,7 +84,7 @@ export function Header() {
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Menü schließen" : "Menü öffnen"}
-            className="relative grid size-11 cursor-pointer place-items-center rounded-button border border-white/12 transition-colors duration-200 hover:bg-white/[0.06] lg:hidden"
+            className="relative grid size-11 cursor-pointer place-items-center rounded-button border border-white/12 transition-colors duration-200 hover:bg-white/[0.06] xl:hidden"
           >
             <span className={cn("absolute h-px w-[18px] bg-white transition-transform duration-300", open ? "rotate-45" : "-translate-y-[4px]")} />
             <span className={cn("absolute h-px w-[18px] bg-white transition-transform duration-300", open ? "-rotate-45" : "translate-y-[4px]")} />
@@ -101,7 +101,7 @@ export function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
-            className="glass absolute inset-x-3 top-[80px] rounded-[20px] bg-[#161616] p-6 md:inset-x-6 lg:hidden"
+            className="glass absolute inset-x-3 top-[80px] rounded-[20px] bg-[#161616] p-6 md:inset-x-6 xl:hidden"
           >
             <ul className="space-y-1">
               {NAV.map((item) => (
