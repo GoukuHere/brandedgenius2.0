@@ -121,6 +121,23 @@
   .tone {
     color: rgb(234 241 250 / 0.42);
   }
+  /*
+    v4 devices (inspired by the reference the developer chose): a short continuation phrase in a heading set as
+    an outline instead of a fill (contrast without italics or a second colour), and large outlined numbers.
+    Only on display sizes (40px and up), where a 1.25px stroke stays clearly legible.
+  */
+  .outline-text {
+    color: transparent;
+    -webkit-text-stroke: 1.25px rgb(234 241 250 / 0.78);
+  }
+  .ghost-num {
+    font-weight: 300;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(105 191 248 / 0.5);
+  }
   .accent {
     font-weight: 400;
     /*

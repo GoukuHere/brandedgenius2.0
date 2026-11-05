@@ -98,6 +98,7 @@ export const COMPARE = {
   title: "Der Unterschied zwischen",
   accent: "KI testen und KI wirklich umsetzen.",
   text: "Zwei Wege. Zwei Ergebnisse. Entscheiden Sie, wohin Ihr Unternehmen geht.",
+  vs: "VS",
   classic: {
     title: "Der klassische Weg",
     points: [

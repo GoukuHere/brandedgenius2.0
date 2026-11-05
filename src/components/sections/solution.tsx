@@ -2,63 +2,139 @@
 
 import { motion, useTransform } from "motion/react";
 import Image from "next/image";
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { Container, Heading, PrimaryLink, SecondaryLink, Section } from "@/components/system/primitives";
 import { Reveal } from "@/components/system/reveal";
 import { useSectionProgress } from "@/components/system/use-section-progress";
+import { Tilt } from "@/components/ui/tilt";
 import { LINKS, SOLUTION } from "@/content/site";
 
 /*
-  Lösung, as on the original: a split. The left column holds the photo of Roman at the desk and, below it (never on
-  it), the two short cards as text blocks. The right column holds the heading, the text, the three pillars as
-  full-width editorial rows and the two actions. No glass.
+  Lösung (v4). A split: on the left the photo of Roman at his desk, large, turning gently towards the pointer
+  (Motion Primitives Tilt), with the two short cards as small glass plates directly under it (never on it); on the
+  right the heading with its continuation set in outline, the text and both actions. Below, across the full width,
+  the three pillars as one row of three wide columns, each numbered by a huge outlined figure that stands behind
+  its word, with hairlines between the columns.
 
-  The pillars are the section's one movement, tied to the scroll and reversible: as a row reaches 60% of the viewport
-  height its hairline draws from left to right and its word rises from 35% to full opacity. Reduced motion shows every
-  row complete (CSS only, so the server markup never changes).
+  The pillars are the section's one movement, tied to the scroll and reversible: as a column crosses the screen its
+  outlined number draws itself (SVG stroke-dashoffset), its word slides up 20px into place and the hairline before
+  it grows. The columns start one after another, left to right. Reduced motion shows every column complete and
+  stops the tilt (CSS only, so the server markup never changes); touch screens get no tilt either.
 
-  Phones read in document order: heading and text, the photo and its cards, then the pillars and the actions. On lg
-  the photo column sits on the left across both rows and stays in view while the pillars scroll (only when the
-  viewport is tall enough to hold it).
+  Reading order: heading, text and actions first, then the photo and the plates, then the pillars. On phones the
+  photo and the plates are shown above the heading (CSS order; they hold nothing focusable).
 */
 
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 
 // A no-break space before each dot keeps the dot on its item's line when the list wraps.
 const NBSP = String.fromCharCode(0xa0);
-const joined = (items: readonly string[]) => items.join(`${NBSP}· `);
 
-function PillarRow({ index, title, items }: { index: number; title: string; items: readonly string[] }) {
-  const row = useRef<HTMLLIElement>(null);
-  // 0 as the row's top edge enters the lower screen, 1 when it reaches 60% of the viewport height.
-  const progress = useSectionProgress(row, ["start 0.95", "start 0.6"]);
-  const wordOpacity = useTransform(progress, [0, 1], [0.35, 1]);
+/** Items joined with dots for the eye; screen readers hear a comma between them instead of the dot. */
+function Joined({ items }: { items: readonly string[] }) {
+  return items.map((item, i) => (
+    <Fragment key={item}>
+      {i > 0 && (
+        <>
+          <span className="sr-only">,</span>
+          <span aria-hidden>{`${NBSP}·`}</span>{" "}
+        </>
+      )}
+      {item}
+    </Fragment>
+  ));
+}
+
+/*
+  The pillar numbers are SVG text, so their stroke can be drawn. The figure is set at a font size of 100 in a
+  102 x 72 box (baseline at 0) that CSS scales to the number size, so 1em of CSS font size on the svg equals the
+  figure's font size. The text is nudged 3 units left to line the figure's left edge up with the word in front.
+*/
+const NUM_BOX = "0 -70 102 72";
+
+// Longest outline of each digit 0-9 in General Sans Light at a font size of 100, measured from the font file. The
+// dash has to be at least that long, or the stroke would stay open at the end.
+const DIGIT_OUTLINE = [189, 172, 306, 343, 205, 355, 210, 233, 217, 210];
+const dashFor = (num: string) => Math.ceil(Math.max(...num.split("").map((d) => DIGIT_OUTLINE[Number(d)] ?? 360)) * 1.06);
+
+// Each column draws while its top edge travels from 92% to 56% of the viewport height. Every next column starts
+// 8% later, so on md and up, where the three share a top edge, they follow each other from left to right.
+const STAGGER = 0.08;
+
+function Pillar({ index, title, items }: { index: number; title: string; items: readonly string[] }) {
+  const ref = useRef<HTMLLIElement>(null);
+  const shift = index * STAGGER;
+  const progress = useSectionProgress(ref, [
+    [0, 0.92 - shift],
+    [0, 0.56 - shift],
+  ]);
+
+  const num = pad(index);
+  const dash = dashFor(num);
+  const dashOffset = useTransform(progress, [0, 0.8], [dash, 0]);
+  const wordY = useTransform(progress, [0.3, 1], [20, 0]);
+  const wordOpacity = useTransform(progress, [0.3, 0.75], [0, 1]);
+  const grow = useTransform(progress, [0, 0.6], [0, 1]);
 
   return (
-    <li ref={row} className="relative pt-7 pb-9 md:pt-8 md:pb-10">
-      <motion.div
-        aria-hidden
-        style={{ scaleX: progress }}
-        className="rule absolute inset-x-0 top-0 origin-left motion-reduce:!transform-none"
-      />
-      {/*
-        Phones and the narrower lg column: the number and the word on one baseline, the items under the word.
-        Wider single-column layouts (sm to lg) and xl: a ledger, with the items beside the word on the same baseline.
-      */}
-      <div className="grid grid-cols-[2.75rem_minmax(0,1fr)] items-baseline gap-x-4 sm:grid-cols-[2.75rem_13rem_minmax(0,1fr)] sm:gap-x-5 lg:grid-cols-[2.75rem_minmax(0,1fr)] lg:gap-x-4 xl:grid-cols-[2.75rem_13rem_minmax(0,1fr)] xl:gap-x-5">
-        <span aria-hidden className="text-[13px] font-medium text-silver tabular-nums">
-          {pad(index)}
-        </span>
+    <li ref={ref} className="relative py-10 first:pt-0 last:pb-0 md:py-0">
+      {index > 0 && (
+        <>
+          {/* Phones: a hairline above the column. md and up: a vertical hairline centred in the gap before it. */}
+          <motion.span
+            aria-hidden
+            style={{ scaleX: grow }}
+            className="rule absolute inset-x-0 top-0 origin-left md:hidden motion-reduce:!transform-none"
+          />
+          <motion.span
+            aria-hidden
+            style={{ scaleY: grow }}
+            className="absolute inset-y-0 hidden w-px origin-top bg-white/10 md:-left-4 md:block lg:-left-8 xl:-left-12 motion-reduce:!transform-none"
+          />
+        </>
+      )}
+
+      {/* The number and the word share one cell: the outlined figure behind, the word in front on its baseline. */}
+      <div className="grid">
+        <svg
+          aria-hidden
+          viewBox={NUM_BOX}
+          overflow="visible"
+          className="col-start-1 row-start-1 h-[0.72em] w-[1.02em] text-[96px] md:text-[112px] lg:text-[140px]"
+        >
+          <motion.text
+            x={-3}
+            y={0}
+            fontSize={100}
+            fontWeight={300}
+            letterSpacing={-4}
+            fill="none"
+            strokeWidth={0.9}
+            strokeDasharray={dash}
+            style={{ strokeDashoffset: dashOffset }}
+            className="stroke-sky/55 motion-reduce:[stroke-dasharray:none]"
+          >
+            {num}
+          </motion.text>
+        </svg>
         <motion.h3
-          style={{ opacity: wordOpacity }}
-          className="text-[44px] leading-[1.05] font-medium tracking-[-0.03em] text-white motion-reduce:!opacity-100"
+          style={{ y: wordY, opacity: wordOpacity }}
+          className="col-start-1 row-start-1 self-end text-[36px] leading-none font-medium tracking-[-0.025em] text-white md:text-[40px] motion-reduce:!transform-none motion-reduce:!opacity-100"
         >
           {title}
         </motion.h3>
-        <p className="col-start-2 mt-3 text-[17px] leading-relaxed text-silver sm:col-start-3 sm:mt-0 lg:col-start-2 lg:mt-3 xl:col-start-3 xl:mt-0">
-          {joined(items)}
-        </p>
       </div>
+
+      <ul role="list" className="mt-6 flex flex-col gap-2.5 md:mt-7">
+        {items.map((item) => (
+          <li key={item} className="flex items-start gap-3 text-[16px] leading-6 text-silver">
+            <span aria-hidden className="flex h-6 shrink-0 items-center">
+              <span className="size-[5px] rounded-full bg-sky" />
+            </span>
+            <span className="min-w-0">{item}</span>
+          </li>
+        ))}
+      </ul>
     </li>
   );
 }
@@ -67,56 +143,59 @@ export function SolutionSection() {
   return (
     <Section id="loesung">
       <Container>
-        <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-[auto_1fr] lg:gap-x-16 xl:gap-x-24">
+        <div className="grid gap-y-12 lg:grid-cols-2 lg:items-center lg:gap-x-16 xl:gap-x-20">
           <Reveal className="lg:col-start-2 lg:row-start-1">
-            <Heading title={SOLUTION.title} accent={SOLUTION.accent} className="max-w-[640px]" />
-            <p className="t-lead mt-6 max-w-[560px]">{SOLUTION.text}</p>
-          </Reveal>
-
-          <div className="mt-12 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:self-start lg:[@media(min-height:760px)]:sticky lg:[@media(min-height:760px)]:top-28">
-            <Reveal>
-              <div className="frame">
-                <Image
-                  src={SOLUTION.img}
-                  alt={SOLUTION.imgAlt}
-                  width={1600}
-                  height={1196}
-                  sizes="(min-width:1024px) 520px, 100vw"
-                  className="block h-auto w-full"
-                />
-              </div>
-
-              <ol role="list" className="mt-8 grid grid-cols-2 gap-x-6 sm:gap-x-8">
-                {SOLUTION.cards.map((card, i) => (
-                  <li key={card.title}>
-                    <div aria-hidden className="rule" />
-                    <h3 className="mt-5 text-[17px] leading-snug font-medium text-white">
-                      <span aria-hidden className="mr-2.5 text-[13px] text-silver tabular-nums">
-                        {pad(i)}
-                      </span>
-                      {card.title}
-                    </h3>
-                    <p className="mt-2 text-[15px] leading-relaxed text-silver">{joined(card.items)}</p>
-                  </li>
-                ))}
-              </ol>
-            </Reveal>
-          </div>
-
-          <div className="mt-14 lg:col-start-2 lg:row-start-2 lg:mt-14">
-            <ol role="list">
-              {SOLUTION.pillars.map((pillar, i) => (
-                <PillarRow key={pillar.title} index={i} title={pillar.title} items={pillar.items} />
-              ))}
-            </ol>
-
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:mt-12">
+            <Heading
+              title={SOLUTION.title}
+              accent={SOLUTION.accent}
+              variant="outline"
+              className="max-w-[600px] text-[36px] sm:text-[44px] lg:text-[48px] xl:text-[50px]"
+            />
+            <p className="t-lead mt-6 max-w-[520px]">{SOLUTION.text}</p>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               {/* The original opens the hosted contact form here and the booking widget from the second button. */}
               <PrimaryLink href={LINKS.contact}>{SOLUTION.primary}</PrimaryLink>
               <SecondaryLink href={LINKS.booking}>{SOLUTION.secondary}</SecondaryLink>
             </div>
-          </div>
+          </Reveal>
+
+          <Reveal className="order-first lg:order-none lg:col-start-1 lg:row-start-1">
+            <Tilt
+              rotationFactor={5}
+              springOptions={{ stiffness: 150, damping: 22, mass: 0.6 }}
+              className="motion-reduce:!transform-none [@media(hover:none)]:!transform-none"
+            >
+              <div className="frame aspect-[4/3] bg-deep">
+                <Image src={SOLUTION.img} alt={SOLUTION.imgAlt} fill sizes="(min-width:1024px) 600px, 100vw" className="object-cover" />
+              </div>
+            </Tilt>
+
+            {/* The two cards from the original, under the photo. Side by side once there are 400px for them. */}
+            <div className="@container mt-4">
+              <ol role="list" className="grid gap-3 @min-[400px]:grid-cols-2">
+                {SOLUTION.cards.map((card, i) => (
+                  <li key={card.title} className="glass rounded-[20px] p-5">
+                    <p className="text-[16px] leading-snug font-medium text-white">
+                      <span aria-hidden className="mr-2 text-[13px] font-normal text-sky">
+                        {pad(i)}
+                      </span>
+                      {card.title}
+                    </p>
+                    <p className="t-small mt-2">
+                      <Joined items={card.items} />
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </Reveal>
         </div>
+
+        <ol role="list" className="mt-20 grid md:mt-28 md:grid-cols-3 md:gap-x-8 lg:mt-32 lg:gap-x-16 xl:gap-x-24">
+          {SOLUTION.pillars.map((pillar, i) => (
+            <Pillar key={pillar.title} index={i} title={pillar.title} items={pillar.items} />
+          ))}
+        </ol>
       </Container>
     </Section>
   );

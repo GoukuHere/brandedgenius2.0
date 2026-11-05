@@ -1,3 +1,50 @@
+# v4 (2026-11-06): READ THIS FIRST. It overrides the v3 brief below for the nine sections being redone.
+
+## Why v4
+The developer marked nine v3 sections as "cheap": Problem, Die Realität, Vorher/Nachher, Versprechen, Lösung,
+System, Fallstudien, Warum and the Workshop topics. He wants them redone completely: new, premium, animated,
+stunning, and not looking like v1, v2 or v3. They must be visibly built from Magic UI, 21st.dev and Motion
+Primitives. Inspiration (not to copy): https://ave-engineers.vercel.app/. Its lessons:
+- One big object per screen, with generous black space; never a wall of equal boxes.
+- A short continuation phrase in a heading set as an OUTLINE instead of a fill.
+- Large OUTLINED numbers as real numbering.
+- Thin accent lines with dots as connective tissue, branching like a circuit.
+- Pinned scroll stories: one object that turns in 3D while statements step beside it, with step ticks.
+- Wide case panels that move horizontally.
+Kept untouched: the hero, the Leistungen stack, the Ablauf timeline, Business Impact, Partners, the Kundenstimmen
+arc, the CTA and the footer.
+
+## Rules that still bind (from the client and the developer)
+- ONE background (PageBackground). No section backgrounds, light pools, shaders, canvases or particles.
+- Brand colours only: royal #004BA0, sky #69BFF8, ice #dcecff, grey #969595, white, ink, page #040a13.
+- Content clearly visible. NO text over photos. Body text at least 4.5:1.
+- Effects in moderation; performance matters (integrated graphics). Animate transform, opacity, clip-path and
+  SVG stroke only. No animated blur on large elements, no backdrop-filter in your sections.
+- The client liked: the fly-in problem cards, the service line animations, the original timeline, and
+  testimonials with arrows.
+- Developer: General Sans only, no italics, no monospace, no uppercase micro labels, NO EYEBROWS (nothing small
+  above a headline), no sparkles, orbs, glows as decoration, purple gradients, count-up numbers, icons in tinted
+  squares, or identical card grids. No dummy or invented copy: German text verbatim from src/content/site.ts
+  (never add sentences, labels or numbers that are not there). Display type at most 60px; section h2 48-56px.
+- Every infinite loop pauses off screen. Never branch rendered markup on useReducedMotion, window or matchMedia
+  during render (hydration). Reduced motion shows the final, readable state.
+
+## v4 devices (shared, already in globals.css and primitives.tsx)
+- `Heading variant="outline"` sets the accent as `.outline-text` (stroked, transparent fill). Use it only when the
+  accent is short (about 5 words or fewer) and the heading is 40px or larger.
+- `.ghost-num`: large outlined sky numbers (64-160px), used as the item's real number.
+- Lines and dots: 1px sky lines (opacity 0.35-0.6) and 6-8px sky dots (filled = connected, ring = open).
+- Glass (`.glass`, `.glass-lit`) for focal objects. The 20-surface budget is lifted for the v4 sections, but use
+  glass only where the spec says so.
+- Components in src/components/ui: MagicCard and BorderBeam (Magic UI); AnimatedBeam (21st.dev/Magic UI);
+  TextEffect, TextLoop, Tilt, InView, Accordion, AnimatedBackground, TransitionPanel and MorphingDialog (Motion
+  Primitives); Compare (21st.dev/Aceternity, rewritten in brand by the Compare builder).
+- Pinned scroll stages only where the spec says so, only on lg screens at least 720px tall
+  (`lg:[@media(min-height:720px)]:...` in CSS). Phones and short screens get a simple stacked version with all
+  content visible.
+
+---
+
 # Branded Genius v3: design brief for every section
 
 Read this whole file before writing code. It is the contract that keeps the page coherent.

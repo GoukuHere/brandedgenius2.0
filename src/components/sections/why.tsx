@@ -1,38 +1,124 @@
 "use client";
 
-import { motion, useTransform, type MotionValue, type Variants } from "motion/react";
+import { motion, useMotionValue, useSpring, useTransform, type MotionStyle, type Variant } from "motion/react";
 import Image from "next/image";
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Container, Section } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
+import { InView } from "@/components/ui/in-view";
 import { TextEffect } from "@/components/ui/text-effect";
 import { WHY } from "@/content/site";
 
 /*
-  Warum Branded Genius, the page's "Über uns". An asymmetric spread with no glass: on desktop the team photo stays
-  on the left (sticky, its native 4:3 so nobody is cropped) while the argument scrolls past it on the right. The
-  title is set plain and the punchline lands a beat later, word by word (the page's only TextEffect). The six reasons
-  are one list with hairlines between them; each one comes up to full strength as it reaches the middle of the
-  screen, scroll-linked and reversible. Inside the frame the photo drifts slowly with the scroll (transform only).
-  Phones and tablets: the photo first (not sticky), then the rest.
+  Warum Branded Genius, the page's "Über uns". The scroll expansion after 21st.dev's scroll-expansion hero, rebuilt
+  on a sticky runway (no wheel or touch hijacking): a 240svh runway pins a one-screen stage. At rest the headline sits
+  centred near the top (the title solid, the accent outlined and revealed word by word with Motion Primitives
+  TextEffect) and the team photo waits below it in a centred, rounded 4:3 frame with its caption.
+
+  Scrolling opens the photo to the full screen. The photo is one full-screen layer whose visible area is a
+  clip-path inset() that runs from the frame's rectangle (measured in a ResizeObserver) to 0, the corner radius from
+  28px to 0. Inside it the picture grows from "the whole photo in the frame, 15% closer" to "covering the screen";
+  every edge of the picture and of the clip moves on the same eased value, so the picture always covers the window.
+  A dark veil on the photo lifts from 0.35 to 0. The two headline lines slide apart (left and right, up to 30vw) and
+  are gone by 15% of the runway, the caption by 8%, both long before the photo's edge reaches them; the photo layer
+  is also stacked above them, so text can never sit on the photo. The photo is full screen from 75% of the runway to
+  the end, then the page scrolls on to the paragraph and the six reasons.
+
+  Everything is scroll-linked (useSectionProgress plus a light spring) and reversible, and moves only by transform,
+  opacity and clip-path. The picture's scale is never promoted with will-change: it is painted at its current size
+  on every frame, so it stays sharp at full screen.
+
+  Where the stage does not pin (phones in landscape, desktop windows under 720px tall, reduced motion), the same
+  markup is a plain stack: the headline, the photo full width in a .frame, the caption, then the rest. The switch
+  is pure CSS (the media query below); the motion values reach the pinned layout only through CSS variables that
+  the stacked layout never reads, so the server HTML is right in both cases.
 */
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-// The punchline's words rise 12px and fade in. The preset's 20px rise is too much at heading size.
-const PUNCHLINE_WORD: Variants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0 },
-};
+// Where the stage pins: desktops at least 720px tall, and portrait phones and tablets at least 560px tall.
+const PIN =
+  "(prefers-reduced-motion: no-preference) and (width >= 64rem) and (height >= 45rem), " +
+  "(prefers-reduced-motion: no-preference) and (width < 64rem) and (aspect-ratio <= 4/5) and (height >= 35rem)";
+
+// The runway's timeline, as fractions of the pinned scroll.
+const OPEN_END = 0.75; // the photo is full screen from here to the end
+const TEXT_FADE_START = 0.02;
+const TEXT_END = 0.15; // the headline lines have slid apart and are gone
+const CAPTION_END = 0.08;
+
+const SLIDE = 0.3; // how far each headline line travels, in stage widths
+const RADIUS = 28;
+const VEIL = 0.35;
+const DEPTH = 1.15; // how much closer than "fits the frame" the photo starts
+const RATIO = 1600 / 1194; // team-group.webp
+const FOCUS_Y = 0.2; // full screen, a wide screen crops the photo's height: keep the heads in, cut more of the legs
+
+// The full-screen layer starts closed, so nothing shows before the frame has been measured.
+const CLOSED = `inset(50% 50% 50% 50% round ${RADIUS}px)`;
 
 /*
-  The dimmed state of a reason before it reaches the middle of the screen. The white title can drop to 60% and still
-  reads at about 7:1; the silver text stops at 85%, which keeps it above 4.5:1 even under the page's royal glow.
-*/
-const TITLE_DIM = 0.6;
-const TEXT_DIM = 0.85;
+  The two layouts. Unlayered, so these rules win over the Tailwind utilities on the same elements. The stacked layout
+  is the default (in the markup's Tailwind classes); everything below only applies while the stage pins.
 
-/** Keeps hyphenated German compounds whole (as the Heading primitive does), so "KI-Beratung" never breaks after "KI-". */
+  The stage is 100lvh (the same as 100svh and 100vh on a desktop): on a phone the browser hides its toolbar while
+  the reader scrolls down, and a 100svh stage would then leave a strip of page under the full-screen photo. The
+  frame's size is capped against 100svh, so the headline, the frame and the caption always fit the smaller screen.
+  The negative scroll margin cancels the page's 96px scroll padding, so the navigation's "Über uns" lands exactly
+  where the stage starts to pin, with the headline, the framed photo and the caption all in view.
+*/
+const CSS = `
+.why-veil{display:none}
+@media ${PIN}{
+  .why-section{padding-top:0;scroll-margin-top:-96px}
+  .why-runway{height:240svh}
+  .why-stage{position:sticky;top:0;height:100lvh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding-top:80px;padding-bottom:24px}
+  .why-frame{position:static;overflow:visible;width:min(72vw,calc((100svh - 300px) * 4 / 3));aspect-ratio:4/3;margin:24px auto 0;border-radius:${RADIUS}px}
+  .why-frame::after{content:none}
+  .why-layer{z-index:1;clip-path:var(--why-clip)}
+  .why-img{inset:auto;left:0;top:0;width:var(--why-w);height:var(--why-h);transform-origin:0 0;transform:var(--why-tf)}
+  .why-veil{display:block}
+  .why-caption{margin-top:16px}
+  @media (width >= 48rem){.why-frame{width:min(56vw,calc((100svh - 340px) * 4 / 3));margin-top:32px}}
+  @media (width >= 64rem){.why-stage{padding-top:88px}.why-frame{width:min(30vw,calc((100svh - 360px) * 4 / 3));margin-top:40px}}
+}
+`;
+
+/** The expansion, worked out once per layout: the clip's start insets and the picture's start and end placement. */
+type Plan = {
+  width: number;
+  inset: [number, number, number, number];
+  box: { w: number; h: number };
+  from: { x: number; y: number; s: number };
+  to: { x: number; y: number };
+};
+
+function planFor(stage: DOMRect, frame: DOMRect): Plan {
+  const sw = stage.width;
+  const sh = stage.height;
+  const left = frame.left - stage.left;
+  const top = frame.top - stage.top;
+  // The picture's own box: the photo at the size that covers the stage.
+  const w = Math.max(sw, sh * RATIO);
+  const h = w / RATIO;
+  // At the start the whole photo fits the frame, then DEPTH brings it closer; centred on the frame.
+  const s = Math.max(frame.width / w, frame.height / h) * DEPTH;
+  return {
+    width: sw,
+    inset: [top, sw - left - frame.width, sh - top - frame.height, left],
+    box: { w, h },
+    from: { x: left + frame.width / 2 - (w * s) / 2, y: top + frame.height / 2 - (h * s) / 2, s },
+    to: { x: (sw - w) / 2, y: (sh - h) * FOCUS_Y },
+  };
+}
+
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
+const lerp = (from: number, to: number, t: number) => from + (to - from) * t;
+const easeIn = (t: number) => t * t;
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const px = (value: number) => `${value.toFixed(2)}px`;
+
+/** Keeps hyphenated German compounds whole, as the Heading primitive does, so "KI-Beratung" never breaks after "KI-". */
 function keepWhole(text: string): ReactNode {
   return text.split(/(\s+)/).map((part, i) =>
     part.includes("-") && part.trim() ? (
@@ -45,97 +131,183 @@ function keepWhole(text: string): ReactNode {
   );
 }
 
-export function WhySection({ id = "ueber-uns" }: { id?: string }) {
-  const spread = useRef<HTMLDivElement>(null);
-  // The drift runs while any part of the spread is on screen: about 20px over the whole pass, slow on purpose.
-  const progress = useSectionProgress(spread, ["start end", "end start"]);
-  const photoY = useTransform(progress, [0, 1], ["-3%", "3%"]);
+// The accent's words rise 12px and fade in; the preset's 20px rise is too much at this size.
+const WORD = { hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } };
+
+const RISE: { hidden: Variant; visible: Variant } = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 },
+};
+const STAGGER: { hidden: Variant; visible: Variant } = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06 } },
+};
+const VIEW = { once: true, margin: "0px 0px -10% 0px" } as const;
+
+export function WhySection() {
+  const runway = useRef<HTMLDivElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const column = useRef<HTMLDivElement>(null);
+  const frame = useRef<HTMLDivElement>(null);
+
+  const progress = useSectionProgress(runway, ["start start", "end end"]);
+  const smooth = useSpring(progress, { stiffness: 160, damping: 32, restDelta: 0.0005, skipInitialAnimation: true });
+
+  // Set after mount, never read during render: whether the stage pins, and the measured expansion.
+  const live = useMotionValue(0);
+  const plan = useMotionValue<Plan | null>(null);
+
+  useEffect(() => {
+    const stageEl = stage.current;
+    const columnEl = column.current;
+    const frameEl = frame.current;
+    if (!stageEl || !columnEl || !frameEl) return;
+    const query = window.matchMedia(PIN);
+    const measure = () => {
+      if (!query.matches) {
+        live.set(0);
+        return;
+      }
+      plan.set(planFor(stageEl.getBoundingClientRect(), frameEl.getBoundingClientRect()));
+      live.set(1);
+    };
+    measure();
+    // The stage for the screen size, the column for the headline's height once the font has loaded.
+    const observer = new ResizeObserver(measure);
+    observer.observe(stageEl);
+    observer.observe(columnEl);
+    query.addEventListener("change", measure);
+    return () => {
+      observer.disconnect();
+      query.removeEventListener("change", measure);
+    };
+  }, [live, plan]);
+
+  // Every motion value is read unconditionally, so each transform keeps all of its sources subscribed.
+  const p = useTransform(() => live.get() * smooth.get());
+  const open = useTransform(() => easeInOut(clamp01(p.get() / OPEN_END)));
+
+  const textOpacity = useTransform(() => 1 - clamp01((p.get() - TEXT_FADE_START) / (TEXT_END - TEXT_FADE_START)));
+  const leftX = useTransform(() => {
+    const t = clamp01(p.get() / TEXT_END);
+    const width = plan.get()?.width ?? 0;
+    return -SLIDE * width * easeIn(t);
+  });
+  const rightX = useTransform(() => -leftX.get());
+  const captionOpacity = useTransform(() => 1 - clamp01(p.get() / CAPTION_END));
+
+  const clip = useTransform(() => {
+    const k = open.get();
+    const g = plan.get();
+    if (!g) return CLOSED;
+    const f = 1 - k;
+    const [t, r, b, l] = g.inset;
+    return `inset(${px(t * f)} ${px(r * f)} ${px(b * f)} ${px(l * f)} round ${px(RADIUS * f)})`;
+  });
+  const picture = useTransform(() => {
+    const k = open.get();
+    const g = plan.get();
+    if (!g) return "none";
+    const x = lerp(g.from.x, g.to.x, k);
+    const y = lerp(g.from.y, g.to.y, k);
+    const s = lerp(g.from.s, 1, k);
+    // 2D on purpose: a 3D transform would promote the picture and freeze its raster at the small start scale.
+    return `translate(${px(x)}, ${px(y)}) scale(${s.toFixed(4)})`;
+  });
+  const boxWidth = useTransform(() => {
+    const g = plan.get();
+    return g ? px(g.box.w) : "100%";
+  });
+  const boxHeight = useTransform(() => {
+    const g = plan.get();
+    return g ? px(g.box.h) : "100%";
+  });
+  const veil = useTransform(() => VEIL * (1 - open.get()));
 
   return (
-    <Section id={id}>
-      <Container>
-        <div ref={spread} className="grid gap-y-14 lg:grid-cols-12 lg:gap-x-16 xl:gap-x-20">
-          <TeamPhoto y={photoY} />
+    <Section id="ueber-uns" className="why-section">
+      <style href="bg-why-expansion" precedence="default">
+        {CSS}
+      </style>
 
-          <div className="lg:col-span-7">
-            <h2 className="t-h2 max-w-[640px]">
-              {keepWhole(WHY.title)}{" "}
-              <TextEffect
-                as="span"
-                per="word"
-                preset="slide"
-                delay={0.35}
-                variants={{ item: PUNCHLINE_WORD }}
-                segmentTransition={{ duration: 0.8, ease: EASE }}
-                className="block"
-              >
-                {WHY.accent}
-              </TextEffect>
-            </h2>
-            <p className="t-lead mt-6 max-w-[580px]">{WHY.text}</p>
+      <div ref={runway} className="why-runway relative">
+        <div ref={stage} className="why-stage">
+          <Container>
+            <div ref={column} className="text-center">
+              <h2 className="text-[clamp(1.875rem,9.2vw,2.25rem)] leading-[1.06] font-medium tracking-[-0.03em] text-balance text-white md:text-[48px] lg:text-[56px]">
+                <motion.span style={{ x: leftX, opacity: textOpacity }} className="block">
+                  {keepWhole(WHY.title)}
+                </motion.span>
+                <motion.span style={{ x: rightX, opacity: textOpacity }} className="block">
+                  <TextEffect
+                    as="span"
+                    per="word"
+                    preset="slide"
+                    delay={0.25}
+                    variants={{ item: WORD }}
+                    segmentTransition={{ duration: 0.8, ease: EASE }}
+                    className="outline-text block pb-[0.06em]"
+                  >
+                    {WHY.accent}
+                  </TextEffect>
+                </motion.span>
+              </h2>
 
-            <ul role="list" className="mt-12 md:mt-14">
-              {WHY.reasons.map((reason, index) => (
-                <Reason key={reason.title} title={reason.title} text={reason.text} first={index === 0} />
-              ))}
-            </ul>
-          </div>
+              <figure>
+                {/*
+                  Stacked: the photo's frame. Pinned: only the frame's rectangle (measured), while the photo itself is
+                  the full-screen layer inside it, positioned against the stage.
+                */}
+                <div ref={frame} className="why-frame frame mt-10 aspect-[4/3] w-full bg-deep md:mt-14 md:aspect-video">
+                  <motion.div style={{ "--why-clip": clip } as MotionStyle} className="why-layer absolute inset-0">
+                    <motion.div
+                      style={{ "--why-w": boxWidth, "--why-h": boxHeight, "--why-tf": picture } as MotionStyle}
+                      className="why-img absolute inset-0"
+                    >
+                      <Image
+                        src="/media/photos/team-group.webp"
+                        alt="Roman Tränkle und das Team von Branded Genius"
+                        fill
+                        sizes="(max-aspect-ratio: 4/3) 134vh, 100vw"
+                        className="object-cover object-[50%_20%]"
+                      />
+                    </motion.div>
+                    <motion.div aria-hidden style={{ opacity: veil }} className="why-veil pointer-events-none absolute inset-0 bg-page" />
+                  </motion.div>
+                </div>
+                <motion.figcaption style={{ opacity: captionOpacity }} className="why-caption mt-5">
+                  <span className="block text-[17px] leading-snug font-medium text-white">{WHY.center.title}</span>
+                  <span className="mt-1 block text-[14px] leading-normal text-silver">{WHY.center.text}</span>
+                </motion.figcaption>
+              </figure>
+            </div>
+          </Container>
         </div>
+      </div>
+
+      <Container className="pt-20 md:pt-28">
+        <InView variants={RISE} transition={{ duration: 0.8, ease: EASE }} viewOptions={VIEW}>
+          <p className="t-lead max-w-[640px]">{WHY.text}</p>
+        </InView>
+
+        <InView variants={STAGGER} viewOptions={VIEW}>
+          <ul role="list" className="mt-14 grid gap-x-10 gap-y-12 md:mt-16 md:grid-cols-2 lg:grid-cols-3 lg:gap-y-14">
+            {WHY.reasons.map((reason) => (
+              <motion.li key={reason.title} variants={RISE} transition={{ duration: 0.7, ease: EASE }}>
+                {/* A hairline that starts at a filled sky dot and fades out along the column. */}
+                <div
+                  aria-hidden
+                  className="relative h-px bg-[linear-gradient(90deg,rgb(105_191_248/0.5),rgb(255_255_255/0.08)_45%)]"
+                >
+                  <span className="absolute top-1/2 left-0 size-1.5 -translate-y-1/2 rounded-full bg-sky" />
+                </div>
+                <h3 className="mt-6 text-[20px] leading-snug font-medium tracking-[-0.01em] text-balance text-white">{reason.title}</h3>
+                <p className="mt-2.5 max-w-[400px] text-[16px] leading-relaxed text-silver">{reason.text}</p>
+              </motion.li>
+            ))}
+          </ul>
+        </InView>
       </Container>
     </Section>
-  );
-}
-
-/*
-  The photo at its native ratio (1600x1194) in the shared hairline frame. The image is scaled 1.08 so its 3% drift
-  never shows an edge (the scale leaves 4% spare on each side). Reduced motion drops the transform entirely (CSS, so
-  the markup is the same on server and client) and the photo sits still at its exact fit.
-*/
-function TeamPhoto({ y }: { y: MotionValue<string> }) {
-  return (
-    <figure className="w-full md:max-w-[640px] lg:sticky lg:top-28 lg:col-span-5 lg:max-w-none lg:self-start">
-      <div className="frame isolate aspect-[1600/1194] w-full">
-        <motion.div
-          style={{ y, scale: 1.08 }}
-          className="absolute inset-0 will-change-transform motion-reduce:!transform-none"
-        >
-          {/* Widths include the 1.08 scale: about 470px wide at 1280+, 36% of the screen between 1024 and 1280. */}
-          <Image
-            src="/media/photos/team-group.webp"
-            alt="Roman Tränkle und das Team von Branded Genius"
-            fill
-            sizes="(min-width: 1280px) 510px, (min-width: 1024px) 40vw, (min-width: 768px) 700px, 100vw"
-            className="object-cover"
-          />
-        </motion.div>
-      </div>
-      <figcaption className="mt-5">
-        <p className="text-[18px] leading-snug font-medium text-white">{WHY.center.title}</p>
-        <p className="mt-1 text-[16px] leading-normal text-silver">{WHY.center.text}</p>
-      </figcaption>
-    </figure>
-  );
-}
-
-/*
-  One reason. It reaches full strength as its centre crosses the middle of the screen (starting when its top is 75%
-  down) and dims again if the reader scrolls back up. Opacity only, bound straight to the scroll.
-*/
-function Reason({ title, text, first }: { title: string; text: string; first: boolean }) {
-  const ref = useRef<HTMLLIElement>(null);
-  const progress = useSectionProgress(ref, ["start 0.75", "center 0.5"]);
-  const titleOpacity = useTransform(progress, [0, 1], [TITLE_DIM, 1]);
-  const textOpacity = useTransform(progress, [0, 1], [TEXT_DIM, 1]);
-
-  return (
-    <li ref={ref} className="relative py-7 first:pt-0 last:pb-0">
-      {!first && <div aria-hidden className="rule absolute inset-x-0 top-0" />}
-      <motion.h3 style={{ opacity: titleOpacity }} className="text-[20px] leading-snug font-medium tracking-[-0.01em] text-white">
-        {title}
-      </motion.h3>
-      <motion.p style={{ opacity: textOpacity }} className="mt-2 max-w-[540px] text-[16px] leading-relaxed text-silver">
-        {text}
-      </motion.p>
-    </li>
   );
 }

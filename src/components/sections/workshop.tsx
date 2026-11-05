@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
-import { Container, Heading, PrimaryLink, Section } from "@/components/system/primitives";
+import { WorkshopTopics } from "@/components/sections/workshop-topics";
+import { Container, Heading, Section } from "@/components/system/primitives";
 import { Reveal } from "@/components/system/reveal";
-import { LINKS, WORKSHOP } from "@/content/site";
+import { WORKSHOP } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 /*
@@ -12,8 +13,9 @@ import { cn } from "@/lib/utils";
   stands beside them as a pull quote (a 1px sky rule, no card, no photo). Signature: the four formats as an image
   accordion. Desktop shows four tall photos in a row; the hovered, focused or tapped panel widens from 1fr to 2.4fr
   (flex-grow, 500ms ease-out-expo) and shows its description under the photo, the others keep number and title.
-  Phones and tablets: every format with its own 3:2 photo and its text, nothing to switch. Then the topics as two
-  columns of plain lines and the booking link.
+  Phones and tablets: every format with its own 3:2 photo and its text, nothing to switch. Then the topics
+  (workshop-topics.tsx): one large display line that shows them one at a time, the full list under it, and the
+  booking link.
 
   The open panel's description has a fixed measure, so it never rewraps while the panel grows; it is clipped by its
   own wrapper and fades in once the panel has room. Collapsed descriptions are visibility: hidden, so assistive
@@ -50,7 +52,6 @@ export function WorkshopSection() {
   const hoverTimer = useRef<number | undefined>(undefined);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const baseId = useId();
-  const topicsId = `${baseId}-topics`;
 
   useEffect(() => {
     const timer = hoverTimer;
@@ -198,27 +199,7 @@ export function WorkshopSection() {
           </ul>
         </Reveal>
 
-        <Reveal className="mt-16 md:mt-24">
-          <div className="rule" />
-          <div className="grid gap-y-5 pt-10 md:pt-12 lg:grid-cols-12 lg:gap-x-8">
-            <p id={topicsId} className="text-[15px] leading-normal text-white/60 lg:col-span-4 lg:pt-2.5">
-              {WORKSHOP.topicsLabel}
-            </p>
-            <div className="lg:col-span-8">
-              <ul role="list" aria-labelledby={topicsId} className="sm:columns-2 sm:gap-x-12">
-                {WORKSHOP.topics.map((topic) => (
-                  <li key={topic} className="flex break-inside-avoid items-start gap-3.5 py-2.5 text-[17px] leading-[1.45] text-ink/85">
-                    <span aria-hidden className="mt-[0.72em] h-px w-3 shrink-0 bg-sky" />
-                    <span className="min-w-0">{topic}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-10">
-                <PrimaryLink href={LINKS.booking}>{WORKSHOP.cta}</PrimaryLink>
-              </div>
-            </div>
-          </div>
-        </Reveal>
+        <WorkshopTopics />
       </Container>
     </Section>
   );

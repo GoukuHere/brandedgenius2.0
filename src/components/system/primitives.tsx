@@ -53,12 +53,13 @@ export function Heading({
   accentFirst?: boolean;
   /** Older name for variant="gradient". */
   serif?: boolean;
-  variant?: "solid" | "tone" | "gradient";
+  /** "outline" (v4) sets the continuation as an outline; display sizes only. */
+  variant?: "solid" | "tone" | "gradient" | "outline";
 }) {
   const cls = size === "display" ? "t-display" : size === "h3" ? "t-h3" : "t-h2";
   const mode = variant ?? (serif ? "gradient" : "solid");
   const accentEl = accent ? (
-    <span className={mode === "gradient" ? "accent" : mode === "tone" ? "tone" : undefined}>{keepCompounds(accent)}</span>
+    <span className={mode === "gradient" ? "accent" : mode === "tone" ? "tone" : mode === "outline" ? "outline-text" : undefined}>{keepCompounds(accent)}</span>
   ) : null;
   return (
     <Tag className={cn(cls, className)}>
