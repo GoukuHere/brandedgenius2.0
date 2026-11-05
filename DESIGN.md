@@ -91,7 +91,7 @@ The client (Roman Tränkle, Branded Genius, an AI-automation agency in Pforzheim
 - Icons: lucide-react, strokeWidth 1.5, bare (never in a container); only where they carry meaning.
 
 ## Layout and rhythm
-- Container: `Container` (max-w 1280, px-5/md:px-8). Sections `py-24 md:py-36`.
+- Container: `Container` (max-w 1280, px-5/md:px-8). Sections `py-16 md:py-24` (2026-11-06: tightened; about 200px between sections on desktop).
 - Each section has ONE signature composition from its spec; never reuse another section's layout. Alternate alignment: some headers centred, some left, as the spec says.
 - Generous space, few large elements. Large glass panels (radius 28 to 36px) rather than many small cards.
 - Mobile first: must work at 360 to 375px wide (no horizontal overflow, 44px touch targets, 16px minimum body text). Desktop reference 1659x900.

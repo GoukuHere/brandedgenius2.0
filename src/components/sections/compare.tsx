@@ -108,7 +108,7 @@ export function CompareSection() {
   return (
     // The Versprechen follows straight on (on the original it is the last row of this section), so the bottom
     // padding is shorter than the shared rhythm.
-    <Section id="unterschied" className="pb-16 md:pb-20">
+    <Section id="unterschied" className="pb-12 md:pb-16 lg:[@media(min-height:720px)]:pb-0">
       <Container>
         <Reveal>
           <Heading

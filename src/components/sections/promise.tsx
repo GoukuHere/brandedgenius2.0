@@ -49,7 +49,7 @@ export function PromiseSection() {
     <section
       ref={runway}
       id="mehrwert"
-      className="relative pt-0 pb-24 md:pt-4 md:pb-36 lg:[@media(min-height:720px)]:h-[320svh] lg:[@media(min-height:720px)]:py-0"
+      className="relative pt-0 pb-16 md:pt-4 md:pb-24 lg:[@media(min-height:720px)]:h-[320svh] lg:[@media(min-height:720px)]:py-0"
     >
       {/* The stage: pinned for the length of the runway, its content centred below the fixed header. */}
       <div className="lg:[@media(min-height:720px)]:sticky lg:[@media(min-height:720px)]:top-0 lg:[@media(min-height:720px)]:flex lg:[@media(min-height:720px)]:h-svh lg:[@media(min-height:720px)]:items-center lg:[@media(min-height:720px)]:pt-20">

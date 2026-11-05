@@ -100,7 +100,7 @@ export function ProcessSection() {
   }, [fill, sync]);
 
   return (
-    <Section id="prozess" className="overflow-x-clip">
+    <Section id="prozess" className="overflow-x-clip lg:pb-14">
       <Container>
         <Reveal y={12}>
           <Heading title={PROCESS.title} accent={PROCESS.accent} className="max-w-[820px]" />
