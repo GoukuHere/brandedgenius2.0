@@ -2,7 +2,7 @@
 
 ## Why v4
 The developer marked nine v3 sections as "cheap": Problem, Die Realität, Vorher/Nachher, Versprechen, Lösung,
-System, Fallstudien, Warum and the Workshop topics. He wants them redone completely: new, premium, animated,
+System, Fallstudien, Warum and the Workshop topics. They want them redone completely: new, premium, animated,
 stunning, and not looking like v1, v2 or v3. They must be visibly built from Magic UI, 21st.dev and Motion
 Primitives. Inspiration (not to copy): https://ave-engineers.vercel.app/. Its lessons:
 - One big object per screen, with generous black space; never a wall of equal boxes.
@@ -36,6 +36,11 @@ arc, the CTA and the footer.
 - Lines and dots: 1px sky lines (opacity 0.35-0.6) and 6-8px sky dots (filled = connected, ring = open).
 - Glass (`.glass`, `.glass-lit`) for focal objects. The 20-surface budget is lifted for the v4 sections, but use
   glass only where the spec says so.
+- Buttons (2026-11-06, the developer's reference): slightly curved corners, no pill or round buttons anywhere.
+  One radius for every button, icon button and button-like badge: `rounded-button` (12px, `--radius-button` in
+  globals.css; `BUTTON_RADIUS` in primitives.tsx feeds SpecularButton's edge light). 10px for the small nav
+  highlight and the skip link. A bar or panel that holds a button keeps its corner concentric: the header bar is
+  20px (the 12px button plus its 8px inset). Dots, rings and progress lines stay round.
 - Components in src/components/ui: MagicCard and BorderBeam (Magic UI); AnimatedBeam (21st.dev/Magic UI);
   TextEffect, TextLoop, Tilt, InView, Accordion, AnimatedBackground, TransitionPanel and MorphingDialog (Motion
   Primitives); (Vorher/Nachher is a hand-built "chaos to system" panel in the site's line-and-dot language.)
@@ -82,7 +87,7 @@ The client (Roman Tränkle, Branded Genius, an AI-automation agency in Pforzheim
 - `AnimatedBeam` (21st.dev Animated Beam Integration core): System routes only.
 - `Marquee` (Magic UI): partner logos only (pauses off screen).
 - `TextEffect` (Motion Primitives, forked to play once in view): only the Warum punchline.
-- `AnimatedBackground` (Motion Primitives, controlled via `value`): the Realität hover highlight and the Fallstudien tab pill.
+- `AnimatedBackground` (Motion Primitives, controlled via `value`): no longer used (v4 replaced the Realität highlight and the Fallstudien tab pill).
 - `TransitionPanel` (Motion Primitives): Fallstudien case switch.
 - `Accordion` (Motion Primitives): Die Realität rows.
 - `MorphingDialog` (Motion Primitives): testimonial video player.

@@ -41,7 +41,7 @@ export function Footer() {
             target="_blank"
             rel="noopener"
             aria-label="Kontakt aufnehmen"
-            className="group grid size-16 shrink-0 place-items-center rounded-full border border-sky/40 text-sky transition-colors duration-300 hover:bg-sky hover:text-page"
+            className="group grid size-16 shrink-0 place-items-center rounded-button border border-sky/40 text-sky transition-colors duration-300 hover:bg-sky hover:text-page"
           >
             <ArrowUpRight className="size-6 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>

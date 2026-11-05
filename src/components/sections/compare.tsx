@@ -107,7 +107,7 @@ export function CompareSection() {
             <div aria-hidden className="pointer-events-none absolute inset-x-6 top-1/2 h-px bg-white/[0.08] lg:inset-x-auto lg:inset-y-8 lg:left-1/2 lg:h-auto lg:w-px" />
             <div
               aria-hidden
-              className="glass absolute top-1/2 left-1/2 z-10 grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full text-[12px] font-medium text-sky"
+              className="glass absolute top-1/2 left-1/2 z-10 grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-button text-[12px] font-medium text-sky"
             >
               {COMPARE.vs}
             </div>

@@ -83,13 +83,17 @@ type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { children: ReactNode
 const external = (href?: string) => (href?.startsWith("http") ? { target: "_blank", rel: "noopener" } : {});
 
 /*
-  The two pill buttons are React Bits' SpecularButton (components/ui/specular-button.tsx): a thin edge light follows
-  the pointer when it comes near. Primary keeps the brand's royal-blue gradient with an ice-white light; secondary is
+  The two buttons are React Bits' SpecularButton (components/ui/specular-button.tsx): a thin edge light follows the
+  pointer when it comes near. Primary keeps the brand's royal-blue gradient with an ice-white light; secondary is
   clear glass with a sky light. Both keep the lifting arrow.
+  Corners are slightly curved, never a pill (the developer's reference, 2026-11-06). BUTTON_RADIUS is the same 12px
+  as `--radius-button` in globals.css: the edge light is drawn along the same curve, so the shader needs the number.
 */
+export const BUTTON_RADIUS = 12;
+
 const ARROW = "size-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5";
 
-/** The brand's blue gradient pill, as on brandedgenius.de, with a specular edge light. Primary action only. */
+/** The brand's blue gradient button, as on brandedgenius.de, with a specular edge light. Primary action only. */
 export function PrimaryLink({ children, className, size = "md", href, ...props }: LinkProps) {
   return (
     <SpecularButton
@@ -97,7 +101,7 @@ export function PrimaryLink({ children, className, size = "md", href, ...props }
       {...external(href)}
       {...props}
       size={size}
-      radius={999}
+      radius={BUTTON_RADIUS}
       tint="#1a6fe0"
       tintOpacity={0}
       lineColor="#dcecff"
@@ -123,7 +127,7 @@ export function SecondaryLink({ children, className, size = "md", href, ...props
       {...external(href)}
       {...props}
       size={size}
-      radius={999}
+      radius={BUTTON_RADIUS}
       tint="#dcecff"
       tintOpacity={0.04}
       lineColor="#69bff8"

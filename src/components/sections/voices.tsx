@@ -245,7 +245,7 @@ export function VoicesSection() {
                   aria-controls={TRACK_ID}
                   aria-current={i === active ? "true" : undefined}
                   aria-label={`Kundenstimme von ${item.name}`}
-                  className="group grid size-11 cursor-pointer place-items-center rounded-full"
+                  className="group grid size-11 cursor-pointer place-items-center rounded-button"
                 >
                   <span
                     aria-hidden
@@ -336,7 +336,7 @@ function ArcCard({
             <span
               aria-hidden
               className={cn(
-                "absolute top-1/2 left-1/2 grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-page shadow-[0_12px_32px_-8px_rgb(0_0_0/0.6)] transition-[scale,background-color,opacity] duration-300 ease-out group-hover:scale-[1.06] group-hover:bg-white",
+                "absolute top-1/2 left-1/2 grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-button bg-white/90 text-page shadow-[0_12px_32px_-8px_rgb(0_0_0/0.6)] transition-[scale,background-color,opacity] duration-300 ease-out group-hover:scale-[1.06] group-hover:bg-white",
                 centre ? "opacity-100" : "opacity-0"
               )}
             >
@@ -420,7 +420,7 @@ function Player({ voice, returnTo }: { voice: Voice; returnTo: RefObject<HTMLBut
       {/* Above the player, outside the video, so it never covers YouTube's own controls. */}
       <MorphingDialogClose
         variants={CLOSE_FADE}
-        className="top-auto right-0 bottom-full mb-3 grid size-11 cursor-pointer place-items-center rounded-full border border-white/25 text-white transition-[border-color,background-color] duration-200 ease-out hover:border-white/50 hover:bg-white/10"
+        className="top-auto right-0 bottom-full mb-3 grid size-11 cursor-pointer place-items-center rounded-button border border-white/25 text-white transition-[border-color,background-color] duration-200 ease-out hover:border-white/50 hover:bg-white/10"
       >
         <X aria-hidden strokeWidth={1.5} className="size-5" />
       </MorphingDialogClose>
@@ -443,7 +443,7 @@ function Player({ voice, returnTo }: { voice: Voice; returnTo: RefObject<HTMLBut
   );
 }
 
-/** A 52px round step button with a hairline border; the arrow nudges the way it points. */
+/** A 52px step button with slightly curved corners and a hairline border; the arrow nudges the way it points. */
 function StepButton({ direction, onClick }: { direction: 1 | -1; onClick: () => void }) {
   const iconClass = cn(
     "size-5 transition-transform duration-200 ease-out",
@@ -455,7 +455,7 @@ function StepButton({ direction, onClick }: { direction: 1 | -1; onClick: () => 
       onClick={onClick}
       aria-controls={TRACK_ID}
       aria-label={direction === 1 ? "Nächste Kundenstimme" : "Vorherige Kundenstimme"}
-      className="group grid size-[52px] shrink-0 cursor-pointer place-items-center rounded-full border border-white/15 text-white transition-[border-color,background-color,scale] duration-200 ease-out hover:border-white/40 hover:bg-white/[0.04] active:scale-[0.96]"
+      className="group grid size-[52px] shrink-0 cursor-pointer place-items-center rounded-button border border-white/15 text-white transition-[border-color,background-color,scale] duration-200 ease-out hover:border-white/40 hover:bg-white/[0.04] active:scale-[0.96]"
     >
       {direction === 1 ? (
         <ArrowRight aria-hidden strokeWidth={1.5} className={iconClass} />

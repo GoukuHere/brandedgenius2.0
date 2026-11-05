@@ -19,6 +19,9 @@
   --color-silver: #969595;
   --color-ink: #eaf1fa;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Every button and icon button: slightly curved, never a pill (the developer's reference, 2026-11-06: a 50px
+     button with 12px corners). `rounded-button` in markup; BUTTON_RADIUS in primitives.tsx for SpecularButton. */
+  --radius-button: 12px;
 }
 
 @theme inline {
@@ -277,13 +280,14 @@
   }
 }
 /*
-  SpecularButton (React Bits, reactbits.dev), sized and coloured for this site: a glass pill whose thin edge light
+  SpecularButton (React Bits, reactbits.dev), sized and coloured for this site: a button with slightly curved
+  corners (--radius-button) whose thin edge light
   (drawn by the component's WebGL canvas) follows the pointer when it comes near. Sizes match the site's buttons:
   40, 48 and 56px tall. No backdrop blur (not needed here, and it costs a layer per button).
 */
 @layer components {
   .specular-button {
-    --sb-radius: 18px;
+    --sb-radius: var(--radius-button);
     --sb-tint: #ffffff;
     --sb-tint-opacity: 0.04;
     --sb-text-color: #f5f5f5;

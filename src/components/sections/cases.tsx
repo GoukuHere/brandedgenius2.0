@@ -277,7 +277,7 @@ function CaseNav({ current, onSelect, className }: { current: number; onSelect: 
             aria-controls={casePanelId(index)}
             aria-current={on ? "true" : undefined}
             aria-label={item.name}
-            className="group relative min-h-11 shrink-0 cursor-pointer rounded-full pr-2 pl-4 text-[15px] leading-5 whitespace-nowrap"
+            className="group relative min-h-11 shrink-0 cursor-pointer rounded-button pr-2 pl-4 text-[15px] leading-5 whitespace-nowrap"
           >
             <span
               aria-hidden

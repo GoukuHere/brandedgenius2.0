@@ -16,7 +16,8 @@ import { cn } from "@/lib/utils";
   site:
   - It can render as a link (`href`), because every call to action here is a link.
   - The live settings are copied into a ref after each render (an effect), not during render.
-  - Sizes match the site's buttons (48px and 56px tall pills); the styles live in globals.css (`.specular-button`).
+  - Sizes match the site's buttons (48px and 56px tall, 12px corners); the styles live in globals.css
+    (`.specular-button`).
   A WebGL2 canvas draws a thin edge light that follows the pointer when it comes near; it only animates while the
   light is moving, pauses off screen, and leaves the plain button in place where WebGL2 is unavailable.
 */
@@ -232,7 +233,7 @@ export function SpecularButton(props: SpecularButtonProps) {
   const {
     children = "Get Started",
     size = "lg",
-    radius = 18,
+    radius = 12,
     tint = "#ffffff",
     tintOpacity = 0.04,
     blur = 0,

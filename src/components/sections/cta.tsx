@@ -58,7 +58,7 @@ export function CtaSection() {
                       </span>
                       <span
                         aria-hidden
-                        className="grid size-[52px] shrink-0 place-items-center rounded-full border border-white/15 text-white transition-[background-color,border-color,color] duration-200 ease-out group-hover:border-sky group-hover:bg-sky group-hover:text-page group-focus-visible:border-sky group-focus-visible:bg-sky group-focus-visible:text-page"
+                        className="grid size-[52px] shrink-0 place-items-center rounded-button border border-white/15 text-white transition-[background-color,border-color,color] duration-200 ease-out group-hover:border-sky group-hover:bg-sky group-hover:text-page group-focus-visible:border-sky group-focus-visible:bg-sky group-focus-visible:text-page"
                       >
                         <ArrowUpRight
                           strokeWidth={1.5}
