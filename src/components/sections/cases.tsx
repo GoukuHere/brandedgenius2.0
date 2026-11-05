@@ -1,39 +1,50 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { useRef, useState, type KeyboardEvent } from "react";
-import { Container, Heading, Section, TextLink } from "@/components/system/primitives";
+import { AnimatedBackground } from "@/components/ui/animated-background";
+import { Container, Heading, Section } from "@/components/system/primitives";
 import { Reveal } from "@/components/system/reveal";
-import { CASES, LINKS, SOLUTION, type CaseStudy } from "@/content/site";
+import { CASES, type CaseStudy } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 /*
-  Use cases: six client results behind one tab bar. One case shows at a time in a large panel that crossfades on
-  change. The tabs, the prev/next arrows and the keyboard all move through the same six.
+  Fallstudien (v3): the client's six case studies behind their own six two-line tabs. One sky-tinted glass pill
+  glides behind the chosen tab; the case itself is set as type inside ONE blurred glass panel (no boxes inside it):
+  the tagline as the headline, the three figures as a row divided by hairlines, the quote on a sky rule, and two
+  quiet columns for what was built and which tools were used.
 
-  From tablet width up, every case is also laid out invisibly in the panel's grid cell, so the panel always has the
-  height of the longest case and nothing below it moves when the case changes. On phones the panel is taller than the
-  screen, so it simply takes the height of the case on show.
+  All six cases sit stacked in one grid cell, so the panel always has the height of the longest case and nothing
+  below it moves when the case changes. Only the chosen case is visible and reachable (the others are transparent,
+  aria-hidden and inert). A switch slides 24px in the direction of travel along the tab bar: a tab to the right of
+  the old one comes in from the right, a tab to the left comes in from the left.
 
-  The case name sits beside the arrows (desktop) and above the figures (phones), never above the tagline: a small
-  label over a headline is an eyebrow, which the brief rules out.
+  The panel carries the backdrop blur, so it must never sit inside Reveal or any other opacity, filter or mask
+  wrapper; it runs its own one-off entrance instead. The case name and the arrows form the panel's title bar above
+  a hairline (panel chrome, not a label over the headline).
 */
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+const SLIDE = 24;
 const ITEMS = CASES.items;
 const COUNT = ITEMS.length;
-const PANEL_ID = "use-cases-panel";
 const HEADING_ID = "use-cases-heading";
 const tabId = (i: number) => `use-cases-tab-${i}`;
+const panelId = (i: number) => `use-cases-panel-${i}`;
+
+/** Where case `i` rests while case `index` is on show: in place, or just off to the side it lies on along the tab bar. */
+function slideTo(i: number, index: number) {
+  return i === index
+    ? { opacity: 1, x: 0, transition: { x: { duration: 0.4, ease: EASE }, opacity: { duration: 0.4, delay: 0.05, ease: EASE } } }
+    : { opacity: 0, x: i < index ? -SLIDE : SLIDE, transition: { x: { duration: 0.4, ease: EASE }, opacity: { duration: 0.2, ease: EASE } } };
+}
 
 export function CasesSection() {
   const [index, setIndex] = useState(0);
   const [announcement, setAnnouncement] = useState("");
-  const reduce = useReducedMotion();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const active = ITEMS[index];
 
   // On phones the tab bar scrolls sideways: bring the chosen tab fully into view, moving only the bar, never the page.
   function revealTab(i: number) {
@@ -44,7 +55,8 @@ export function CasesSection() {
     const bar = scroller.getBoundingClientRect();
     const box = tab.getBoundingClientRect();
     if (box.left >= bar.left + inset - 1 && box.right <= bar.right - inset + 1) return;
-    scroller.scrollTo({ left: scroller.scrollLeft + box.left - bar.left - inset, behavior: reduce ? "auto" : "smooth" });
+    const instant = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    scroller.scrollTo({ left: scroller.scrollLeft + box.left - bar.left - inset, behavior: instant ? "auto" : "smooth" });
   }
 
   function select(i: number) {
@@ -52,14 +64,14 @@ export function CasesSection() {
     revealTab(i);
   }
 
-  // The arrows cycle through all six and tell screen readers which case is now on show.
+  // The arrows cycle through all six and tell screen readers which case is now on show (focus stays on the arrow).
   function step(delta: 1 | -1) {
     const next = (index + delta + COUNT) % COUNT;
     select(next);
     setAnnouncement(ITEMS[next].name);
   }
 
-  // Left and right arrows move between tabs (wrapping), Home and End jump to the ends. The focused tab is the shown one.
+  // Roving tabindex: Left and Right move between the tabs (wrapping), Home and End jump to the ends; the focused tab is shown.
   function onTabKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
     let next: number;
     switch (event.key) {
@@ -88,87 +100,113 @@ export function CasesSection() {
       <Container>
         <Reveal>
           <div id={HEADING_ID}>
-            <Heading title={CASES.title} accent={CASES.accent} className="max-w-[820px]" />
+            <Heading title={CASES.title} accent={CASES.accent} className="max-w-[760px]" />
           </div>
-          <p className="t-lead mt-6 max-w-[620px]">{CASES.text}</p>
-        </Reveal>
+          <p className="t-lead mt-6 max-w-[580px]">{CASES.text}</p>
 
-        <Reveal className="mt-14 md:mt-20" delay={0.08}>
-          {/* Full bleed on phones so the pills scroll edge to edge; the inner padding keeps the first pill on the content edge
-              and leaves room for the focus ring. */}
-          <div
+          {/* Full bleed on phones so the tabs scroll edge to edge with snap; the padding keeps the first tab on the content
+              edge and leaves room for the focus ring. From lg up all six fit and nothing scrolls. */}
+          <motion.div
             ref={scrollerRef}
-            className="-mx-5 -my-1.5 snap-x snap-mandatory scroll-px-5 overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] md:-mx-8 md:scroll-px-8 [&::-webkit-scrollbar]:hidden"
+            layoutScroll
+            className="-mx-5 mt-12 -mb-2 snap-x snap-mandatory scroll-px-5 overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:none] md:-mx-8 md:mt-16 md:scroll-px-8 [&::-webkit-scrollbar]:hidden"
           >
-            <div role="tablist" aria-labelledby={HEADING_ID} className="flex w-max gap-2 px-5 py-1.5 md:px-8">
-              {ITEMS.map((item, i) => {
-                const selected = i === index;
-                return (
-                  <button
-                    key={item.area}
-                    ref={(el) => {
-                      tabRefs.current[i] = el;
-                    }}
-                    type="button"
-                    role="tab"
-                    id={tabId(i)}
-                    aria-selected={selected}
-                    aria-controls={PANEL_ID}
-                    tabIndex={selected ? 0 : -1}
-                    onClick={() => select(i)}
-                    onKeyDown={onTabKeyDown}
-                    className={cn(
-                      "h-11 shrink-0 cursor-pointer snap-start rounded-full border px-5 text-[15px] whitespace-nowrap transition-[background-color,border-color,color,scale] duration-200 ease-out active:scale-[0.97]",
-                      selected ? "border-white bg-white text-page" : "border-white/12 text-ink/70 hover:border-white/30 hover:text-ink"
-                    )}
-                  >
-                    {/* The hidden medium-weight copy reserves the width, so no pill changes size when the weight changes. */}
-                    <span className="grid justify-items-center">
-                      <span className={cn("col-start-1 row-start-1", selected && "font-medium")}>{item.area}</span>
-                      <span aria-hidden className="invisible col-start-1 row-start-1 font-medium">
-                        {item.area}
+            <div role="tablist" aria-labelledby={HEADING_ID} aria-orientation="horizontal" className="flex w-max gap-1 px-5 py-2 md:px-8">
+              <AnimatedBackground
+                value={String(index)}
+                defaultValue="0"
+                onValueChange={(id) => {
+                  if (id !== null) select(Number(id));
+                }}
+                transition={{ duration: 0.4, ease: EASE }}
+                className="rounded-2xl bg-sky/[0.14] shadow-[inset_0_1px_0_rgb(255_255_255/0.12),inset_0_0_0_1px_rgb(105_191_248/0.35)]"
+              >
+                {ITEMS.map((item, i) => {
+                  const selected = i === index;
+                  return (
+                    <button
+                      key={item.name}
+                      data-id={String(i)}
+                      ref={(el) => {
+                        tabRefs.current[i] = el;
+                      }}
+                      type="button"
+                      role="tab"
+                      id={tabId(i)}
+                      aria-selected={selected}
+                      aria-controls={panelId(i)}
+                      aria-label={`${item.area} ${item.kind}`}
+                      tabIndex={selected ? 0 : -1}
+                      onKeyDown={onTabKeyDown}
+                      className="group min-h-11 shrink-0 cursor-pointer snap-start rounded-2xl px-4 py-2.5 text-left transition-colors duration-200 ease-out hover:bg-white/[0.04] data-[checked=true]:hover:bg-transparent lg:px-5"
+                    >
+                      <span className="flex flex-col items-start">
+                        <span className="text-[15px] leading-5 font-medium whitespace-nowrap text-white/75 transition-colors duration-200 group-hover:text-white group-data-[checked=true]:text-white">
+                          {item.area}
+                        </span>
+                        <span className="mt-0.5 text-[13px] leading-[18px] whitespace-nowrap text-silver">{item.kind}</span>
                       </span>
-                    </span>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })}
+              </AnimatedBackground>
             </div>
-          </div>
-
-          <div className="surface relative mt-6 rounded-[32px] md:mt-8">
-            <div role="tabpanel" id={PANEL_ID} aria-labelledby={tabId(index)} tabIndex={0} className="rounded-[32px] p-6 md:p-12">
-              <div className="grid">
-                {ITEMS.map((item) => (
-                  <div key={item.area} aria-hidden className="invisible col-start-1 row-start-1 hidden md:block">
-                    <CaseBody item={item} />
-                  </div>
-                ))}
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
-                    key={active.area}
-                    className="col-start-1 row-start-1"
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } }}
-                    exit={{ opacity: 0, y: -12, transition: { duration: 0.2, ease: EASE } }}
-                  >
-                    <CaseBody item={active} />
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </div>
-
-            <div className="absolute top-6 right-6 z-10 flex gap-2 md:top-12 md:right-12">
-              <PagerButton direction={-1} label="Vorheriges Praxisbeispiel" onClick={() => step(-1)} />
-              <PagerButton direction={1} label="Nächstes Praxisbeispiel" onClick={() => step(1)} />
-            </div>
-          </div>
-
-          <div className="mt-8 flex md:mt-10">
-            <TextLink href={LINKS.analysis} className="min-h-11">
-              {SOLUTION.primary}
-            </TextLink>
-          </div>
+          </motion.div>
         </Reveal>
+
+        {/* The section's one glass object and one of the page's two blurred surfaces. It animates itself: no Reveal around it. */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+          transition={{ duration: 0.8, delay: 0.08, ease: EASE }}
+          className="glass glass-lit glass-blur mt-6 rounded-[36px] p-6 md:mt-8 md:p-12"
+        >
+          {/* Title bar: the case name (the same words as the chosen tab, so it is hidden from screen readers) and the arrows. */}
+          <div className="flex items-center gap-3">
+            <div aria-hidden className="grid min-w-0 flex-1">
+              {ITEMS.map((item, i) => (
+                <motion.p
+                  key={item.name}
+                  inert={i !== index}
+                  initial={false}
+                  animate={slideTo(i, index)}
+                  className="col-start-1 row-start-1 text-[15px] leading-[1.4] font-medium text-sky"
+                >
+                  {item.name}
+                </motion.p>
+              ))}
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <PagerButton direction={-1} label="Vorheriges Praxisbeispiel" controls={panelId(index)} onClick={() => step(-1)} />
+              <PagerButton direction={1} label="Nächstes Praxisbeispiel" controls={panelId(index)} onClick={() => step(1)} />
+            </div>
+          </div>
+
+          <div aria-hidden className="rule mt-5 md:mt-8" />
+
+          <div className="mt-8 grid grid-cols-[minmax(0,1fr)] md:mt-10">
+            {ITEMS.map((item, i) => {
+              const active = i === index;
+              return (
+                <motion.div
+                  key={item.name}
+                  role="tabpanel"
+                  id={panelId(i)}
+                  aria-labelledby={tabId(i)}
+                  aria-hidden={active ? undefined : true}
+                  inert={!active}
+                  tabIndex={active ? 0 : undefined}
+                  initial={false}
+                  animate={slideTo(i, index)}
+                  className="col-start-1 row-start-1 rounded-2xl"
+                >
+                  <CaseBody item={item} />
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
 
         <p className="sr-only" aria-live="polite" aria-atomic="true">
           {announcement}
@@ -178,76 +216,96 @@ export function CasesSection() {
   );
 }
 
-/** One case: the story on the left, the figures and tools on the right (stacked on phones). */
+/**
+ * One case as editorial type: headline and text, the three figures in a row (stacked on phones), then the quote and
+ * the two quiet columns. From lg up the bottom row shares the figures' three columns, so everything lines up.
+ */
 function CaseBody({ item }: { item: CaseStudy }) {
   return (
-    <div className="grid gap-y-10 pt-16 lg:grid-cols-12 lg:gap-x-16 lg:pt-0">
-      <div className="lg:col-span-7">
-        <h3 className="text-[clamp(1.75rem,1.25rem+1.5vw,2.5rem)] leading-[1.15] font-medium tracking-[-0.03em] text-balance text-white">
-          {item.tagline}
-        </h3>
-        <p className="t-body mt-5">{item.text}</p>
+    <>
+      <h3 className="max-w-[780px] text-[clamp(1.75rem,1.2rem+1.5vw,2.375rem)] leading-[1.15] font-medium tracking-[-0.025em] text-balance text-white">
+        {item.tagline}
+      </h3>
+      <p className="t-body mt-4 max-w-[620px]">{item.text}</p>
 
-        <figure className="mt-8 border-l-2 border-sky/40 pl-5">
+      <ul className="mt-10 md:mt-12 md:grid md:grid-cols-3">
+        {item.metrics.map((metric, i) => (
+          <li
+            key={metric.label}
+            className={cn(
+              "md:px-6 lg:px-8",
+              i === 0 && "md:pl-0 lg:pl-0",
+              i > 0 && "md:border-l md:border-white/[0.08]",
+              i === item.metrics.length - 1 && "md:pr-0 lg:pr-0"
+            )}
+          >
+            {i > 0 ? <div aria-hidden className="rule my-6 md:hidden" /> : null}
+            <p className="num text-[56px] leading-none whitespace-nowrap text-white lg:text-[64px]">{metric.value}</p>
+            <p className="t-small mt-3 max-w-[16rem]">{metric.label}</p>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-10 md:mt-14 md:grid-cols-2 md:gap-x-6 lg:grid-cols-3 lg:gap-x-0">
+        <figure className="border-l border-sky pl-5 md:col-span-2 lg:col-span-1 lg:mr-8">
           <blockquote>
-            <p className="text-[18px] leading-[1.6] text-white/85">„{item.quote}“</p>
+            <p className="text-[18px] leading-[1.6] text-pretty text-white/90">„{item.quote}“</p>
           </blockquote>
-          <figcaption className="t-small mt-3">{item.role}</figcaption>
+          <figcaption className="mt-3 text-[14px] leading-[1.5] text-silver">
+            <span aria-hidden>– </span>
+            {item.role}
+          </figcaption>
         </figure>
 
-        <p className="mt-10 text-[14px] text-white/60">{CASES.doneLabel}</p>
-        <ul className="mt-4 grid gap-3">
-          {item.done.map((entry) => (
-            <li key={entry} className="flex gap-3 text-[15px] leading-6 text-ink/85">
-              <Check aria-hidden strokeWidth={1.5} className="mt-1 size-4 shrink-0 text-sky" />
-              <span>{entry}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="lg:px-8">
+          <h4 className="text-[14px] leading-[1.5] text-silver">{CASES.doneLabel}</h4>
+          <ul className="mt-4 grid gap-2.5">
+            {item.done.map((entry) => (
+              <li key={entry} className="flex gap-3 text-[15px] leading-6 text-ink/85">
+                <Check aria-hidden strokeWidth={1.5} className="mt-1 size-4 shrink-0 text-sky" />
+                <span>{entry}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="lg:pl-8">
+          <h4 className="text-[14px] leading-[1.5] text-silver">{CASES.toolsLabel}</h4>
+          {/* Plain text joined by middle dots; each name stays whole and lines break only between tools. */}
+          <ul className="mt-4 text-[15px] leading-7 text-ink/85">
+            {item.tools.map((tool, i) => (
+              <li key={tool} className="inline">
+                <span className="whitespace-nowrap">
+                  {tool}
+                  {i < item.tools.length - 1 ? (
+                    <span aria-hidden className="text-silver">
+                      {" ·"}
+                    </span>
+                  ) : null}
+                </span>
+                {i < item.tools.length - 1 ? " " : null}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-
-      <div className="lg:col-span-5">
-        {/* On desktop this row lines up with the arrows, which sit over its right end. */}
-        <p className="text-[15px] font-medium text-sky lg:flex lg:min-h-11 lg:items-center lg:pr-28">{item.name}</p>
-
-        <ul className="mt-5 lg:mt-6">
-          {item.metrics.map((metric, i) => (
-            <li key={metric.label}>
-              {i > 0 ? <div aria-hidden className="hairline my-4 lg:my-6" /> : null}
-              <div className="grid grid-cols-[8rem_minmax(0,1fr)] items-center gap-x-4 lg:grid-cols-1 lg:items-start lg:gap-y-2">
-                <p className="num text-[44px] leading-none text-white lg:text-[64px]">{metric.value}</p>
-                <p className="t-small">{metric.label}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        <p className="mt-10 text-[14px] text-white/60">{CASES.toolsLabel}</p>
-        <ul className="mt-4 flex flex-wrap gap-2">
-          {item.tools.map((tool) => (
-            <li key={tool} className="inline-flex h-8 items-center rounded-full border border-white/12 px-3 text-[13px] text-ink/80">
-              {tool}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    </>
   );
 }
 
-/** A 44px round arrow button; it stays mounted while the panel content changes, so keyboard focus is never lost. */
-function PagerButton({ direction, label, onClick }: { direction: 1 | -1; label: string; onClick: () => void }) {
+/** A 44px round arrow with a hairline border; it stays mounted while the case changes, so keyboard focus is never lost. */
+function PagerButton({ direction, label, controls, onClick }: { direction: 1 | -1; label: string; controls: string; onClick: () => void }) {
   const iconClass = cn(
-    "size-4 transition-transform duration-300 ease-out",
+    "size-4 transition-transform duration-200 ease-out",
     direction === 1 ? "group-hover:translate-x-0.5" : "group-hover:-translate-x-0.5"
   );
   return (
     <button
       type="button"
       aria-label={label}
-      aria-controls={PANEL_ID}
+      aria-controls={controls}
       onClick={onClick}
-      className="group grid size-11 cursor-pointer place-items-center rounded-full border border-white/15 bg-white/[0.03] text-ink/80 transition-[border-color,background-color,color,scale] duration-200 ease-out hover:border-sky/30 hover:bg-white/[0.06] hover:text-white active:scale-[0.96]"
+      className="group grid size-11 cursor-pointer place-items-center rounded-full border border-white/15 text-ink/80 transition-[border-color,background-color,color,scale] duration-200 ease-out hover:border-white/35 hover:bg-white/[0.04] hover:text-white active:scale-[0.96]"
     >
       {direction === 1 ? (
         <ArrowRight aria-hidden strokeWidth={1.5} className={iconClass} />

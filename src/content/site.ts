@@ -4,6 +4,9 @@
 export const LINKS = {
   analysis: "https://api.brandedgenius.net/widget/survey/FXLzi1dZ9ecKm8EVD5sf",
   booking: "https://api.brandedgenius.net/widget/booking/CiuYtyMNCf8R7Dkft6Pe",
+  // The client's hosted contact form: the original opens it from "Jetzt Kontakt aufnehmen", "Send Message",
+  // "Leistungen entdecken", the service cards and the Lösung button.
+  contact: "https://api.brandedgenius.net/widget/form/JemoFrrJQ5D665FZaVM0",
   imprint: "https://brandedgenius.de/impressum/",
   privacy: "https://brandedgenius.de/datenschutzerklarung/",
   terms: "https://brandedgenius.de/agb/",
@@ -14,17 +17,22 @@ export const LINKS = {
 export const MEDIA = {
   heroVideo: "/media/hero.mp4",
   heroPoster: "/media/hero-poster.webp",
-  film: "/media/imagefilm.mp4",
-  filmPoster: "/media/imagefilm-poster.webp",
 };
 
 export const NAV = [
+  { label: "Startseite", href: "#top" },
   { label: "Leistungen", href: "#leistungen" },
   { label: "Use Cases", href: "#use-cases" },
   { label: "KI-Workshop", href: "#ki-workshop" },
   { label: "Über uns", href: "#ueber-uns" },
   { label: "Kontakt", href: "#kontakt" },
 ];
+
+export const HEADER = {
+  cta: "Jetzt Kontakt aufnehmen",
+  mobileCta: "Analyse",
+  menuCta: "KI-Potenzialanalyse anfragen",
+};
 
 export const HERO = {
   title: "KI-Automatisierung,",
@@ -34,12 +42,6 @@ export const HERO = {
   primary: "Potenzialanalyse anfragen",
   secondary: "Strategiegespräch",
   claim: ["Strategisch.", "Automatisiert.", "Messbar."],
-};
-
-export const FILM = {
-  title: "Das ist Branded Genius.",
-  text: "Erfahren Sie, wie wir künstliche Intelligenz, Automatisierung und strategisches Marketing verbinden, um Unternehmen effizienter und zukunftsfähiger zu machen.",
-  play: "Branded Genius Imagefilm abspielen",
 };
 
 export const PROBLEM = {
@@ -58,6 +60,37 @@ export const PROBLEM = {
     { label: "Tools", value: "Nicht miteinander verbunden" },
     { label: "Daten", value: "In einzelnen Systemen" },
     { label: "Aufgaben", value: "Weiterhin manuell" },
+  ],
+};
+
+// "Die Realität" on brandedgenius.de: six reasons, each with the photo the client uses there.
+export const REALITY = {
+  title: "Die häufigsten Gründe, warum KI-Projekte",
+  accent: "nicht produktiv werden.",
+  text: "Viele Unternehmen investieren in KI-Tools, doch ohne klare Strategie und Struktur bleiben Potenziale ungenutzt und Ergebnisse aus.",
+  items: [
+    { title: "Keine klare KI-Roadmap", text: "KI-Tools werden ausprobiert, aber ohne strukturierten Umsetzungsplan.", img: "/media/reality/01.webp" },
+    {
+      title: "Tool-Chaos statt System",
+      text: "Viele Tools werden genutzt, aber nicht sinnvoll miteinander verbunden oder in einen klaren Prozess integriert.",
+      img: "/media/reality/02.webp",
+    },
+    {
+      title: "Manuelle Prozesse bleiben bestehen",
+      text: "Wiederkehrende Aufgaben kosten weiterhin Zeit und Ressourcen, obwohl sie automatisiert werden könnten.",
+      img: "/media/reality/03.webp",
+    },
+    {
+      title: "Mitarbeiter sind unsicher",
+      text: "Teams wissen nicht, welche Tools sie nutzen dürfen oder wie KI richtig eingesetzt werden soll.",
+      img: "/media/reality/04.webp",
+    },
+    { title: "Datenschutz wird zu spät berücksichtigt", text: "Compliance und interne Regeln werden häufig erst am Ende berücksichtigt.", img: "/media/reality/05.webp" },
+    {
+      title: "Keine KPIs und keine klare Wirkung",
+      text: "KI wird getestet, aber der Business-Impact wird nicht gemessen oder transparent ausgewertet.",
+      img: "/media/reality/06.webp",
+    },
   ],
 };
 
@@ -111,6 +144,13 @@ export const SOLUTION = {
   ],
   primary: "KI-Potenzialanalyse anfragen",
   secondary: "Unsere Lösung entdecken",
+  // The left column of the original's Lösung section: the photo and two cards.
+  img: "/media/photos/vorher-nachher.webp",
+  imgAlt: "Roman Tränkle am Schreibtisch vor dem Branded Genius Logo",
+  cards: [
+    { title: "Klarer Plan", items: ["Analyse", "Priorisierung", "Roadmap"] },
+    { title: "Verbundene Abläufe", items: ["Workflows", "Agenten", "Automatisierung"] },
+  ],
 };
 
 export const SYSTEM = {
@@ -118,6 +158,7 @@ export const SYSTEM = {
   accent: "intelligenten KI-System",
   text: "Branded Genius verbindet Ihre Systeme, Daten und Prozesse zu einem zentralen, intelligenten Ökosystem – für bessere Entscheidungen, automatisierte Abläufe und nachhaltiges Wachstum.",
   claim: "Alle Tools. Ein System. Intelligent vernetzt.",
+  cta: "KI-Potenzialanalyse anfragen",
   qualities: [
     { title: "DSGVO-bewusst", text: "Sicher & konform" },
     { title: "Systemübergreifend", text: "Offen & flexibel" },
@@ -139,6 +180,7 @@ export const SYSTEM = {
 export const SERVICES = {
   title: "Unsere Leistungen.",
   accent: "Für messbare KI-Transformation.",
+  cta: "Leistungen entdecken",
   text: "Strategie, Technologie und Training aus einer Hand – damit KI in Ihrem Unternehmen nicht nur getestet, sondern erfolgreich umgesetzt wird.",
   items: [
     {
@@ -171,6 +213,8 @@ export const SERVICES = {
 
 export type CaseStudy = {
   area: string;
+  /** Second line of the original tab label. */
+  kind: string;
   name: string;
   tagline: string;
   text: string;
@@ -190,6 +234,7 @@ export const CASES = {
   items: [
     {
       area: "Marketing",
+      kind: "Automation",
       name: "Marketing Automation",
       tagline: "Lead-Generierung neu gedacht.",
       text: "Automatisierte Kampagnensteuerung und intelligente Lead-Qualifizierung steigern die Conversion-Raten messbar und nachhaltig.",
@@ -205,6 +250,7 @@ export const CASES = {
     },
     {
       area: "Vertrieb",
+      kind: "Automation",
       name: "Vertrieb Automation",
       tagline: "Mehr Abschlüsse. Weniger manuelle Vertriebsarbeit.",
       text: "KI-gestützte Pipeline-Steuerung und automatisierte Follow-ups verwandeln qualifizierte Termine schneller in erfolgreiche Abschlüsse.",
@@ -220,6 +266,7 @@ export const CASES = {
     },
     {
       area: "Kundenservice",
+      kind: "Chatbot",
       name: "Kundenservice Chatbot",
       tagline: "Schneller antworten. Kunden besser betreuen.",
       text: "Autonome Anfrage-Erkennung und nahtlose Übergaben entlasten das Serviceteam und sichern 24/7-Reaktionszeiten.",
@@ -235,6 +282,7 @@ export const CASES = {
     },
     {
       area: "Backoffice",
+      kind: "Automation",
       name: "Backoffice Automation",
       tagline: "Prozesse automatisieren. Aufwand deutlich reduzieren.",
       text: "Automatische Dokumentenerfassung und fehlerfreie Freigabe-Workflows beschleunigen interne Verwaltungsabläufe signifikant.",
@@ -250,6 +298,7 @@ export const CASES = {
     },
     {
       area: "Telefonie",
+      kind: "AI Assistant",
       name: "Telefonie AI Assistant",
       tagline: "Anrufe automatisieren. Erreichbarkeit intelligent skalieren.",
       text: "Smarte Sprachassistenten qualifizieren Anrufer rund um die Uhr und buchen Termine eigenständig.",
@@ -265,6 +314,7 @@ export const CASES = {
     },
     {
       area: "CRM",
+      kind: "Follow-up",
       name: "CRM Follow-up",
       tagline: "Leads nachfassen. Kein Potenzial mehr verlieren.",
       text: "Automatisierte Reaktivierungssequenzen stellen sicher, dass kein wertvoller Lead im Nachfassprozess verloren geht.",
@@ -390,7 +440,9 @@ export const CTA = {
   title: "Bereit, Ihr Unternehmen",
   accent: "mit KI zu automatisieren?",
   text: "Erfahren Sie in einer kostenlosen Potenzialanalyse oder einem persönlichen Strategiegespräch, welche Prozesse sich in Ihrem Unternehmen am schnellsten und effektivsten automatisieren lassen.",
-  primary: "Kostenlose Potenzialanalyse",
+  // The original's first button ("Send Message") opens the client's hosted contact form; it is labelled here with the
+  // German label the original gives the same form elsewhere ("KI-Potenzialanalyse anfragen").
+  primary: "KI-Potenzialanalyse anfragen",
   secondary: "Strategiegespräch buchen",
   checks: ["100% kostenlos & unverbindlich", "Konkrete Handlungsempfehlungen", "Keine Vorbereitung nötig"],
 };
@@ -400,15 +452,12 @@ export const FOOTER = {
   accent: "sprechen.",
   text: "Erweitern Sie Ihr Unternehmen mit KI-gestützten Lösungen.",
   cta: "Beratungsgespräch buchen",
-  discover: { title: "Entdecken", links: [...NAV.slice(0, 4), { label: "Blogs", href: LINKS.blog }, { label: "KI Wikipedia", href: LINKS.wiki }] },
+  discover: { title: "Entdecken", links: [...NAV.slice(1, 5), { label: "Blogs", href: LINKS.blog }, { label: "KI Wikipedia", href: LINKS.wiki }] },
   // The client's own footer links Facebook to facebook.com itself and has no LinkedIn address, so only real contact routes are listed.
   connect: {
     title: "Verbinden",
-    links: [
-      { label: "info@brandedgenius.de", href: "mailto:info@brandedgenius.de" },
-      { label: "+49 176 24624981", href: "tel:+4917624624981" },
-      { label: "Beratungsgespräch buchen", href: LINKS.booking },
-    ],
+    // The original also lists Facebook and LinkedIn; they will be added once the client sends the profile links.
+    links: [{ label: "Kontakt", href: LINKS.contact }],
   },
   legal: [
     { label: "AGB", href: LINKS.terms },

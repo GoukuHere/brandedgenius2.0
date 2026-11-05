@@ -1,18 +1,19 @@
-import { ArrowUp } from "lucide-react";
-import { Container, Heading, PrimaryLink } from "@/components/system/primitives";
-import { CONTACT, FOOTER, LINKS } from "@/content/site";
+/* eslint-disable @next/next/no-img-element */
+import { ArrowUp, ArrowUpRight } from "lucide-react";
+import { Container, Heading } from "@/components/system/primitives";
+import { FOOTER, LINKS } from "@/content/site";
 
-function Column({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+function Column({ title, links, align = "left" }: { title: string; links: { label: string; href: string }[]; align?: "left" | "right" }) {
   return (
-    <div>
-      <h3 className="text-[15px] text-ink/45">{title}</h3>
+    <div className={align === "right" ? "lg:text-right" : undefined}>
+      <h3 className="text-[15px] font-medium text-sky">{title}</h3>
       <ul className="mt-5 space-y-3">
         {links.map((l) => (
-          <li key={l.href}>
+          <li key={l.href + l.label}>
             <a
               href={l.href}
               {...(l.href.startsWith("http") ? { target: "_blank", rel: "noopener" } : {})}
-              className="text-[16px] text-ink/80 transition-colors duration-200 hover:text-white"
+              className="text-[16px] text-ink/75 transition-colors duration-200 hover:text-white"
             >
               {l.label}
             </a>
@@ -23,29 +24,49 @@ function Column({ title, links }: { title: string; links: { label: string; href:
   );
 }
 
-// After the client's own footer (Lassen Sie uns sprechen / Entdecken / Verbinden / legal), set like arventas.de's closing.
+// The client's own footer (brandedgenius.de), on the page background: "Lassen Sie uns sprechen.", Entdecken, the
+// logo in the middle with the booking link, Verbinden, the legal links and "Nach oben". No glass here.
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden pt-24 md:pt-32">
+    <footer className="relative pt-16 pb-8 md:pt-24">
       <Container>
-        <div className="grid gap-14 lg:grid-cols-12">
-          <div className="lg:col-span-6">
-            <Heading title={FOOTER.title} accent={FOOTER.accent} />
-            <p className="t-lead mt-5 max-w-[440px]">{FOOTER.text}</p>
-            <PrimaryLink href={LINKS.booking} className="mt-8">
-              {FOOTER.cta}
-            </PrimaryLink>
+        <div className="rule" />
+        <div className="flex flex-col gap-6 pt-14 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Heading title={FOOTER.title} accent={FOOTER.accent} variant="tone" className="[&_.tone]:text-sky" />
+            <p className="t-lead mt-4 max-w-[440px]">{FOOTER.text}</p>
           </div>
-          <div className="grid gap-10 sm:grid-cols-2 lg:col-span-6 lg:col-start-7 xl:col-span-5 xl:col-start-8">
-            <Column title={FOOTER.discover.title} links={FOOTER.discover.links} />
-            <Column title={FOOTER.connect.title} links={FOOTER.connect.links} />
-          </div>
+          <a
+            href={LINKS.contact}
+            target="_blank"
+            rel="noopener"
+            aria-label="Kontakt aufnehmen"
+            className="group grid size-16 shrink-0 place-items-center rounded-full border border-sky/40 text-sky transition-colors duration-300 hover:bg-sky hover:text-page"
+          >
+            <ArrowUpRight className="size-6 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </a>
         </div>
 
-        <div className="mt-20 flex flex-col gap-6 border-t border-white/10 py-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="t-small">
-            {FOOTER.copyright} {CONTACT.city}
-          </p>
+        <div className="mt-14 grid gap-12 lg:grid-cols-3 lg:items-start">
+          <Column title={FOOTER.discover.title} links={FOOTER.discover.links} />
+          <div className="flex flex-col items-start lg:items-center">
+            <img src="/brand/mark.svg" alt="" width={168} height={96} className="h-20 w-auto md:h-24" />
+            <p className="mt-4 text-[15px] font-medium tracking-[0.02em] text-white">BRANDED GENIUS</p>
+            <a
+              href={LINKS.booking}
+              target="_blank"
+              rel="noopener"
+              className="group mt-2 inline-flex items-center gap-1.5 text-[15px] font-medium text-sky transition-colors hover:text-white"
+            >
+              {FOOTER.cta}
+              <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </a>
+          </div>
+          <Column title={FOOTER.connect.title} links={FOOTER.connect.links} align="right" />
+        </div>
+
+        <div className="mt-14 flex flex-col gap-5 border-t border-white/[0.08] pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="t-small">{FOOTER.copyright}</p>
           <nav aria-label="Rechtliches" className="flex gap-6">
             {FOOTER.legal.map((l) => (
               <a key={l.href} href={l.href} target="_blank" rel="noopener" className="text-[14px] text-ink/60 transition-colors duration-200 hover:text-white">
@@ -53,23 +74,12 @@ export function Footer() {
               </a>
             ))}
           </nav>
-          <a
-            href="#top"
-            aria-label="Nach oben"
-            className="group grid size-12 place-items-center self-start rounded-full border border-white/15 transition-colors duration-300 hover:border-sky/50 hover:bg-sky/10 sm:self-auto"
-          >
+          <a href="#top" className="group inline-flex items-center gap-2 text-[14px] text-ink/70 transition-colors hover:text-white">
+            Nach oben
             <ArrowUp className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
           </a>
         </div>
       </Container>
-
-      {/* The name set huge and quiet at the very bottom, as arventas.de closes its page. */}
-      <p
-        aria-hidden
-        className="pointer-events-none mt-4 translate-y-[18%] text-center text-[11.6vw] leading-[0.8] font-semibold tracking-[-0.055em] whitespace-nowrap text-white/[0.045] select-none"
-      >
-        BRANDED GENIUS
-      </p>
     </footer>
   );
 }

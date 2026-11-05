@@ -1,233 +1,211 @@
 "use client";
 
-import { MessagesSquare, PhoneCall, TrendingUp, Workflow, type LucideIcon } from "lucide-react";
-import { AnimatePresence, motion, useMotionValue, type MotionValue } from "motion/react";
-import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type ReactNode } from "react";
-import { isSceneId, SCENE_ASPECT, SCENES, ServiceAnimation, usePrefersReducedMotion, type SceneId } from "@/components/sections/service-scenes";
-import { Container, Heading, IconChip, Section, TextLink } from "@/components/system/primitives";
+import { motion, useMotionValue, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
+import { createRef, useCallback, useEffect, useRef, useState, useSyncExternalStore, type FocusEvent, type ReactNode, type RefObject } from "react";
+import { isSceneId, ServiceAnimation, type SceneId } from "@/components/sections/service-scenes";
+import { Container, Heading, Section, TextLink } from "@/components/system/primitives";
 import { Reveal } from "@/components/system/reveal";
+import { useSectionProgress } from "@/components/system/use-section-progress";
+import { MagicCard } from "@/components/ui/magic-card";
 import { LINKS, SERVICES } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 /*
-  Leistungen: a tabbed showcase after the interactive "Objektreport" on arventas.de. One panel shows the active
-  service, its looping line drawing beside the details, where the step the drawing is acting out is highlighted.
-  Under the panel sits one tab per service. The active tab's top edge fills while its drawing plays, and the panel
-  moves on when the drawing completes its loop, so no drawing is ever cut off. It moves on only while the drawing
-  is on screen, nobody has clicked a tab in the last 20 seconds, keyboard focus is outside the showcase, and the
-  visitor has not asked for reduced motion.
+  Leistungen: four full-width glass plates that stack as the reader scrolls. On desktop windows at least 720px tall
+  each plate is sticky, its top 20px lower than the one before, so the top edges of the earlier plates stay in view
+  above the one in front. Each plate carries its service's line drawing across its full width, then the number and
+  title on the left and the original text and link on the right.
+
+  Only the front plate plays its drawing (from its still frame, so it never blanks). As the next plate slides over
+  a plate, the covered one rests on its still frame, scales to 0.97 from its top edge and dims to 60%, all tied to
+  the scroll and fully reversible. The plates are opaque (only their sheen and rim are glass), so a covered drawing never shows through the plate
+  in front, while the uncovered top strip keeps its still frame in view. The front plate carries the page's only MagicCard: a cursor-lit
+  edge for mouse users. On phones and short windows nothing sticks: the plates follow one after another.
+
+  Every visual state that depends on the window (stacking, fine pointer) is read after hydration, so the server
+  HTML and the first browser render always match.
 */
-
-const EASE = [0.16, 1, 0.3, 1] as const;
-const HOLD_MS = 20_000;
-const PANEL_ID = "leistungen-panel";
-const tabId = (id: SceneId) => `leistungen-tab-${id}`;
-// The list heading from v1's service cards; site.ts has no line for it.
-const INCLUDES = "Was dazugehört";
-
-const ICONS: Record<SceneId, LucideIcon> = { agents: Workflow, chat: MessagesSquare, calls: PhoneCall, marketing: TrendingUp };
 
 type Service = (typeof SERVICES.items)[number] & { id: SceneId };
 const ITEMS = SERVICES.items.filter((s): s is Service => isSceneId(s.id));
 
-/** The panel content for one service. Drawn live for the active service, and invisibly for each service to hold the tallest one's height. */
-function ServiceBody({ service, index, step, drawing, live = false }: { service: Service; index: number; step: number; drawing: ReactNode; live?: boolean }) {
-  const listId = live ? `leistungen-steps-${service.id}` : undefined;
-  return (
-    <div className="grid h-full content-start gap-8 lg:grid-cols-[minmax(0,11fr)_minmax(0,9fr)] lg:content-stretch lg:gap-14">
-      <div className="-mx-6 md:mx-0 lg:self-center">{drawing}</div>
-      <div className="lg:self-start">
-        <h3 className="text-[24px] leading-[1.15] font-medium tracking-tight text-balance text-white hyphens-auto sm:text-[30px]">
-          <span aria-hidden className="num mr-3 text-[40px] leading-none text-sky">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          {service.title}
-        </h3>
-        <p className="t-body mt-5">{service.text}</p>
-        <h4 id={listId} className="mt-8 text-[14px] font-normal text-white/60">
-          {INCLUDES}
-        </h4>
-        <ol aria-labelledby={listId} className="mt-4 grid gap-y-3 xl:auto-cols-fr xl:grid-flow-col xl:grid-rows-3 xl:gap-x-6">
-          {SCENES[service.id].steps.map(([, , name], i) => {
-            const on = i === step;
-            return (
-              <li
-                key={name}
-                aria-current={on ? "step" : undefined}
-                className={cn("flex items-center gap-3 text-[16px] leading-snug transition-colors duration-300", on ? "text-white" : step < 0 ? "text-ink/80" : "text-ink/45")}
-              >
-                <span aria-hidden className={cn("size-2 shrink-0 rounded-full transition-colors duration-300", on ? "bg-sky" : step < 0 ? "bg-sky/60" : "bg-white/20")} />
-                {name}
-              </li>
-            );
-          })}
-        </ol>
-        <div className="mt-8">
-          <TextLink href={LINKS.analysis}>{service.cta}</TextLink>
-        </div>
-      </div>
-    </div>
+/** Sticky tops in px, 20px apart, below the fixed header. */
+const TOPS = [112, 132, 152, 172];
+const topOf = (i: number) => TOPS[Math.min(i, TOPS.length - 1)];
+
+/** Must match the `lg:[@media(min-height:720px)]:` classes below. */
+const STACKED = "(min-width: 1024px) and (min-height: 720px)";
+const FINE_POINTER = "(hover: hover) and (pointer: fine)";
+
+
+/** A media query that is safe to hydrate: false on the server and while hydrating, then the real value. */
+function useMedia(query: string) {
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      const list = window.matchMedia(query);
+      list.addEventListener("change", onChange);
+      return () => list.removeEventListener("change", onChange);
+    },
+    [query]
+  );
+  return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches, () => false);
+}
+
+/** Keeps hyphenated compounds (KI-Agenten) whole, so a title never breaks after "KI-". */
+function keepCompounds(text: string): ReactNode {
+  return text.split(/(\s+)/).map((part, i) =>
+    part.includes("-") && part.trim() ? (
+      <span key={i} className="whitespace-nowrap">
+        {part}
+      </span>
+    ) : (
+      part
+    )
   );
 }
 
-function LiveService({ service, index, onLoopEnd, progress }: { service: Service; index: number; onLoopEnd: () => boolean; progress: MotionValue<number> }) {
-  const [step, setStep] = useState(0);
-  const reduced = usePrefersReducedMotion();
-  return (
-    <ServiceBody
-      live
-      service={service}
-      index={index}
-      // Reduced motion shows the still frame, so no step is "current" and the whole list reads at one level.
-      step={reduced ? -1 : step}
-      drawing={<ServiceAnimation id={service.id} onStep={setStep} onLoopEnd={onLoopEnd} progress={progress} className="[contain:layout_paint]" />}
-    />
-  );
-}
+function Plate({
+  service,
+  index,
+  spacer,
+  next,
+  front,
+  stacked,
+  magic,
+  stack,
+  onCover,
+}: {
+  service: Service;
+  index: number;
+  /** The gap in front of this plate. Its bottom edge is where the plate sits in the flow, sticky or not. */
+  spacer: RefObject<HTMLDivElement | null>;
+  /** The next plate's gap, whose bottom edge is where that plate sits: it measures how far it has covered this one. */
+  next?: RefObject<HTMLDivElement | null>;
+  front: boolean;
+  stacked: boolean;
+  magic: boolean;
+  /** 1 while the plates stack, 0 otherwise: the covered look only applies to a stack. */
+  stack: MotionValue<number>;
+  onCover: (index: number, covered: boolean) => void;
+}) {
+  const top = topOf(index);
 
-function ServiceShowcase() {
-  const [active, setActive] = useState(0);
-  const [held, setHeld] = useState(false);
-  const [holdKey, setHoldKey] = useState(0);
-  const [keyboard, setKeyboard] = useState(false);
-  const reduced = usePrefersReducedMotion();
-  const progress = useMotionValue(0);
-  const row = useRef<HTMLDivElement>(null);
-  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
-  const auto = !held && !keyboard && !reduced;
-  const service = ITEMS[active];
+  // 0 while the next plate is a screen away, 1 once it rests 20px below this one's top. Measured on the next gap,
+  // which never sticks, so the numbers stay true while the plates themselves are stuck.
+  const arriving = useSectionProgress(next ?? spacer, ["end end", `end ${topOf(index + 1)}px`]);
+  const cover = useTransform(() => (next ? arriving.get() : 0));
+  const scale = useTransform(() => 1 - 0.03 * cover.get() * stack.get());
+  const dim = useTransform(() => 1 - 0.4 * cover.get() * stack.get());
 
-  // A click on a tab holds the auto-advance for 20 seconds; each click starts the wait again.
-  useEffect(() => {
-    if (!holdKey) return;
-    const timer = window.setTimeout(() => setHeld(false), HOLD_MS);
-    return () => window.clearTimeout(timer);
-  }, [holdKey]);
+  // Hand the front over once the next plate is halfway across; report only the moments it flips.
+  const reported = useRef(false);
+  useMotionValueEvent(cover, "change", (v) => {
+    const on = v >= 0.5;
+    if (on === reported.current) return;
+    reported.current = on;
+    onCover(index, on);
+  });
 
-  // Each service starts with an empty bar. On phones the tab row brings the active tab into view, sideways only.
-  useEffect(() => {
-    progress.set(0);
-    const list = row.current;
-    const tab = tabs.current[active];
-    if (!list || !tab || list.scrollWidth <= list.clientWidth) return;
-    const pad = parseFloat(getComputedStyle(list).paddingLeft) || 0;
-    list.scrollTo({ left: tab.offsetLeft - pad, behavior: reduced ? "auto" : "smooth" });
-  }, [active, progress, reduced]);
-
-  const select = (i: number) => {
-    progress.set(0);
-    setActive(i);
-    setHeld(true);
-    setHoldKey((k) => k + 1);
-  };
-
-  // Called by the drawing when it completes a loop: move on, or let it loop again while the visitor is in control.
-  const onLoopEnd = () => {
-    if (!auto) return false;
-    progress.set(0);
-    setActive((i) => (i + 1) % ITEMS.length);
-    return true;
-  };
-
-  // Arrow keys, Home and End move between tabs and select at once (the WAI-ARIA tabs pattern, automatic activation).
-  const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>, from: number) => {
-    const last = ITEMS.length - 1;
-    const keys: Partial<Record<string, number>> = { ArrowRight: from === last ? 0 : from + 1, ArrowLeft: from === 0 ? last : from - 1, Home: 0, End: last };
-    const next = keys[e.key];
-    if (next === undefined) return;
-    e.preventDefault();
-    select(next);
-    tabs.current[next]?.focus();
-  };
-
-  // Keyboard focus anywhere in the showcase holds the auto-advance, so the selection never moves under a keyboard
-  // user. A mouse click focuses without :focus-visible and only starts the 20 second hold.
+  // A keyboard user tabbing into a plate that is covered (or still below the front one) brings it to the front, so
+  // the focused link is never hidden under another plate. Mouse focus never scrolls, so clicks land where aimed.
   const onFocus = (e: FocusEvent<HTMLDivElement>) => {
-    setKeyboard(e.target.matches(":focus-visible"));
+    if (front || !stacked || !e.target.matches(":focus-visible")) return;
+    const edge = spacer.current?.getBoundingClientRect().bottom;
+    if (edge === undefined) return;
+    window.scrollTo({ top: window.scrollY + edge - top, behavior: "instant" });
   };
-  const onBlur = (e: FocusEvent<HTMLDivElement>) => {
-    if (!e.currentTarget.contains(e.relatedTarget)) setKeyboard(false);
-  };
+
+  // With the cursor light on, the content lets the pointer through to it; the link takes it back.
+  const lit = magic && front;
 
   return (
-    <div onFocus={onFocus} onBlur={onBlur}>
-      <div id={PANEL_ID} role="tabpanel" aria-labelledby={tabId(service.id)} className="surface rounded-[32px] p-6 md:p-10">
-        <div className="grid">
-          {/* Invisible copies of every service hold the tallest one's height, so the panel and the tabs never jump. */}
-          {ITEMS.map((s, i) => (
-            <div key={s.id} aria-hidden inert className="invisible col-start-1 row-start-1">
-              <ServiceBody service={s} index={i} step={-1} drawing={<div style={{ aspectRatio: SCENE_ASPECT }} />} />
+    <>
+      <div ref={spacer} aria-hidden className={index === 0 ? "h-14 md:h-20" : "h-6 md:h-8 lg:[@media(min-height:720px)]:h-24"} />
+      <div role="listitem" style={{ top }} onFocus={onFocus} className="lg:[@media(min-height:720px)]:sticky">
+        <motion.div
+          style={{ scale, opacity: dim }}
+          className={cn(
+            "glass origin-top rounded-[28px] bg-[#090f1c]! p-5 sm:p-7 md:rounded-[36px] lg:p-10 motion-reduce:!transform-none lg:[@media(min-height:720px)]:will-change-transform",
+            front && "glass-lit"
+          )}
+        >
+          {lit && (
+            <div aria-hidden className="absolute inset-0 rounded-[inherit]">
+              <MagicCard className="h-full rounded-[inherit]" gradientSize={320} gradientOpacity={0} />
             </div>
-          ))}
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={service.id}
-              className="col-start-1 row-start-1"
-              initial={{ opacity: 0, y: reduced ? 0 : 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: reduced ? 0 : -10 }}
-              transition={{ duration: reduced ? 0 : 0.4, ease: EASE }}
-            >
-              <LiveService service={service} index={active} onLoopEnd={onLoopEnd} progress={progress} />
-            </motion.div>
-          </AnimatePresence>
-        </div>
+          )}
+          <div className={cn("relative", lit && "pointer-events-none")}>
+            {/* On phones the drawing runs to the plate's edges; on short stacked windows it is capped so the whole plate fits. */}
+            <div className="-mx-5 sm:mx-0">
+              <ServiceAnimation id={service.id} playing={front} className="lg:[@media(min-height:720px)]:max-h-[calc(100svh_-_440px)]" />
+            </div>
+            <div className="mt-6 grid gap-4 sm:mt-8 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-10 lg:mt-9 lg:gap-14">
+              <h3 className="text-[26px] leading-[1.15] font-medium tracking-[-0.015em] text-balance text-white sm:text-[30px] lg:text-[32px]">
+                <span aria-hidden className="num mr-3 text-silver">
+                  {String(index + 1).padStart(2, "0")}.
+                </span>
+                {keepCompounds(service.title)}
+              </h3>
+              <div>
+                <p className="t-body">{service.text}</p>
+                <TextLink href={LINKS.contact} className="pointer-events-auto mt-3 min-h-11">
+                  {service.cta}
+                </TextLink>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
-
-      <div
-        ref={row}
-        role="tablist"
-        aria-label={SERVICES.title}
-        className="relative -mx-5 mt-4 flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pt-2 pb-3 [scrollbar-width:none] md:-mx-8 md:scroll-px-8 md:px-8 lg:mx-0 lg:mt-6 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:p-0 [&::-webkit-scrollbar]:hidden"
-      >
-        {ITEMS.map((s, i) => {
-          const on = i === active;
-          const Icon = ICONS[s.id];
-          return (
-            <button
-              key={s.id}
-              ref={(el) => {
-                tabs.current[i] = el;
-              }}
-              type="button"
-              role="tab"
-              id={tabId(s.id)}
-              aria-selected={on}
-              aria-controls={PANEL_ID}
-              tabIndex={on ? 0 : -1}
-              onClick={() => select(i)}
-              onKeyDown={(e) => onKeyDown(e, i)}
-              className="group relative flex w-[64vw] max-w-[280px] shrink-0 cursor-pointer snap-start items-center gap-3.5 rounded-xl pt-6 text-left lg:w-auto lg:max-w-none lg:min-w-0"
-            >
-              {/* The bar fills while the drawing plays; it stays full while the visitor is in control. */}
-              <span aria-hidden className="absolute inset-x-0 top-0 h-[2px] overflow-hidden rounded-full bg-white/10">
-                <motion.span className="absolute inset-0 origin-left rounded-full bg-sky" style={{ scaleX: on ? (auto ? progress : 1) : 0 }} />
-              </span>
-              <IconChip className={cn("transition-opacity duration-300", on ? "opacity-100" : "opacity-55 group-hover:opacity-90")}>
-                <Icon strokeWidth={1.5} aria-hidden />
-              </IconChip>
-              <span className={cn("min-w-0 text-[15px] leading-snug font-medium hyphens-auto transition-colors duration-300", on ? "text-white" : "text-ink/55 group-hover:text-ink/85")}>
-                {s.title}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
+    </>
   );
 }
 
 export function ServicesSection() {
+  const stacked = useMedia(STACKED);
+  const magic = useMedia(FINE_POINTER);
+  const stack = useMotionValue(0);
+  const [spacers] = useState(() => ITEMS.map(() => createRef<HTMLDivElement>()));
+  const [covered, setCovered] = useState(() => ITEMS.map(() => false));
+
+  useEffect(() => {
+    stack.set(stacked ? 1 : 0);
+  }, [stack, stacked]);
+
+  const onCover = useCallback((index: number, on: boolean) => {
+    setCovered((prev) => (prev[index] === on ? prev : prev.map((v, i) => (i === index ? on : v))));
+  }, []);
+
+  // The front plate is the first one nothing has slid over yet.
+  const first = covered.indexOf(false);
+  const front = first < 0 ? ITEMS.length - 1 : first;
+
   return (
     <Section id="leistungen">
       <Container>
-        <Reveal>
-          <Heading title={SERVICES.title} accent={SERVICES.accent} className="max-w-[820px]" />
+        <Reveal y={12} className="max-w-[820px]">
+          <Heading title={SERVICES.title} accent={SERVICES.accent} />
           <p className="t-lead mt-6 max-w-[620px]">{SERVICES.text}</p>
+          <TextLink href={LINKS.contact} className="mt-5 min-h-11">
+            {SERVICES.cta}
+          </TextLink>
         </Reveal>
-        <Reveal className="mt-14 md:mt-20" delay={0.1}>
-          <ServiceShowcase />
-        </Reveal>
+
+        <div role="list" className="relative">
+          {ITEMS.map((service, i) => (
+            <Plate
+              key={service.id}
+              service={service}
+              index={i}
+              spacer={spacers[i]}
+              next={spacers[i + 1]}
+              front={i === front}
+              stacked={stacked}
+              magic={magic}
+              stack={stack}
+              onCover={onCover}
+            />
+          ))}
+        </div>
       </Container>
     </Section>
   );

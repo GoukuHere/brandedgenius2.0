@@ -14,10 +14,11 @@ const LINES = Array.from({ length: 16 }, (_, i) => {
 export function PageBackground() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-page">
-      <div className="absolute inset-0 bg-[radial-gradient(1200px_760px_at_80%_8%,rgb(0_75_160/0.26),transparent_70%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(900px_640px_at_6%_92%,rgb(105_191_248/0.07),transparent_70%)]" />
+      {/* All light on the page lives here, fixed, so every section sees the same ground (no per-section light). */}
+      <div className="absolute inset-0 bg-[radial-gradient(1200px_760px_at_80%_6%,rgb(0_75_160/0.2),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(1600px_520px_at_30%_105%,rgb(26_111_224/0.07),transparent_70%)]" />
       <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" fill="none">
-        <g stroke="#69bff8" strokeOpacity="0.07" strokeWidth="1" vectorEffect="non-scaling-stroke">
+        <g stroke="#69bff8" strokeOpacity="0.055" strokeWidth="1" vectorEffect="non-scaling-stroke">
           {LINES.map((d, i) => (
             <path key={i} d={d} vectorEffect="non-scaling-stroke" />
           ))}

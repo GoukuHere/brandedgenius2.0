@@ -24,12 +24,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050a14",
+  themeColor: "#04070e",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={brand.variable}>
+    <html lang="de" className={`dark ${brand.variable}`}>
       <body>
         <PageBackground />
         <MotionProvider>{children}</MotionProvider>

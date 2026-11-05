@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export function Section({ id, className, children }: { id?: string; className?: string; children: ReactNode }) {
   return (
-    <section id={id} className={cn("relative py-24 md:py-32", className)}>
+    <section id={id} className={cn("relative py-24 md:py-36", className)}>
       {children}
     </section>
   );
@@ -30,8 +30,9 @@ function keepCompounds(text: string): ReactNode {
 }
 
 /**
- * A two-tone headline: the title in white and its continuation (`accent`) in a softer ink. Only the hero and the
- * closing contact section pass `serif`, which sets the continuation in the client's serif gradient instead.
+ * A headline in the brand face. v3 default: the whole sentence in solid white (`variant="solid"`). `variant="tone"`
+ * dims the continuation (only where the copy has a natural second clause); `variant="gradient"` (or the older
+ * `serif` prop) sets the continuation in the client's white-to-sky gradient, reserved for the hero and the CTA.
  */
 export function Heading({
   title,
@@ -41,6 +42,7 @@ export function Heading({
   className,
   accentFirst = false,
   serif = false,
+  variant,
 }: {
   title: string;
   accent?: string;
@@ -49,11 +51,15 @@ export function Heading({
   className?: string;
   /** Put the accent phrase before the title (when the copy reads that way). */
   accentFirst?: boolean;
-  /** Set the continuation in the serif gradient (hero and closing CTA only). */
+  /** Older name for variant="gradient". */
   serif?: boolean;
+  variant?: "solid" | "tone" | "gradient";
 }) {
   const cls = size === "display" ? "t-display" : size === "h3" ? "t-h3" : "t-h2";
-  const accentEl = accent ? <span className={serif ? "accent" : "tone"}>{keepCompounds(accent)}</span> : null;
+  const mode = variant ?? (serif ? "gradient" : "solid");
+  const accentEl = accent ? (
+    <span className={mode === "gradient" ? "accent" : mode === "tone" ? "tone" : undefined}>{keepCompounds(accent)}</span>
+  ) : null;
   return (
     <Tag className={cn(cls, className)}>
       {accentFirst && accentEl ? (
@@ -128,11 +134,7 @@ export function TextLink({ children, className, href, ...props }: LinkProps) {
   );
 }
 
-/** Square icon holder in the brand's sky blue. Pass a lucide icon as the child. */
+/** A meaningful icon set bare in sky (v3 has no icon holders: icons in tinted shapes read as a template). */
 export function IconChip({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <span className={cn("grid size-11 shrink-0 place-items-center rounded-xl border border-sky/20 bg-sky/[0.08] text-sky [&>svg]:size-5", className)}>
-      {children}
-    </span>
-  );
+  return <span className={cn("inline-flex shrink-0 text-sky [&>svg]:size-5", className)}>{children}</span>;
 }

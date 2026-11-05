@@ -1,49 +1,61 @@
-# Branded Genius v2: design brief for every section
+# Branded Genius v3: design brief for every section
 
 Read this whole file before writing code. It is the contract that keeps the page coherent.
 
-## Why v2 exists
-The client (Roman Tränkle, Branded Genius, an AI-automation agency in Pforzheim) rejected every section of v1. Their review:
-- Too many different things and too many different backgrounds. Wants ONE consistent background for the whole page, like https://arventas.de/ (deep navy, a soft glow, faint thin lines). That background already exists: `src/components/system/page-background.tsx`, fixed behind the page. **Never give a section its own background colour, image, gradient band, shader or canvas.**
-- Animated backgrounds hurt performance. No ambient background animation anywhere.
-- Colours must follow the brand guide. "We don't use this kind of colours." No red, orange, green, purple, teal, or bright light-blue tints.
-- Content must be clearly visible. No photos behind text, no text over busy images.
-- The client liked: the headline font with the serif gradient accent, the fly-in animation of the problem cards, the small looping line drawings (the phone for callbots) if more visible, the scrolling service-word marquee, and the ORIGINAL brandedgenius.de process timeline (optimise it, "like a better timeline").
-- Testimonials need arrows. CTA and footer had off-brand colours.
+## Why v3 exists
+The client (Roman Tränkle, Branded Genius, an AI-automation agency in Pforzheim) rejected v1. The developer rejected v2 as "cheap" and "AI generated": every section had the same skeleton (left heading, paragraph, grid of thin cards with small icons in tinted squares), two-tone headings everywhere, and invented content that is not on the client's site. v3 is **dark, glass and effects**, built from Magic UI, 21st.dev and Motion Primitives components, and it follows the client's ORIGINAL homepage content and order exactly (see `src/content/site.ts`).
 
-Quality bar: arventas.de (calm, premium, one background, generous space, big confident headlines) and jamescannella.com (craft). Premium comes from restraint, spacing, type and a few well-made motions, not from effects.
+## The client's standing instructions (binding)
+- ONE consistent background on the whole page (`PageBackground`, fixed, static). Never give a section its own background colour, image, gradient band, light pool, shader or canvas.
+- Brand colours only: Royal `#004BA0` (`royal`), bright royal `#1a6fe0` (`royal-bright`, gradients only), Sky `#69BFF8` (`sky`), ice `#dcecff` (`ice`), grey `#969595` (`silver`), white, ink `#eaf1fa` (`ink`), the page `#040a13` (`page`). No red, orange, green, purple, teal, yellow (also not in components' defaults: override every colour prop).
+- Content clearly visible: no text over photos, no photos behind text.
+- Effects in moderation; performance matters (the client and the developer both use integrated graphics).
 
-## Hard rules
-1. **Colours**: only these. Page navy `bg-page` (#050a14), surfaces via `.surface`, Royal `#004BA0` (`royal`), bright royal `#1a6fe0` (`royal-bright`, only inside gradients), Sky `#69BFF8` (`sky`), ice `#dcecff` (`ice`), brand grey `#969595` (`silver`), white, `ink` (#eaf1fa) for text. Opacity variants (`white/10`, `sky/20`) are fine.
-2. **Fonts**: ONE face, General Sans (variable, 200 to 700, self-hosted from `src/app/fonts`), upright only. **No italics anywhere** (no `italic` class, no `font-style: italic`, no italic files) and no second typeface. Headlines are two-tone through `Heading` (title in white weight 500, continuation in `.tone`). The white-to-sky gradient `.accent` (same face, weight 400) appears ONLY in the hero and the closing contact section (`Heading serif`; the prop name is historical). Big figures and step numbers use `.num` (weight 300, lining tabular figures). No monospace. No all-caps labels with wide tracking. Sizes: display max 60px, h2 max 48px; tracking -0.03em display, -0.025em h2.
-3. **No eyebrows**: never put a small label, kicker, "01 / Section", or category tag above a headline. A number may sit inline before a title (e.g. a serif "01" on the same line).
-4. **Banned AI tells**: decorative orbs/blobs/spheres, purple-to-blue gradients, sparkles, particle or dot backgrounds, concentric circles, glassmorphism with backdrop blur, auto-incrementing counters, identical icon-card grids without purpose, emoji icons, fake badges, status dots, elements that do no real work.
-5. **No backdrop-filter** in sections (it costs frames on the client's integrated graphics). No animated `filter`/`blur`. Animate only `transform` and `opacity` (and SVG stroke-dashoffset where specified).
-6. **Copy** comes only from `src/content/site.ts`, in German, verbatim. Never invent, translate or embellish copy. If a line you need is missing, use only what is there.
-7. **Images**: `next/image` with a real `sizes` attribute, `rounded-[24px]`, and a soft bottom shade (`bg-gradient-to-t from-page/50 to-transparent`) when text sits near them. Never place text over a photo.
+## The developer's standing rules (binding)
+- One typeface: General Sans (the page default). **No italics anywhere.** No monospace. No uppercase micro-labels with wide tracking.
+- **No eyebrows**: nothing small above a headline (no kicker, no "01 / Section", no badge, no pill). A number may sit inline before a title on the same line.
+- No sparkles, particles, decorative orbs or concentric circles, purple-blue gradients, stat counters that count up, emoji icons, fake badges, status dots.
+- Every element does real work: no dummy links, no invented copy, no invented numbers or charts.
+- Copy comes ONLY from `src/content/site.ts`, verbatim, German. Never invent, translate or embellish. If something is missing there, do not make it up; report it.
 
-## Shared building blocks (import, do not re-create)
-- `@/components/system/primitives`: `Section` (`py-24 md:py-32` section wrapper with id), `Container` (max-w 1280, px-5/md:px-8), `Heading` (`title` + `accent`, sizes display/h2/h3), `PrimaryLink` (brand-blue gradient pill; external links open in a new tab automatically), `SecondaryLink` (outline pill), `TextLink` (sky text link with arrow), `IconChip` (sky icon holder; pass a lucide icon).
-- `@/components/system/reveal`: `Reveal` (rise and fade once on view), `RevealGroup` + `RevealItem` (staggered lists).
-- `@/components/system/use-section-progress`: `useSectionProgress(ref, offset)` for scroll-linked motion (JS-driven, respects offsets).
-- CSS classes in `src/app/globals.css`: `.t-display .t-h2 .t-h3 .t-lead .t-body .t-small .accent .num .surface .surface-hover .hairline`.
-- Icons: `lucide-react`, `strokeWidth={1.5}`, inside `IconChip` or at size-4/5 inline.
-- Content and links: `@/content/site` (`LINKS`, `MEDIA`, and one export per section).
-- `cn` from `@/lib/utils`.
+## The v3 glass system (globals.css), reviewed
+- ONE material, lit from above. GLASS BUDGET: fewer than 20 glass surfaces on the whole page, only where your spec says. Never glass inside glass. No glass on headings, text blocks, list items, chips, icons, photos, buttons, the partner strip or the footer.
+- `.glass`: the sheet (top-lit rim, faint ice fill, grey grain, black shadow). Radius 28px default; inner radius = outer minus padding.
+- `.glass-lit`: add to the ONE featured glass object of a section (sky-tinted top edge).
+- `.glass-blur`: backdrop blur. ONLY the header and the Fallstudien case panel. A blurred element must have no ancestor with an opacity animation, filter, mask, clip-path or blend mode (no Reveal around it; animate the element itself).
+- `.frame`: photos. Hairline frame + 24px radius, no glass. Photos are already colour-graded into one look.
+- `.rule`: 1px hairline between editorial items.
+- NO light pools anywhere (all light lives in the fixed PageBackground).
+- Default composition is EDITORIAL: type on the one background, hairlines between items, asymmetric spreads, one focal object per section. A card only where the object moves or is touched.
+- Typography classes: `.t-display .t-h2 .t-h3 .t-lead .t-body .t-small .accent .num .tone`. Headings LEFT aligned, solid white (`Heading` default). `.accent` (white-to-sky) only in the hero and CTA (`variant="gradient"`).
 
-## Layout conventions
-- Section header: left aligned, `Heading` (h2) with `max-w-[820px]`, then `.t-lead` paragraph `mt-6 max-w-[620px]`. Header block wrapped in `Reveal`. Content starts `mt-14 md:mt-20` below it.
-- Grid gaps `gap-5 md:gap-6`; card padding `p-6 md:p-8`; radius 24px (cards), 28-32px (large panels), full (pills).
-- Asymmetric, editorial compositions beat centred stacks. Generous whitespace.
-- Mobile first: everything must work at 375px wide (no horizontal overflow, touch targets at least 44px, 16px minimum body text). Desktop reference width 1659px.
+## Components (src/components/ui, adapted; use each only where your spec says)
+- `MagicCard` (Magic UI): cursor-lit edge; only on the front Leistungen plate.
+- `BorderBeam` (Magic UI): only on the CTA panel (pauses off screen, hidden for reduced motion).
+- `AnimatedBeam` (21st.dev Animated Beam Integration core): System routes only.
+- `Marquee` (Magic UI): partner logos only (pauses off screen).
+- `TextEffect` (Motion Primitives, forked to play once in view): only the Warum punchline.
+- `AnimatedBackground` (Motion Primitives, controlled via `value`): the Realität hover highlight and the Fallstudien tab pill.
+- `TransitionPanel` (Motion Primitives): Fallstudien case switch.
+- `Accordion` (Motion Primitives): Die Realität rows.
+- `MorphingDialog` (Motion Primitives): testimonial video player.
+- Shared primitives in `src/components/system`: `Section`, `Container`, `Heading`, `PrimaryLink`, `SecondaryLink`, `TextLink` (primitives.tsx); `Reveal`, `RevealGroup`, `RevealItem` (reveal.tsx); `useSectionProgress` (scroll progress honouring offsets).
+- ONE motion style: scroll-linked and reversible (useSectionProgress + useTransform on transform/opacity) for content, 600 to 900ms ease-out-expo for one-off entrances, 150 to 250ms hovers. Big moments only in Problem (fly-in), System (route), Leistungen (stack) and Ablauf (beam). Other sections: one block fade or nothing.
+- Icons: lucide-react, strokeWidth 1.5, bare (never in a container); only where they carry meaning.
 
-## Motion conventions
-- Default entrance: `Reveal` / `RevealGroup`. Durations 0.6-0.9s, ease `[0.16, 1, 0.3, 1]`. Micro-interactions 200-300ms.
-- Only the section that owns a signature motion (named in its spec) may add more. Loops must pause when off screen (IntersectionObserver) and stop for `useReducedMotion()`.
-- Hover states: border to `sky/30`, slight lift (`-translate-y-0.5`), arrow nudge. No scale on text.
+## Layout and rhythm
+- Container: `Container` (max-w 1280, px-5/md:px-8). Sections `py-24 md:py-36`.
+- Each section has ONE signature composition from its spec; never reuse another section's layout. Alternate alignment: some headers centred, some left, as the spec says.
+- Generous space, few large elements. Large glass panels (radius 28 to 36px) rather than many small cards.
+- Mobile first: must work at 360 to 375px wide (no horizontal overflow, 44px touch targets, 16px minimum body text). Desktop reference 1659x900.
+
+## Motion and performance
+- Animate only transform and opacity (and SVG stroke where specified). No animated blur on large elements.
+- Every infinite loop pauses or unmounts off screen (BorderBeam and AnimatedBeam already do).
+- Reduced motion: `MotionProvider` (MotionConfig reducedMotion="user") handles motion components. NEVER render different markup based on `useReducedMotion()` (it breaks hydration); use CSS `motion-reduce:` or effects instead.
+- Images: `next/image` with real `sizes`, inside a `.frame` (its hairline is drawn above the photo by `.frame::after`). Never text over an image.
 
 ## File ownership and verification
-- Create only the files named in your task, under `src/components/sections/`. Export exactly the component name given. Do not edit shared files (`globals.css`, `primitives.tsx`, `reveal.tsx`, `site.ts`, `page.tsx`, `layout.tsx`); if you need a shared change, say so in your final report.
-- Client components need `"use client"` only when they use hooks or events.
-- Verify with `npx tsc --noEmit -p .` (ignore errors in files you do not own; other agents are writing in parallel) and `npx eslint <your files>`. Do NOT run `next build`, `next dev`, `npm install`, or any browser: other agents share this machine.
-- In your final report: exports, section ids, client-side behaviour, anything the integrator must know.
+- Create only the files named in your task under `src/components/sections/` (and, if your task says so, a private helper file next to it). Export exactly the component name given. Do not edit shared files (`globals.css`, `primitives.tsx`, `reveal.tsx`, `site.ts`, `page.tsx`, `layout.tsx`, anything in `components/ui`). If you need a shared change, say so in your final report.
+- Verify with `npx tsc --noEmit -p .` (only your files must be error-free; others are being written in parallel) and `npx eslint <your files>`. Do NOT run `next build`, `next dev`, `npm install`, the shadcn CLI, or any browser.
+- Final report: exports, section ids, client-side behaviour, anything the integrator must know.

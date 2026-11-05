@@ -1,153 +1,130 @@
 "use client";
 
-import { ChartColumn, Timer, TrendingUp, Zap, type LucideIcon } from "lucide-react";
-import { useInView } from "motion/react";
-import { Fragment, useRef } from "react";
-import { Container, Heading, IconChip, PrimaryLink, Section } from "@/components/system/primitives";
-import { Reveal, RevealGroup, RevealItem } from "@/components/system/reveal";
-import { IMPACT, LINKS, SOLUTION } from "@/content/site";
-import { cn } from "@/lib/utils";
+import { ArrowUpRight } from "lucide-react";
+import { motion, useSpring, useTransform } from "motion/react";
+import { useRef } from "react";
+import { Container, Heading, Section } from "@/components/system/primitives";
+import { Reveal } from "@/components/system/reveal";
+import { useSectionProgress } from "@/components/system/use-section-progress";
+import { IMPACT, LINKS } from "@/content/site";
 
 /*
-  Business impact: three principles, one worked example with its measured result beside the four benefits, then the
-  goal and the call to the potential analysis. The section's one signature motion is the cycle-time comparison: two
-  bars on one baseline grow from zero when they come into view, the old process at full length and the AI workflow at
-  what is left of it. Everything else uses the shared Reveal entrance.
+  Business Impact. Desktop: an asymmetric split, the argument on the left (heading, text and the three principles as
+  plain ruled lines) and the section's one glass object on the right, the worked example with its measured result.
+  Under the figure sits the original's thin bar, drawn to its value as the reader scrolls (reversible, transform
+  only). Then the four benefits as a ruled row of text, and the goal with the original's arrow link to the booking.
+  No icons, no tiles, no banner.
 */
 
-// One icon per benefit, in IMPACT.benefits order. ChartColumn is lucide's current name for the BarChart3 glyph.
-const BENEFIT_ICONS: LucideIcon[] = [Zap, Timer, ChartColumn, TrendingUp];
-
-// The brief names these two bar labels; site.ts has no line for them.
-const BEFORE_LABEL = "Vorher";
-const AFTER_LABEL = "Mit KI";
-
-// The metric is a reduction (-84%), so the AI bar keeps what is left of the old cycle time (16%). It is drawn from
-// the metric itself, so the bars stay honest if the figure ever changes.
-const reduction = Number.parseFloat(IMPACT.live.metric.replace(/[^\d.,]/g, "").replace(",", "."));
-const remaining = Number.isFinite(reduction) ? Math.min(100, Math.max(0, 100 - reduction)) : null;
+// The bar is drawn to the figure itself ("−84%" draws to 84%), so it stays honest if the figure ever changes.
+const parsed = Number.parseFloat(IMPACT.live.metric.replace(/[^\d.,]/g, "").replace(",", "."));
+const SHARE = Number.isFinite(parsed) ? Math.min(100, Math.max(0, parsed)) : null;
 
 export function ImpactSection({ id = "impact" }: { id?: string }) {
   return (
     <Section id={id}>
       <Container>
-        <Reveal>
-          <Heading title={IMPACT.title} accent={IMPACT.accent} className="max-w-[820px]" />
-          <p className="t-lead mt-6 max-w-[620px]">{IMPACT.text}</p>
-        </Reveal>
+        <div className="grid gap-y-14 lg:grid-cols-12 lg:gap-x-16 xl:gap-x-20">
+          <div className="lg:col-span-5">
+            <Reveal y={12}>
+              <Heading title={IMPACT.title} accent={IMPACT.accent} />
+              <p className="t-lead mt-6">{IMPACT.text}</p>
+            </Reveal>
 
-        {/* Principles: hairlines between them, horizontal on a phone, vertical from tablet up. */}
-        <RevealGroup as="ul" className="mt-14 grid md:mt-20 md:grid-cols-3">
-          {IMPACT.principles.map((principle) => (
-            <RevealItem
-              as="li"
-              key={principle.title}
-              className="border-white/10 py-5 not-first:border-t first:pt-0 last:pb-0 md:px-6 md:py-0 md:not-first:border-t-0 md:not-first:border-l md:first:pl-0 md:last:pr-0 lg:px-10"
-            >
-              <h3 className="text-[22px] leading-tight font-medium tracking-[-0.02em] text-white">{principle.title}</h3>
-              <p className="mt-2 text-[16px] leading-normal text-silver">{principle.text}</p>
-            </RevealItem>
-          ))}
-        </RevealGroup>
+            <ul role="list" className="mt-10 md:mt-12">
+              {IMPACT.principles.map((principle, index) => (
+                <li key={principle.title} className="relative py-4 first:pt-0 last:pb-0">
+                  {index > 0 && <div aria-hidden className="rule absolute inset-x-0 top-0" />}
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                    <h3 className="text-[17px] leading-snug font-medium text-white">{principle.title}</h3>
+                    <p className="text-[15px] leading-snug text-silver">{principle.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        {/* Both columns stretch to one height: the card pins its result to the bottom, the benefits spread to match. */}
-        <div className="mt-12 grid gap-12 md:mt-16 lg:grid-cols-2 lg:gap-16">
-          <Reveal className="surface flex flex-col justify-between gap-10 p-8 md:p-10">
+          {/* The one glass surface. On desktop it stretches to the left column's height and pins the result to its foot. */}
+          <article
+            aria-label={IMPACT.live.label}
+            className="glass glass-lit flex flex-col justify-between gap-12 rounded-[32px] p-8 md:p-10 lg:col-span-7 lg:gap-16"
+          >
             <div>
               <h3 className="t-h3">{IMPACT.live.title}</h3>
-              <p className="t-body mt-3">{IMPACT.live.text}</p>
+              <p className="t-body mt-3 max-w-[480px]">{IMPACT.live.text}</p>
             </div>
             <div>
-              <dl>
-                <dt className="t-small">{IMPACT.live.metricLabel}</dt>
-                <dd className="num mt-2 text-[72px] leading-none text-white">{IMPACT.live.metric}</dd>
-              </dl>
-              {remaining !== null && <CycleBars remaining={remaining} />}
+              <p className="num text-[84px] leading-none text-white">{IMPACT.live.metric}</p>
+              <p className="mt-3 text-[16px] leading-normal text-silver">{IMPACT.live.metricLabel}</p>
+              {SHARE !== null && <PerformanceBar share={SHARE} />}
             </div>
-          </Reveal>
-
-          <RevealGroup as="ul" className="grid gap-9 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-12 lg:content-between lg:py-10">
-            {IMPACT.benefits.map((benefit, i) => (
-              <RevealItem as="li" key={benefit.title} className="flex gap-4 sm:flex-col sm:gap-5">
-                <Benefit icon={BENEFIT_ICONS[i]} title={benefit.title} text={benefit.text} />
-              </RevealItem>
-            ))}
-          </RevealGroup>
+          </article>
         </div>
 
-        <div className="mt-20">
-          <Reveal>
-            <Heading as="h3" size="h2" title={IMPACT.goal.title} className="max-w-[820px]" />
-            <p className="t-lead mt-6 max-w-[620px]">{IMPACT.goal.text}</p>
-          </Reveal>
+        <ul role="list" className="mt-20 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10">
+          {IMPACT.benefits.map((benefit) => (
+            <li key={benefit.title}>
+              <div aria-hidden className="rule" />
+              <h3 className="mt-6 text-[18px] leading-snug font-medium text-white">{benefit.title}</h3>
+              {/* 16px on phones and tablets (the page's body minimum there), 15px in the four-column row. */}
+              <p className="mt-2 text-[16px] leading-relaxed text-silver lg:text-[15px]">{benefit.text}</p>
+            </li>
+          ))}
+        </ul>
 
-          <Reveal
-            delay={0.1}
-            className="surface mt-10 flex flex-col items-start gap-8 p-6 sm:p-8 md:mt-12 md:p-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16"
-          >
-            <div className="max-w-[640px]">
-              <p className="t-h3">{IMPACT.goal.cta}</p>
-              <p className="t-body mt-3">{IMPACT.goal.ctaText}</p>
-            </div>
-            {/* The label is SOLUTION.primary ("KI-Potenzialanalyse anfragen"). Full width on a phone so it never overflows the card. */}
-            <PrimaryLink href={LINKS.analysis} className="w-full shrink-0 sm:w-auto lg:h-14 lg:px-8 lg:text-[16px]">
-              {SOLUTION.primary}
-            </PrimaryLink>
-          </Reveal>
+        <div className="mt-20">
+          <Heading as="h3" size="h2" title={IMPACT.goal.title} className="max-w-[760px]" />
+          <p className="t-lead mt-5 max-w-[620px]">{IMPACT.goal.text}</p>
+
+          {/* As on the original: the sentence itself, with its arrow, opens the booking. */}
+          <div className="mt-10">
+            <a
+              href={LINKS.booking}
+              target="_blank"
+              rel="noopener"
+              className="group inline-flex max-w-full items-center gap-5 rounded-2xl py-1 text-white"
+            >
+              <span className="min-w-0 text-[22px] leading-snug font-medium tracking-[-0.01em] text-balance">
+                {IMPACT.goal.cta}
+              </span>
+              <span
+                aria-hidden
+                className="grid size-12 shrink-0 place-items-center rounded-full border border-white/20 transition-[background-color,border-color,color] duration-200 ease-out group-hover:border-sky group-hover:bg-sky group-hover:text-page group-focus-visible:border-sky group-focus-visible:bg-sky group-focus-visible:text-page"
+              >
+                <ArrowUpRight
+                  strokeWidth={1.5}
+                  className="size-5 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
+              </span>
+            </a>
+            <p className="mt-3 max-w-[560px] text-[16px] leading-relaxed text-silver">{IMPACT.goal.ctaText}</p>
+          </div>
         </div>
       </Container>
     </Section>
   );
 }
 
-function Benefit({ icon: Icon, title, text }: { icon: LucideIcon; title: string; text: string }) {
-  return (
-    <>
-      <IconChip>
-        <Icon strokeWidth={1.5} />
-      </IconChip>
-      {/* On a phone the chip sits left of the text and pt-2.5 centres the first title line on it; stacked from sm up. */}
-      <div className="min-w-0 pt-2.5 sm:pt-0">
-        <h3 className="text-[17px] leading-snug font-medium text-white">{title}</h3>
-        <p className="t-small mt-1.5 text-ink/60">{text}</p>
-      </div>
-    </>
-  );
-}
-
 /*
-  The cycle time before and with the AI workflow, as two bars on one baseline (the label column is shared, so both
-  start at the same x). The text reads the values to screen readers; the bars themselves are hidden from them.
+  The original's performance bar: a 3px track and a sky fill with a brighter tip. The fill sits in a clip as wide as
+  the figure and slides in from the left (translateX, so it only composites), which keeps the tip at the leading
+  edge without stretching it. It draws while the bar travels from the foot of the screen to just above the middle
+  and undraws on the way back. Reduced motion removes the transform in CSS, so the bar shows fully drawn.
 */
-function CycleBars({ remaining }: { remaining: number }) {
-  const ref = useRef<HTMLDListElement>(null);
-  const shown = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-
-  const bars = [
-    { label: BEFORE_LABEL, value: 100, fill: "bg-white/15", delay: "delay-200" },
-    { label: AFTER_LABEL, value: remaining, fill: "bg-gradient-to-r from-sky to-royal-bright", delay: "delay-350" },
-  ];
+function PerformanceBar({ share }: { share: number }) {
+  const track = useRef<HTMLDivElement>(null);
+  const progress = useSectionProgress(track, ["start 0.95", "start 0.55"]);
+  // Overdamped, as on the Ablauf line: no overshoot, settles about half a second after the scroll stops.
+  const smooth = useSpring(progress, { stiffness: 140, damping: 30, restDelta: 0.001 });
+  const x = useTransform(smooth, [0, 1], ["-100%", "0%"]);
 
   return (
-    <dl ref={ref} className="mt-8 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-3">
-      {bars.map((bar) => (
-        <Fragment key={bar.label}>
-          <dt className="t-small">{bar.label}</dt>
-          <dd>
-            <span className="sr-only">{bar.value} %</span>
-            <span
-              aria-hidden
-              style={{ width: `${bar.value}%` }}
-              className={cn(
-                "block h-2.5 origin-left rounded-full transition-[scale] duration-900 ease-out-expo",
-                bar.fill,
-                bar.delay,
-                !shown && "motion-safe:scale-x-0"
-              )}
-            />
-          </dd>
-        </Fragment>
-      ))}
-    </dl>
+    <div ref={track} aria-hidden className="relative mt-8 h-[3px] rounded-full bg-white/10">
+      <div className="absolute inset-y-0 left-0 overflow-hidden rounded-full" style={{ width: `${share}%` }}>
+        <motion.div style={{ x }} className="absolute inset-0 rounded-full bg-sky will-change-transform motion-reduce:!transform-none">
+          <span className="absolute inset-y-0 right-0 w-10 rounded-full bg-linear-to-r from-sky to-ice" />
+        </motion.div>
+      </div>
+    </div>
   );
 }

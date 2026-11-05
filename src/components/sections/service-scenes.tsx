@@ -1,27 +1,29 @@
 "use client";
 
-import { useIsPresent, type MotionValue } from "motion/react";
-import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /*
   The four looping line drawings from v1 (services-stack.tsx), one per service. Each scene is a pure function of
-  time: draw(t) returns the frame at t seconds, and steps names what the drawing is acting out at that moment.
-  The timings and choreography are v1's. What changed for v2: everything is drawn to be read on the navy panel
-  (outlines in white at 95%, connectors and details in sky, strokes about 1.5x heavier, labels in the page face at 24 to 30
-  units instead of 19 in a dim monospace), a few labels moved so the larger type never touches a line, and the
-  caption under the drawing is gone because the section lists the steps beside it.
+  time: draw(t) returns the frame at t seconds. The timings and choreography are v1's, drawn to be read on the navy
+  glass (outlines in white at 95%, connectors and details in sky, labels in the page face at 22 to 28 units).
+
+  v3: the drawings carry no invented text. No typed prompt, no counters, and every label is a word from that
+  service's own card text on brandedgenius.de (SERVICES.items in site.ts):
+    agents     "Prozesse", "Systeme"
+    chat       "Website", "Lead-Qualifizierung", "Support"
+    calls      "Lead-Qualifizierung", "Terminvereinbarung", "Support", "Follow-ups"
+    marketing  "Kommunikation", "Leadgenerierung", "Follow-ups"
+  Everything else is drawn as shapes and lines.
 */
 
 type Pt = [number, number];
 type Curve = [Pt, Pt, Pt, Pt];
-export type Step = [from: number, to: number, label: string];
 export type Scene = {
   /** Length of one loop in seconds. */
   loop: number;
-  /** The frame shown instead of the loop when the visitor prefers reduced motion. */
+  /** The frame shown while the drawing is not playing (plates behind, reduced motion). Playing resumes from it. */
   still: number;
-  steps: Step[];
   draw: (t: number) => ReactNode;
 };
 export type SceneId = "agents" | "chat" | "calls" | "marketing";
@@ -60,6 +62,8 @@ const line = { fill: "none", stroke: WHITE, strokeOpacity: 0.95, strokeWidth: 3.
 const hair = { ...line, stroke: SKY, strokeOpacity: 0.85, strokeWidth: 3 } as const;
 /** Labels: the page face (General Sans), inherited. */
 const label = { fill: WHITE, fillOpacity: 0.92, fontSize: 26, fontWeight: 500 } as const;
+/** A short drawn line standing in for a line of text, so no word has to be made up. */
+const textLine = (x: number, y: number, w: number, p: number) => <path d={`M${x} ${y}H${x + w}`} {...hair} {...draw(p)} />;
 
 function Person({ at, color = WHITE, s = 1, opacity = 1 }: { at: Pt; color?: string; s?: number; opacity?: number }) {
   return (
@@ -82,8 +86,8 @@ function Token({ at, rare = false }: { at: Pt; rare?: boolean }) {
   );
 }
 
-/* KI-Agenten & Workflows: a task and connected data feed an agent; it routes the work through tools on its own,
-   and only the rare case goes to a person. */
+/* KI-Agenten & Workflows: a recurring process and its data feed an agent; it routes the work through the connected
+   systems on its own, and only the rare case goes to a person. */
 
 const A_AGENT: Pt = [600, 270];
 const A_FEED: Pt = [410, 323];
@@ -91,7 +95,6 @@ const A_TOOLS: Pt[] = [[850, 120], [850, 270], [850, 420]];
 const A_DONE: Pt = [1110, 330];
 const A_TEAM: Pt = [1110, 110];
 const A_SEG = 0.5;
-const A_PROMPT = "> Leads qualifizieren";
 const A_DATA = Array.from({ length: 16 }, (_, i) => ({
   from: [100 + ((i * 97) % 280), 210 + ((i * 53) % 240)] as Pt,
   to: [130 + (i % 4) * 80, 230 + Math.floor(i / 4) * 62] as Pt,
@@ -104,18 +107,9 @@ const A_TOKENS = Array.from({ length: 14 }, (_, k) => {
   const start = 4.8 + k * 0.4;
   return { rare, path, start, end: start + (path.length - 1) * A_SEG };
 });
-// The top tool is labelled above its node, the middle one in the gap between its two exit lines, the bottom one below.
-const A_TOOL_LABELS: [text: string, x: number, y: number, anchor: "start" | "middle"][] = [
-  ["qualifizieren", -22, -36, "start"],
-  ["antworten", 34, -2, "start"],
-  ["buchen", 0, 56, "middle"],
-];
 
 function agents(t: number) {
-  const typed = Math.floor(prog(t, 0.4, 2) * A_PROMPT.length);
-  const cursor = t < 2.8 && (t * 2) % 1 < 0.5 ? "_" : "";
-  const finished = A_TOKENS.filter((k) => !k.rare && k.end <= t);
-  const lastDone = Math.max(-1, ...finished.map((k) => k.end));
+  const lastDone = Math.max(-1, ...A_TOKENS.filter((k) => !k.rare && k.end <= t).map((k) => k.end));
   const lastUp = Math.max(-1, ...A_TOKENS.filter((k) => k.rare && k.end <= t).map((k) => k.end));
   const doneFlash = prog(t, lastDone, lastDone + 0.5);
   const upFlash = prog(t, lastUp, lastUp + 0.7);
@@ -124,14 +118,13 @@ function agents(t: number) {
 
   return (
     <g opacity={fade(t, 12)}>
-      {/* Aufgaben definieren */}
+      {/* The recurring process that comes in */}
       <rect x={80} y={80} width={356} height={76} rx={12} {...line} {...draw(inOut(prog(t, 0.1, 0.7)))} />
-      <text x={102} y={128} {...label} fontSize={28}>
-        {A_PROMPT.slice(0, typed)}
-        {cursor}
+      <text x={102} y={128} {...label} fontSize={28} opacity={prog(t, 0.6, 1)}>
+        Prozesse
       </text>
 
-      {/* Daten anbinden */}
+      {/* Its data */}
       {A_DATA.map(({ from, to }, i) => {
         const [x, y] = mix(from, to, inOut(prog(t, 1.8 + i * 0.04, 2.8 + i * 0.04)));
         return <circle key={i} cx={x} cy={y} r={7} fill={WHITE} opacity={0.9 * prog(t, 1.1 + i * 0.03, 1.5 + i * 0.03)} />;
@@ -160,33 +153,25 @@ function agents(t: number) {
           <rect key="d" x={-17} y={-17} width={34} height={34} rx={4} transform="rotate(45)" />,
           <circle key="c" r={22} />,
         ][i];
-        const [text, lx, ly, anchor] = A_TOOL_LABELS[i];
         return (
-          <g key={i} transform={`translate(${x} ${y})`}>
-            <g transform={`scale(${p})`} {...line} fill={NODE}>
-              {shape}
-            </g>
-            <text x={lx} y={ly} textAnchor={anchor} {...label} opacity={prog(t, 4.2, 4.6)}>
-              {text}
-            </text>
+          <g key={i} transform={`translate(${x} ${y}) scale(${p})`} {...line} fill={NODE}>
+            {shape}
           </g>
         );
       })}
+      {/* One caption under the column of connected systems */}
+      <text x={A_TOOLS[2][0]} y={A_TOOLS[2][1] + 56} textAnchor="middle" {...label} opacity={prog(t, 4.2, 4.6)}>
+        Systeme
+      </text>
 
-      {/* Prozesse uebernehmen: the work is done, the rare case goes up to the team */}
+      {/* The work is done; the rare case goes up to a person */}
       <g opacity={prog(t, 4.4, 4.8)}>
         <circle cx={A_DONE[0]} cy={A_DONE[1]} r={26} {...line} />
         <circle cx={A_DONE[0]} cy={A_DONE[1]} r={12} fill={WHITE} />
         {doneFlash > 0 && doneFlash < 1 && <circle cx={A_DONE[0]} cy={A_DONE[1]} r={26 + 20 * out(doneFlash)} {...line} strokeWidth={3} strokeOpacity={1 - doneFlash} />}
-        <text x={A_DONE[0]} y={A_DONE[1] + 64} textAnchor="middle" {...label}>
-          {finished.length} erledigt
-        </text>
         <circle cx={A_TEAM[0]} cy={A_TEAM[1] - 20} r={14} {...line} />
         <path d={`M${A_TEAM[0] - 26} ${A_TEAM[1] + 24}Q${A_TEAM[0]} ${A_TEAM[1] - 14} ${A_TEAM[0] + 26} ${A_TEAM[1] + 24}`} {...line} />
         {upFlash > 0 && upFlash < 1 && <circle cx={A_TEAM[0]} cy={A_TEAM[1]} r={40 + 24 * out(upFlash)} {...hair} strokeOpacity={1 - upFlash} />}
-        <text x={A_TEAM[0] + 44} y={A_TEAM[1] + 8} {...label}>
-          Ihr Team
-        </text>
       </g>
 
       {A_TOKENS.map(({ rare, path, start, end }, k) => {
@@ -199,13 +184,16 @@ function agents(t: number) {
   );
 }
 
-/* KI-Chatbots: a website opens its chat, the question is recognised, the answer comes from the company's
-   knowledge, the lead gets qualified, the rare case goes to a person, and the clock keeps turning. */
+/* KI-Chatbots: a website opens its chat, the question is recognised and sorted, the answer comes from the company's
+   own documents, the lead gets qualified, the rare case goes to support, and the clock keeps turning. */
 
-const C_INTENTS: [string, number][] = [["Preis", 120], ["Termin", 205], ["Support", 290]];
+/** The three ways a question can be sorted (drawn, not named); the middle one is picked. */
+const C_INTENTS = [120, 205, 290];
+const C_PICKED = 1;
 const C_ROUTE: Curve = [[810, 92], [720, 20], [560, 30], [505, 140]];
 const C_HANDOVER: Curve = [[515, 360], [700, 360], [900, 452], [1068, 446]];
-const C_CHECKS = ["Bedarf", "Budget", "Zeitraum"];
+/** Lengths of the drawn text lines beside the three qualification checks. */
+const C_CHECKS = [100, 72, 88];
 
 function chat(t: number) {
   const widget = back(prog(t, 1.1, 1.45));
@@ -219,12 +207,15 @@ function chat(t: number) {
 
   return (
     <g opacity={fade(t, 12)}>
-      {/* Website-Chat */}
+      {/* The website and its chat */}
       <rect x={80} y={60} width={460} height={390} rx={14} {...line} {...draw(inOut(prog(t, 0.1, 1)))} />
       <line x1={80} y1={100} x2={540} y2={100} {...hair} {...draw(prog(t, 0.8, 1.1))} />
       {[106, 128, 150].map((x, i) => (
         <circle key={x} cx={x} cy={80} r={5.5} fill={WHITE} opacity={0.85 * prog(t, 0.9 + i * 0.08, 1.1 + i * 0.08)} />
       ))}
+      <text x={172} y={89} {...label} fontSize={22} opacity={prog(t, 1, 1.3)}>
+        Website
+      </text>
       <path d="M110 132H250M110 156H210" {...hair} {...draw(prog(t, 1, 1.4))} />
       <rect x={110} y={186} width={160} height={110} rx={8} {...hair} {...draw(inOut(prog(t, 1, 1.5)))} />
       <path d="M110 330H260M110 352H230M110 374H245" {...hair} {...draw(prog(t, 1.2, 1.6))} />
@@ -232,26 +223,24 @@ function chat(t: number) {
       <circle cx={505} cy={420} r={22 * widget} fill={SKY} />
       <path d="M496 415h18M496 424h11" stroke={ON_SKY} strokeWidth={3.5} strokeLinecap="round" opacity={widget} />
 
-      {/* Anfrage-Erkennung: the visitor's question is read and sorted */}
+      {/* The visitor's question is read and sorted */}
       <g opacity={question} transform={`translate(0 ${((1 - question) * 10).toFixed(1)})`}>
         <rect x={372} y={150} width={128} height={46} rx={16} fill={WHITE} fillOpacity={0.14} />
         <path d="M388 167H484M388 180H452" {...line} strokeWidth={3} />
       </g>
-      {C_INTENTS.map(([name, y], i) => {
+      {C_INTENTS.map((y, i) => {
         const p = inOut(prog(t, 2.7 + i * 0.15, 3.2 + i * 0.15));
-        const on = name === "Termin" ? picked : 0;
+        const on = i === C_PICKED ? picked : 0;
         return (
-          <g key={name}>
+          <g key={y}>
             <path d={`M515 175C565 175 570 ${y} 620 ${y}`} {...hair} {...draw(p)} />
             <rect x={620} y={y - 24} width={150} height={48} rx={24} {...line} strokeWidth={3} fill={SKY} fillOpacity={on} {...draw(p)} />
-            <text x={695} y={y + 9} textAnchor="middle" {...label} fill={on > 0.5 ? ON_SKY : WHITE} fillOpacity={1} opacity={prog(t, 3 + i * 0.15, 3.3 + i * 0.15)}>
-              {name}
-            </text>
+            <line x1={665} y1={y} x2={725} y2={y} stroke={on > 0.5 ? ON_SKY : WHITE} strokeWidth={3.5} strokeLinecap="round" opacity={prog(t, 3 + i * 0.15, 3.3 + i * 0.15)} />
           </g>
         );
       })}
 
-      {/* Antwort-Workflows: the answer is written from the company's own knowledge */}
+      {/* The answer is written from the company's own documents */}
       {[0, 1, 2].map((i) => {
         const x = 830 + i * 72;
         return (
@@ -261,9 +250,6 @@ function chat(t: number) {
           </g>
         );
       })}
-      <text x={1064} y={100} {...label} opacity={prog(t, 4.7, 5)}>
-        Wissen
-      </text>
       <path d={curve(C_ROUTE)} {...hair} {...draw(inOut(prog(t, 4.8, 5.4)))} />
       {t > 5.4 &&
         [0, 1].map((k) => {
@@ -277,44 +263,43 @@ function chat(t: number) {
       </g>
 
       {/* Lead-Qualifizierung */}
-      {C_CHECKS.map((name, i) => {
+      <text x={880} y={182} {...label} opacity={prog(t, 6.1, 6.4)}>
+        Lead-Qualifizierung
+      </text>
+      {C_CHECKS.map((w, i) => {
         const y = 220 + i * 54;
         const s = 6.3 + i * 0.45;
         return (
-          <g key={name}>
+          <g key={y}>
             <rect x={880} y={y - 19} width={38} height={38} rx={10} {...line} strokeWidth={3} {...draw(inOut(prog(t, s - 0.2, s + 0.1)))} />
             <path d={`M889 ${y}l7 8l13 -15`} {...line} stroke={SKY} strokeOpacity={1} strokeWidth={4.5} {...draw(prog(t, s + 0.15, s + 0.4))} />
-            <text x={936} y={y + 9} {...label} opacity={prog(t, s, s + 0.25)}>
-              {name}
-            </text>
+            {textLine(936, y, w, prog(t, s, s + 0.3))}
           </g>
         );
       })}
 
-      {/* Uebergabe an Mitarbeiter: only the rare case goes to a person */}
+      {/* Only the rare case goes to a person in support */}
       <path d={curve(C_HANDOVER)} {...hair} strokeDasharray="6 12" opacity={handover} />
       {handover > 0 && handover < 1 && <Token at={along(C_HANDOVER, handover)} rare />}
       <Person at={[1100, 446]} s={back(prog(t, 8.1, 8.5))} />
       {ping > 0 && ping < 1 && <circle cx={1100} cy={440} r={30 + 26 * out(ping)} {...hair} strokeOpacity={0.9 * (1 - ping)} />}
       <text x={1128} y={454} {...label} opacity={prog(t, 8.4, 8.7)}>
-        Ihr Team
+        Support
       </text>
 
-      {/* Rund um die Uhr */}
+      {/* Around the clock */}
       <circle cx={660} cy={455} r={30} {...line} strokeWidth={3} {...draw(clock)} />
       <line x1={660} y1={455} x2={660 + 18 * Math.sin(t * 3)} y2={455 - 18 * Math.cos(t * 3)} {...line} stroke={SKY} strokeOpacity={1} opacity={clock} />
       <line x1={660} y1={455} x2={660 + 11 * Math.sin(t * 0.5)} y2={455 - 11 * Math.cos(t * 0.5)} {...line} opacity={clock} />
-      <text x={708} y={466} {...label} fontSize={30} opacity={prog(t, 10.3, 10.6)}>
-        24/7
-      </text>
     </g>
   );
 }
 
 /* KI-Callbots: the phone rings, the assistant answers and talks, the caller is qualified, a slot gets booked,
-   the call is routed, follow-ups go out. */
+   the call is routed to support, follow-ups go out. */
 
-const K_CHECKS = ["Anliegen", "Budget", "Rückruf"];
+/** Lengths of the drawn text lines beside the three qualification checks. */
+const K_CHECKS = [84, 62, 76];
 const K_CONTACTS: Pt[] = [[1130, 340], [1190, 395], [1130, 450]];
 const K_FROM: Pt = [1010, 373];
 // v1 had 30 bars 10 apart; with heavier strokes, 24 bars 12.5 apart keep the gaps open over the same width.
@@ -352,16 +337,17 @@ function calls(t: number) {
       })}
 
       {/* Lead-Qualifizierung */}
-      {K_CHECKS.map((name, i) => {
+      <text x={720} y={70} {...label} opacity={prog(t, 4.2, 4.5)}>
+        Lead-Qualifizierung
+      </text>
+      {K_CHECKS.map((w, i) => {
         const y = 110 + i * 52;
         const s = 4.4 + i * 0.5;
         return (
-          <g key={name}>
+          <g key={y}>
             <rect x={720} y={y - 19} width={38} height={38} rx={10} {...line} strokeWidth={3} {...draw(inOut(prog(t, s - 0.2, s + 0.1)))} />
             <path d={`M729 ${y}l7 8l13 -15`} {...line} stroke={SKY} strokeOpacity={1} strokeWidth={4.5} {...draw(prog(t, s + 0.15, s + 0.4))} />
-            <text x={776} y={y + 9} {...label} opacity={prog(t, s, s + 0.25)}>
-              {name}
-            </text>
+            {textLine(776, y, w, prog(t, s, s + 0.3))}
           </g>
         );
       })}
@@ -369,6 +355,9 @@ function calls(t: number) {
       {/* Terminvereinbarung: a free slot gets booked */}
       <rect x={720} y={280} width={290} height={186} rx={14} {...line} strokeWidth={3} {...draw(cal)} />
       <line x1={720} y1={318} x2={1010} y2={318} {...hair} {...draw(prog(t, 6.6, 6.9))} />
+      <text x={736} y={307} {...label} fontSize={22} opacity={prog(t, 6.7, 7)}>
+        Terminvereinbarung
+      </text>
       {Array.from({ length: 15 }, (_, k) => {
         const x = 738 + (k % 5) * 54;
         const y = 334 + Math.floor(k / 5) * 42;
@@ -381,15 +370,18 @@ function calls(t: number) {
       })}
       <path d="M858 391l6 6l11 -12" stroke={ON_SKY} strokeWidth={3.5} fill="none" strokeLinecap="round" strokeLinejoin="round" opacity={prog(t, 7.7, 7.9)} />
 
-      {/* Weiterleitung: the right person takes over */}
+      {/* The call is routed to a person in support */}
       <line x1={880} y1={160} x2={1080} y2={148} {...hair} strokeDasharray="6 12" opacity={route} />
       <Person at={[1120, 150]} s={back(prog(t, 8.3, 8.7))} />
       {routePing > 0 && routePing < 1 && <circle cx={1120} cy={144} r={30 + 26 * out(routePing)} {...hair} strokeOpacity={0.9 * (1 - routePing)} />}
       <text x={1152} y={158} {...label} opacity={prog(t, 8.6, 8.9)}>
-        Team
+        Support
       </text>
 
       {/* Follow-ups: calls go back out to the leads */}
+      <text x={1160} y={298} textAnchor="middle" {...label} opacity={prog(t, 10.1, 10.4)}>
+        Follow-ups
+      </text>
       {K_CONTACTS.map((c, i) => {
         const to: Pt = [c[0] - 24, c[1] - 4];
         const u = (((t - 10.5) * 0.8 + i / 3) % 1 + 1) % 1;
@@ -405,17 +397,11 @@ function calls(t: number) {
   );
 }
 
-/* KI-Marketing & Vertrieb: find the audience on the market map, position the offer, put it on channels,
-   personalise the content, fill the funnel, and keep the customers coming back. */
+/* KI-Marketing & Vertrieb: find the gap on the market map, position the offer, put it on channels, personalise the
+   communication, fill the funnel, and keep the customers coming back through follow-ups. */
 
 const G_YOU: Pt = [310, 150];
 const G_BRAND: Pt = [540, 150];
-const G_AXES: [name: string, x: number, y: number, anchor: "start" | "middle" | "end"][] = [
-  ["Premium", 230, 74, "middle"],
-  ["Budget", 230, 404, "middle"],
-  ["Einsteiger", 92, 260, "start"],
-  ["Profis", 368, 260, "end"],
-];
 const G_RIVALS: Pt[] = [[130, 130], [175, 160], [150, 195], [200, 120], [120, 290], [170, 310], [140, 345], [205, 335], [185, 280], [260, 285], [300, 325], [340, 290], [280, 350]];
 const G_CHANNELS = [110, 230, 350];
 const G_ICONS = [
@@ -457,19 +443,13 @@ function marketing(t: number) {
   const aim = quad([150, 300], [380, 400], G_YOU, inOut(prog(t, 0.5, 1.8)));
   const lock = prog(t, 1.8, 2.2);
   const hop = inOut(prog(t, 2.3, 2.8));
-  const leads = G_LEADS.filter((l) => t >= l.start + 0.7).length;
 
   return (
     <g opacity={fade(t, 13)}>
-      {/* Zielgruppenanalyse: the market map, the competitors, and the gap the offer aims at */}
+      {/* The market map, the competitors, and the gap the offer aims at */}
       <rect x={232} y={92} width={136} height={136} fill={SKY} fillOpacity={0.1 * lock} />
       <line x1={90} y1={230} x2={370} y2={230} {...hair} {...draw(axes)} />
       <line x1={230} y1={370} x2={230} y2={90} {...hair} {...draw(axes)} />
-      {G_AXES.map(([name, x, y, anchor]) => (
-        <text key={name} x={x} y={y} textAnchor={anchor} {...label} fontSize={24} fill={SKY} fillOpacity={0.95} opacity={prog(t, 0.5, 0.9)}>
-          {name}
-        </text>
-      ))}
       {G_RIVALS.map(([x, y], i) => (
         <circle key={i} cx={x} cy={y} r={6} fill={SKY} opacity={0.8 * prog(t, 0.3 + i * 0.05, 0.6 + i * 0.05)} />
       ))}
@@ -478,11 +458,8 @@ function marketing(t: number) {
         <path d="M-42 0H-32M32 0H42M0 -42V-32M0 32V42" {...line} strokeWidth={3} />
       </g>
       {lock > 0 && <circle cx={G_YOU[0]} cy={G_YOU[1]} r={10 * back(lock)} fill={WHITE} />}
-      <text x={G_YOU[0] + 18} y={G_YOU[1] - 18} {...label} opacity={prog(t, 2, 2.3)}>
-        Zielgruppe
-      </text>
 
-      {/* Positionierung: the offer takes its place */}
+      {/* The offer takes its place */}
       <line x1={G_YOU[0] + 14} y1={150} x2={490} y2={150} {...hair} strokeDasharray="5 11" opacity={prog(t, 2.3, 2.6)} />
       {hop > 0 && hop < 1 && <circle cx={lerp(G_YOU[0], G_BRAND[0], hop)} cy={150} r={9} fill={WHITE} />}
       <rect x={490} y={100} width={100} height={100} rx={22} {...line} {...draw(inOut(prog(t, 2.4, 3)))} />
@@ -495,7 +472,7 @@ function marketing(t: number) {
         <circle key={i} cx={502 + i * 38} cy={292} r={12 * back(prog(t, 3.3 + i * 0.1, 3.6 + i * 0.1))} {...(fill ? { fill } : hair)} />
       ))}
 
-      {/* Kampagnensteuerung: the offer goes out on search, video and e-mail */}
+      {/* The offer goes out on search, video and e-mail */}
       {G_CHANNELS.map((y, i) => (
         <path key={y} d={`M590 150C640 150 640 ${y} 690 ${y}`} {...hair} {...draw(inOut(prog(t, 3.6 + i * 0.15, 4.2 + i * 0.15)))} />
       ))}
@@ -513,7 +490,10 @@ function marketing(t: number) {
           })
         )}
 
-      {/* Personalisierte Inhalte: one piece of content per channel */}
+      {/* Personalised communication: one piece of content per channel */}
+      <text x={790} y={52} {...label} fontSize={24} opacity={prog(t, 4.9, 5.3)}>
+        Kommunikation
+      </text>
       {G_CHANNELS.map((y, i) => {
         const s = 4.8 + i * 0.3;
         return (
@@ -532,8 +512,8 @@ function marketing(t: number) {
 
       {/* Leadgenerierung: the channels fill the funnel, the right leads come out as customers */}
       <path d="M960 110H1200M960 110L1060 290V330M1200 110L1100 290V330" {...line} strokeWidth={3} {...draw(inOut(prog(t, 5.9, 6.6)))} />
-      <text x={1116} y={324} {...label} opacity={prog(t, 6.4, 6.8)}>
-        {leads} Leads
+      <text x={1080} y={52} textAnchor="middle" {...label} fontSize={24} opacity={prog(t, 6.2, 6.6)}>
+        Leadgenerierung
       </text>
       {G_LEADS.map(({ start, from, rim, won }, i) => {
         const e = t - start;
@@ -546,7 +526,10 @@ function marketing(t: number) {
         return s > 0 ? <Person key={k} at={gSlot(k)} s={s} /> : null;
       })}
 
-      {/* Follow-ups & CRM: customers come back and bring others */}
+      {/* Follow-ups: customers come back and bring others */}
+      <text x={896} y={452} textAnchor="end" {...label} fontSize={24} opacity={prog(t, 10.2, 10.6)}>
+        Follow-ups
+      </text>
       <ellipse cx={G_LOOP.cx} cy={G_LOOP.cy} rx={G_LOOP.rx} ry={G_LOOP.ry} {...hair} {...draw(inOut(prog(t, 9.8, 10.5)))} />
       <path d={`M${G_LOOP.cx + G_LOOP.rx - 9} ${G_LOOP.cy - 7}l9 11l9 -11`} {...hair} opacity={prog(t, 10.4, 10.7)} />
       {[0, 1].map((k) => {
@@ -573,58 +556,10 @@ function marketing(t: number) {
 
 /** The scene registry, keyed by the service ids in SERVICES.items. */
 export const SCENES: Record<SceneId, Scene> = {
-  agents: {
-    loop: 12,
-    still: 10.2,
-    draw: agents,
-    steps: [
-      [0, 2, "Aufgaben definieren"],
-      [2, 3.6, "Daten anbinden"],
-      [3.6, 5, "KI-Agenten"],
-      [5, 7, "Workflows automatisieren"],
-      [7, 8.8, "Systeme verbinden"],
-      [8.8, 12, "Prozesse übernehmen"],
-    ],
-  },
-  chat: {
-    loop: 12,
-    still: 9.4,
-    draw: chat,
-    steps: [
-      [0, 2.2, "Website-Chat"],
-      [2.2, 4.2, "Anfrage-Erkennung"],
-      [4.2, 6.2, "Antwort-Workflows"],
-      [6.2, 8.2, "Lead-Qualifizierung"],
-      [8.2, 10, "Übergabe an Mitarbeiter"],
-      [10, 12, "Rund um die Uhr"],
-    ],
-  },
-  calls: {
-    loop: 12,
-    still: 10.8,
-    draw: calls,
-    steps: [
-      [0, 2, "Eingehende Anrufe"],
-      [2, 4.2, "Sprachassistent"],
-      [4.2, 6.2, "Lead-Qualifizierung"],
-      [6.2, 8.4, "Terminvereinbarung"],
-      [8.4, 10, "Weiterleitung"],
-      [10, 12, "Follow-ups"],
-    ],
-  },
-  marketing: {
-    loop: 13,
-    still: 11.9,
-    draw: marketing,
-    steps: [
-      [0, 2.2, "Zielgruppenanalyse"],
-      [2.2, 3.6, "Positionierung"],
-      [3.6, 4.8, "Kampagnensteuerung"],
-      [4.8, 6.2, "Personalisierte Inhalte"],
-      [6.2, 9.8, "Leadgenerierung"],
-      [9.8, 13, "Follow-ups & CRM"],
-    ],
-  },
+  agents: { loop: 12, still: 10.2, draw: agents },
+  chat: { loop: 12, still: 9.4, draw: chat },
+  calls: { loop: 12, still: 10.8, draw: calls },
+  marketing: { loop: 13, still: 11.9, draw: marketing },
 };
 
 export const isSceneId = (id: string): id is SceneId => id in SCENES;
@@ -637,81 +572,52 @@ const subscribeReduced = (onChange: () => void) => {
 };
 
 /** prefers-reduced-motion that is safe to hydrate: false on the server and while hydrating, then the real value. */
-export function usePrefersReducedMotion() {
+function usePrefersReducedMotion() {
   return useSyncExternalStore(subscribeReduced, () => window.matchMedia(REDUCED).matches, () => false);
 }
 
 /**
- * Plays one scene in a loop. The clock runs only while at least a fifth of the drawing is on screen, stops while
- * the drawing is leaving an AnimatePresence, and never starts for reduced motion (the scene's still frame shows).
- * The rest of the page is told about the drawing through callbacks, so the drawing re-renders alone.
+ * One service drawing. While `playing` it loops, starting from its still frame so it never blanks when it takes
+ * over, and its clock runs only while at least a fifth of it is on screen. While not playing, and always for
+ * reduced motion, it shows the still frame and runs no clock at all. The drawing re-renders alone; nothing else on
+ * the page is told about its frames.
  */
-export function ServiceAnimation({
-  id,
-  label: name,
-  className,
-  onStep,
-  onLoopEnd,
-  progress,
-}: {
-  id: SceneId;
-  /** Accessible name. Leave it out when the steps are listed next to the drawing: it is then hidden from assistive tech. */
-  label?: string;
-  className?: string;
-  /** The index of the step on screen, whenever it changes. */
-  onStep?: (index: number) => void;
-  /** Called at the end of every loop. Return true when the caller moves on: the drawing then holds its last frame. */
-  onLoopEnd?: () => boolean;
-  /** Receives the loop's progress (0 to 1) every frame, without a re-render. */
-  progress?: MotionValue<number>;
-}) {
+export function ServiceAnimation({ id, playing, className }: { id: SceneId; playing: boolean; className?: string }) {
   const scene = SCENES[id];
   const svg = useRef<SVGSVGElement>(null);
-  const [clock, setClock] = useState(0);
+  const [clock, setClock] = useState(scene.still);
+  const [wasPlaying, setWasPlaying] = useState(playing);
   const reduced = usePrefersReducedMotion();
-  const present = useIsPresent();
-  const reportStep = useEffectEvent((index: number) => onStep?.(index));
-  const reportProgress = useEffectEvent((p: number) => progress?.set(p));
-  const endLoop = useEffectEvent(() => onLoopEnd?.() ?? false);
+  const live = playing && !reduced;
+
+  // Each time playing starts or stops, the clock goes back to the still frame (adjusted during render, so a stale
+  // frame from the last run never shows for a frame).
+  if (wasPlaying !== playing) {
+    setWasPlaying(playing);
+    setClock(scene.still);
+  }
 
   useEffect(() => {
     const el = svg.current;
-    if (!el || reduced || !present) return;
-    const { loop, steps } = scene;
+    if (!el || !live) return;
+    const { loop, still } = scene;
     let raf = 0;
     let last = 0;
-    let elapsed = 0;
-    let step = -1;
-    let held = false;
+    let elapsed = still;
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
       // About 60 renders a second is plenty for line drawings, also on 120 and 144 Hz screens.
       if (last && now - last < 12) return;
-      if (last) elapsed += Math.min(0.1, (now - last) / 1000);
+      if (last) elapsed = (elapsed + Math.min(0.1, (now - last) / 1000)) % loop;
       last = now;
-      if (elapsed >= loop) {
-        if (endLoop()) {
-          held = true;
-          cancelAnimationFrame(raf);
-          setClock(loop - 0.001);
-          return;
-        }
-        elapsed %= loop;
-      }
       setClock(elapsed);
-      reportProgress(elapsed / loop);
-      const index = steps.findIndex(([a, b]) => elapsed >= a && elapsed < b);
-      if (index !== step) {
-        step = index;
-        reportStep(index);
-      }
     };
     const io = new IntersectionObserver(
       (entries) => {
         cancelAnimationFrame(raf);
         last = 0;
         // A batch can hold several records for the drawing; the last one is its current state.
-        if (entries[entries.length - 1].isIntersecting && !held) raf = requestAnimationFrame(tick);
+        if (entries[entries.length - 1].isIntersecting) raf = requestAnimationFrame(tick);
       },
       { threshold: 0.2 }
     );
@@ -720,17 +626,11 @@ export function ServiceAnimation({
       io.disconnect();
       cancelAnimationFrame(raf);
     };
-  }, [scene, reduced, present]);
+  }, [scene, live]);
 
-  const t = reduced ? scene.still : clock;
   return (
-    <svg
-      ref={svg}
-      viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`}
-      className={cn("block h-auto w-full select-none", className)}
-      {...(name ? { role: "img", "aria-label": name } : { "aria-hidden": true })}
-    >
-      {scene.draw(t)}
+    <svg ref={svg} viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}`} aria-hidden className={cn("block h-auto w-full select-none", className)}>
+      {scene.draw(live ? clock : scene.still)}
     </svg>
   );
 }

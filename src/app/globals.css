@@ -1,13 +1,14 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@custom-variant dark (&:is(.dark *));
 
 /*
-  Branded Genius v2 design tokens. Colours come only from the client's brand guide (Royal #004BA0, Sky #69BFF8,
-  grey #969595) plus the navy they sit on and white. The whole page shares ONE background (see PageBackground),
-  so no section sets its own background colour.
+  Branded Genius v3 design tokens. Colours come only from the client's brand guide (Royal #004BA0, Sky #69BFF8,
+  grey #969595) plus the near-black navy they sit on and white. The whole page shares ONE background (see
+  PageBackground), so no section sets its own background colour.
 */
 @theme {
-  --color-page: #050a14;
+  --color-page: #040a13;
   --color-deep: #081224;
   --color-panel: #0b1a31;
   --color-panel-hi: #10223f;
@@ -22,6 +23,24 @@
 
 @theme inline {
   --font-sans: var(--font-brand), ui-sans-serif, system-ui, sans-serif;
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  @keyframes marquee {
+  from {
+    transform: translateX(0);
+    }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+    }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
 }
 
 @layer base {
@@ -125,23 +144,79 @@
     font-variant-numeric: lining-nums tabular-nums;
   }
 
-  /* The one card surface used everywhere: deep navy glass without blur (blur costs frames on integrated graphics). */
-  .surface {
-    border-radius: 24px;
-    border: 1px solid rgb(255 255 255 / 0.07);
-    background: linear-gradient(180deg, rgb(16 34 63 / 0.62), rgb(8 18 36 / 0.62));
+  /*
+    v3 glass, one material for the whole page (budget: fewer than 20 glass surfaces). Lit from above only: a
+    neutral rim that is brightest along the top edge, a faint ice-blue fill, grey grain and black shadows. It reads
+    as glass through its edge and depth; never put glass inside glass. Backdrop blur (.glass-blur) only on the
+    header and the one case panel. `.glass-lit` marks the single featured object on screen (a sky-tinted top edge).
+  */
+  .glass {
+    position: relative;
+    isolation: isolate;
+    border-radius: 28px;
+    background:
+      linear-gradient(180deg, rgb(220 236 255 / 0.05) 0%, rgb(220 236 255 / 0.012) 45%, rgb(220 236 255 / 0.01) 100%),
+      rgb(8 14 28 / 0.55);
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.05),
-      0 30px 60px -40px rgb(0 0 0 / 0.8);
+      inset 0 1px 0 rgb(255 255 255 / 0.07),
+      0 1px 0 rgb(0 0 0 / 0.5),
+      0 30px 60px -30px rgb(0 0 0 / 0.9);
   }
-  .surface-hover {
-    transition:
-      border-color 0.4s var(--ease-out-expo),
-      background-color 0.4s var(--ease-out-expo),
-      transform 0.4s var(--ease-out-expo);
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.18) 0%, rgb(255 255 255 / 0.07) 18%, rgb(255 255 255 / 0.03) 55%, rgb(255 255 255 / 0.05) 100%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
-  .surface-hover:hover {
-    border-color: rgb(105 191 248 / 0.28);
+  .glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+  }
+  .glass-lit::before {
+    background: linear-gradient(180deg, rgb(105 191 248 / 0.55) 0%, rgb(105 191 248 / 0.16) 16%, rgb(255 255 255 / 0.04) 55%, rgb(255 255 255 / 0.06) 100%);
+  }
+  .glass-blur {
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+  }
+  /* Photo frame: no glass on photos, just a hairline frame and the shared radius. */
+  .frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+  }
+  /* The hairline sits above the photo; an inset shadow on the frame itself would be painted under it. */
+  .frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    pointer-events: none;
+  }
+  .frame > img {
+    border-radius: inherit;
+  }
+  /* Hairline rule between editorial items. */
+  .rule {
+    height: 1px;
+    background: rgb(255 255 255 / 0.08);
   }
 
   /*

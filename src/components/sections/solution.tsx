@@ -1,110 +1,122 @@
 "use client";
 
-import { motion, type Variants } from "motion/react";
+import { motion, useTransform } from "motion/react";
+import Image from "next/image";
+import { useRef } from "react";
 import { Container, Heading, PrimaryLink, SecondaryLink, Section } from "@/components/system/primitives";
 import { Reveal } from "@/components/system/reveal";
+import { useSectionProgress } from "@/components/system/use-section-progress";
 import { LINKS, SOLUTION } from "@/content/site";
 
 /*
-  Plan, Systeme, Menschen as one sequence. On desktop the three pillars share a rail: a faint 1px line through their
-  nodes, with a sky stroke that draws from the first node to the last when the row comes into view. Stacked on mobile,
-  each pillar draws its own short rail instead, so the stroke plays when that pillar is actually on screen.
+  Lösung, as on the original: a split. The left column holds the photo of Roman at the desk and, below it (never on
+  it), the two short cards as text blocks. The right column holds the heading, the text, the three pillars as
+  full-width editorial rows and the two actions. No glass.
+
+  The pillars are the section's one movement, tied to the scroll and reversible: as a row reaches 60% of the viewport
+  height its hairline draws from left to right and its word rises from 35% to full opacity. Reduced motion shows every
+  row complete (CSS only, so the server markup never changes).
+
+  Phones read in document order: heading and text, the photo and its cards, then the pillars and the actions. On lg
+  the photo column sits on the left across both rows and stays in view while the pillars scroll (only when the
+  viewport is tall enough to hold it).
 */
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+const pad = (i: number) => String(i + 1).padStart(2, "0");
 
-// A symmetric curve, so the stroke passes the middle node exactly halfway through its 1.2s.
-const draw: Variants = {
-  hidden: { scaleX: 0 },
-  shown: { scaleX: 1, transition: { duration: 1.2, ease: [0.45, 0, 0.55, 1] } },
-};
+// A no-break space before each dot keeps the dot on its item's line when the list wraps.
+const NBSP = String.fromCharCode(0xa0);
+const joined = (items: readonly string[]) => items.join(`${NBSP}· `);
 
-const rise: Variants = {
-  hidden: { opacity: 0, y: 22 },
-  shown: (i: number) => ({ opacity: 1, y: 0, transition: { duration: 0.8, delay: 0.1 + i * 0.12, ease: EASE } }),
-};
+function PillarRow({ index, title, items }: { index: number; title: string; items: readonly string[] }) {
+  const row = useRef<HTMLLIElement>(null);
+  // 0 as the row's top edge enters the lower screen, 1 when it reaches 60% of the viewport height.
+  const progress = useSectionProgress(row, ["start 0.95", "start 0.6"]);
+  const wordOpacity = useTransform(progress, [0, 1], [0.35, 1]);
 
-// The rail is drawn at the node's vertical centre (10px node, 1px line).
-const RAIL = "pointer-events-none absolute top-[4.5px] left-[5px] h-px";
+  return (
+    <li ref={row} className="relative pt-7 pb-9 md:pt-8 md:pb-10">
+      <motion.div
+        aria-hidden
+        style={{ scaleX: progress }}
+        className="rule absolute inset-x-0 top-0 origin-left motion-reduce:!transform-none"
+      />
+      {/*
+        Phones and the narrower lg column: the number and the word on one baseline, the items under the word.
+        Wider single-column layouts (sm to lg) and xl: a ledger, with the items beside the word on the same baseline.
+      */}
+      <div className="grid grid-cols-[2.75rem_minmax(0,1fr)] items-baseline gap-x-4 sm:grid-cols-[2.75rem_13rem_minmax(0,1fr)] sm:gap-x-5 lg:grid-cols-[2.75rem_minmax(0,1fr)] lg:gap-x-4 xl:grid-cols-[2.75rem_13rem_minmax(0,1fr)] xl:gap-x-5">
+        <span aria-hidden className="text-[13px] font-medium text-silver tabular-nums">
+          {pad(index)}
+        </span>
+        <motion.h3
+          style={{ opacity: wordOpacity }}
+          className="text-[44px] leading-[1.05] font-medium tracking-[-0.03em] text-white motion-reduce:!opacity-100"
+        >
+          {title}
+        </motion.h3>
+        <p className="col-start-2 mt-3 text-[17px] leading-relaxed text-silver sm:col-start-3 sm:mt-0 lg:col-start-2 lg:mt-3 xl:col-start-3 xl:mt-0">
+          {joined(items)}
+        </p>
+      </div>
+    </li>
+  );
+}
 
 export function SolutionSection() {
-  // Same markup on the server and in the browser; MotionProvider skips the movement for reduced motion.
-  const initial = "hidden";
-
   return (
     <Section id="loesung">
       <Container>
-        <Reveal>
-          <Heading title={SOLUTION.title} accent={SOLUTION.accent} className="max-w-[820px]" />
-          <p className="t-lead mt-6 max-w-[620px]">{SOLUTION.text}</p>
-        </Reveal>
+        <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-[auto_1fr] lg:gap-x-16 xl:gap-x-24">
+          <Reveal className="lg:col-start-2 lg:row-start-1">
+            <Heading title={SOLUTION.title} accent={SOLUTION.accent} className="max-w-[640px]" />
+            <p className="t-lead mt-6 max-w-[560px]">{SOLUTION.text}</p>
+          </Reveal>
 
-        <motion.div
-          className="relative mt-14 md:mt-20"
-          initial={initial}
-          whileInView="shown"
-          viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-        >
-          {/*
-            Desktop rail. The base runs from the first node to the row's end and fades out; the sky stroke ends on the
-            third node. Its width is two column steps: 2/3 of (row width + one 3rem column gap).
-          */}
-          <span
-            aria-hidden
-            className={`${RAIL} right-0 hidden bg-[linear-gradient(90deg,rgb(255_255_255/0.12)_72%,transparent)] lg:block`}
-          />
-          <motion.span
-            aria-hidden
-            variants={draw}
-            className={`${RAIL} hidden w-[calc((100%_+_3rem)*2/3)] origin-left bg-linear-to-r from-sky/35 via-sky/80 to-sky lg:block`}
-          />
+          <div className="mt-12 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:self-start lg:[@media(min-height:760px)]:sticky lg:[@media(min-height:760px)]:top-28">
+            <Reveal>
+              <div className="frame">
+                <Image
+                  src={SOLUTION.img}
+                  alt={SOLUTION.imgAlt}
+                  width={1600}
+                  height={1196}
+                  sizes="(min-width:1024px) 520px, 100vw"
+                  className="block h-auto w-full"
+                />
+              </div>
 
-          <ol role="list" className="grid gap-14 lg:grid-cols-3 lg:gap-x-12">
-            {SOLUTION.pillars.map((pillar, i) => (
-              <motion.li
-                key={pillar.title}
-                initial={initial}
-                whileInView="shown"
-                viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-              >
-                <div className="relative">
-                  <span aria-hidden className={`${RAIL} right-0 bg-linear-to-r from-white/12 to-white/0 lg:hidden`} />
-                  <motion.span
-                    aria-hidden
-                    variants={draw}
-                    className={`${RAIL} right-0 origin-left bg-linear-to-r from-sky/80 to-sky/0 lg:hidden`}
-                  />
-                  <span
-                    aria-hidden
-                    className="relative z-10 block size-2.5 rounded-full bg-sky shadow-[0_0_0_4px_rgb(105_191_248/0.12),0_0_16px_2px_rgb(105_191_248/0.5)]"
-                  />
-                </div>
+              <ol role="list" className="mt-8 grid grid-cols-2 gap-x-6 sm:gap-x-8">
+                {SOLUTION.cards.map((card, i) => (
+                  <li key={card.title}>
+                    <div aria-hidden className="rule" />
+                    <h3 className="mt-5 text-[17px] leading-snug font-medium text-white">
+                      <span aria-hidden className="mr-2.5 text-[13px] text-silver tabular-nums">
+                        {pad(i)}
+                      </span>
+                      {card.title}
+                    </h3>
+                    <p className="mt-2 text-[15px] leading-relaxed text-silver">{joined(card.items)}</p>
+                  </li>
+                ))}
+              </ol>
+            </Reveal>
+          </div>
 
-                <motion.div variants={rise} custom={i} className="mt-8">
-                  <div className="flex items-baseline gap-4">
-                    <span aria-hidden className="num text-[44px] leading-none text-sky">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <h3 className="t-h3">{pillar.title}</h3>
-                  </div>
-                  <ul role="list" className="mt-6 space-y-3">
-                    {pillar.items.map((item) => (
-                      <li key={item} className="flex gap-3 text-[16px] leading-6 text-ink/75">
-                        <span aria-hidden className="mt-[9px] size-1.5 shrink-0 rounded-xs bg-sky" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              </motion.li>
-            ))}
-          </ol>
-        </motion.div>
+          <div className="mt-14 lg:col-start-2 lg:row-start-2 lg:mt-14">
+            <ol role="list">
+              {SOLUTION.pillars.map((pillar, i) => (
+                <PillarRow key={pillar.title} index={i} title={pillar.title} items={pillar.items} />
+              ))}
+            </ol>
 
-        <Reveal className="mt-14 flex flex-col gap-3 sm:flex-row sm:items-center md:mt-20">
-          <PrimaryLink href={LINKS.analysis}>{SOLUTION.primary}</PrimaryLink>
-          <SecondaryLink href="#leistungen">{SOLUTION.secondary}</SecondaryLink>
-        </Reveal>
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:mt-12">
+              {/* The original opens the hosted contact form here and the booking widget from the second button. */}
+              <PrimaryLink href={LINKS.contact}>{SOLUTION.primary}</PrimaryLink>
+              <SecondaryLink href={LINKS.booking}>{SOLUTION.secondary}</SecondaryLink>
+            </div>
+          </div>
+        </div>
       </Container>
     </Section>
   );
