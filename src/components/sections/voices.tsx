@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, Play, X } from "lucide-react";
-import { AnimatePresence, motion, type Transition } from "motion/react";
+import { animate, motion, useMotionValue, useSpring, useTransform, type MotionValue, type Transition } from "motion/react";
 import Image from "next/image";
 import {
   useCallback,
@@ -16,6 +16,7 @@ import {
 } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { Reveal } from "@/components/system/reveal";
+import { useSectionProgress } from "@/components/system/use-section-progress";
 import {
   MorphingDialog,
   MorphingDialogClose,
@@ -27,14 +28,15 @@ import { VOICES } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 /*
-  Kundenstimmen: the client's four YouTube Shorts as a centre-highlighted carousel (the logic of 21st.dev
-  "Testimonial Section 3": the current voice in the middle, its two neighbours beside it, prev/next), set as type
-  and portraits on the page background. No glass, no auto-advance.
+  Kundenstimmen: the client's four YouTube Shorts as an arc of portraits, the arc the developer liked in v1's hero,
+  here carrying real content. The cards stand on a large circle whose centre lies far below the stage: the current
+  voice upright in the middle, its neighbours tilted away on either side and dimmed, the fourth waiting out of view
+  at the far edge. As the section scrolls in, the fan opens from a stack behind the centre card (scroll-linked and
+  reversible); the arrows, dots, swipe and arrow keys turn the arc one card at a time. Only the centre card's quote
+  is shown, under the arc, at full contrast. No glass, no auto-advance, no background effect.
 
-  The cards run on a virtual strip: card v sits at (v - pos) slots from the centre, so stepping moves every card one
-  slot and a new one slides in from the side it comes from, whichever way the visitor goes. Desktop (lg) shows three
-  cards; below lg the strip is clipped to the centre card. The side cards are scaled to 0.92 and only their portraits
-  are dimmed, so every quote keeps full contrast.
+  Every card is placed by one continuous value, the wheel position, so turning the arc is a single animation and a
+  card that leaves at one edge re-enters at the other while it is invisible.
 
   Play opens Motion Primitives' MorphingDialog: the portrait grows into a centred 9:16 player and only then is the
   privacy-enhanced youtube-nocookie iframe mounted.
@@ -47,18 +49,23 @@ const COUNT = ITEMS.length;
 const TRACK_ID = "kundenstimmen-karussell";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-const SLIDE: Transition = { duration: 0.7, ease: EASE };
+const TURN: Transition = { duration: 0.8, ease: EASE };
 const MORPH: Transition = { duration: 0.6, ease: EASE };
 const MORPH_MS = 600;
-const SIDE_SCALE = 0.92;
 const SWIPE_PX = 48;
 
-// The card is 360px wide from xl, 300px at lg (three cards fit the 960px column) and up to 360px below lg.
-const SIZES = "(min-width: 1280px) 360px, (min-width: 1024px) 300px, (min-width: 400px) 360px, calc(100vw - 40px)";
+// Degrees between neighbouring cards on the arc, the side cards' scale, and the circle's radius in card widths
+// (a tighter circle on phones, so the neighbours peek in from the screen edges).
+const STEP = 16;
+const SIDE_SCALE = 0.9;
+const RADIUS_DESKTOP = 4;
+const RADIUS_PHONE = 3.2;
+
+// The card is 320px wide from lg and 240px below.
+const SIZES = "(min-width: 1024px) 320px, 240px";
 
 const mod = (n: number) => ((n % COUNT) + COUNT) % COUNT;
-// One slot is the card width plus a gap of 8% of it.
-const slotX = (offset: number) => `${offset * 108}%`;
+const rad = (deg: number) => (deg * Math.PI) / 180;
 const embed = (id: string) => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
 
 /*
@@ -71,22 +78,54 @@ const BACKDROP_CSS =
 
 export function VoicesSection() {
   const regionRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
   const swiped = useRef(false);
   const focusCentre = useRef(false);
-  // pos is the virtual index of the centre card; from is where the strip stood before the last move.
-  const [view, setView] = useState({ pos: 1, from: 1 });
-  const active = mod(view.pos);
+  // pos is the virtual index of the centre card; it only ever grows or shrinks by whole steps.
+  const [pos, setPos] = useState(1);
+  const active = mod(pos);
 
-  const go = useCallback((step: number) => setView((v) => ({ pos: v.pos + step, from: v.pos })), []);
-  const select = useCallback((pos: number) => setView((v) => (v.pos === pos ? v : { pos, from: v.pos })), []);
+  const go = useCallback((step: number) => setPos((p) => p + step), []);
+
+  // Set after mount, so the server markup never depends on them.
+  const reduced = useMotionValue(0);
+  const radius = useMotionValue(320 * RADIUS_DESKTOP);
+  const wheel = useMotionValue(1);
+
+  useEffect(() => {
+    reduced.set(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : 0);
+  }, [reduced]);
+
+  // The circle scales with the card, which CSS sizes per breakpoint.
+  useEffect(() => {
+    const stage = stageRef.current;
+    const card = stage?.querySelector<HTMLElement>("[data-card]");
+    if (!stage || !card) return;
+    const ro = new ResizeObserver(() => {
+      const w = card.offsetWidth;
+      radius.set(w * (w >= 300 ? RADIUS_DESKTOP : RADIUS_PHONE));
+    });
+    ro.observe(stage);
+    return () => ro.disconnect();
+  }, [radius]);
+
+  useEffect(() => {
+    const controls = animate(wheel, pos, reduced.get() ? { duration: 0 } : TURN);
+    return () => controls.stop();
+  }, [pos, wheel, reduced]);
+
+  // The fan opens as the stage comes up the screen and is fully open once it is centred.
+  const progress = useSectionProgress(stageRef, ["start end", "center center"]);
+  const smooth = useSpring(progress, { stiffness: 140, damping: 30, mass: 0.4 });
+  const spread = useTransform(() => (reduced.get() ? 1 : 0.15 + 0.85 * smooth.get()));
 
   // After a keyboard move from inside a card, or a click on a side card, focus follows the voice now in the centre.
   useEffect(() => {
     if (!focusCentre.current) return;
     focusCentre.current = false;
-    regionRef.current?.querySelector<HTMLElement>(`[data-v="${view.pos}"] [aria-haspopup="dialog"]`)?.focus({ preventScroll: true });
-  }, [view.pos]);
+    regionRef.current?.querySelector<HTMLElement>(`[data-i="${mod(pos)}"] [aria-haspopup="dialog"]`)?.focus({ preventScroll: true });
+  }, [pos]);
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
@@ -95,11 +134,11 @@ export function VoicesSection() {
     // Keys pressed in the open player bubble here through the React portal; only keys from the carousel count.
     if (!event.currentTarget.contains(target)) return;
     event.preventDefault();
-    focusCentre.current = target.closest("[data-v]") !== null;
+    focusCentre.current = target.closest("[data-i]") !== null;
     go(event.key === "ArrowRight" ? 1 : -1);
   }
 
-  // Swipe on touch and pen: a horizontal drag past the threshold steps once. Mouse drags are left alone (text selection).
+  // Swipe on touch and pen: a horizontal drag past the threshold turns the arc once. Mouse drags are left alone.
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
     swiped.current = false;
     swipeStart.current = event.pointerType === "mouse" ? null : { x: event.clientX, y: event.clientY };
@@ -122,13 +161,14 @@ export function VoicesSection() {
     event.stopPropagation();
   }
 
-  function goToIndex(index: number) {
+  // The shortest way round to a voice.
+  function goTo(index: number) {
     const diff = mod(index - active);
     if (diff) go(diff > COUNT / 2 ? diff - COUNT : diff);
   }
 
   return (
-    // Clipped sideways: a card entering or leaving two slots out can reach past the screen edge for a moment.
+    // Clipped sideways: the far cards of the arc reach past the screen edge.
     <Section id="kundenstimmen" className="overflow-x-clip">
       <style href="bg-voices-player-backdrop" precedence="default">
         {BACKDROP_CSS}
@@ -139,95 +179,115 @@ export function VoicesSection() {
           <p className="t-lead mt-6 max-w-[560px]">{VOICES.text}</p>
         </Reveal>
 
-        <Reveal delay={0.1} className="mt-14 md:mt-20">
-          <div ref={regionRef} role="region" aria-roledescription="Karussell" aria-label="Kundenstimmen" onKeyDown={onKeyDown}>
-            {/* All cards share one grid cell; the cell is as tall as the tallest card, so the controls never jump. */}
-            <div
-              id={TRACK_ID}
-              className="mx-auto grid w-full max-w-[360px] touch-pan-y max-lg:overflow-x-clip lg:w-[300px] xl:w-[360px]"
-              onPointerDown={onPointerDown}
-              onPointerUp={onPointerUp}
-              onPointerCancel={() => {
-                swipeStart.current = null;
-              }}
-              onClickCapture={onClickCapture}
-            >
-              <AnimatePresence initial={false} custom={view.pos}>
-                {[-1, 0, 1].map((offset) => {
-                  const v = view.pos + offset;
-                  return (
-                    <VoiceCard
-                      key={v}
-                      v={v}
-                      offset={offset}
-                      from={view.from}
-                      index={mod(v)}
-                      voice={ITEMS[mod(v)]}
-                      onSelect={() => {
-                        // Only when the clicked card held focus (it unmounts); otherwise focus stays where it was.
-                        focusCentre.current = regionRef.current?.contains(document.activeElement) ?? false;
-                        select(v);
-                      }}
-                    />
-                  );
-                })}
-              </AnimatePresence>
-            </div>
-
-            <div className="mt-10 flex items-center justify-center gap-3 md:mt-14">
-              <StepButton direction={-1} onClick={() => go(-1)} />
-              <div className="flex items-center">
-                {ITEMS.map((item, i) => (
-                  <button
-                    key={item.youtube}
-                    type="button"
-                    onClick={() => goToIndex(i)}
-                    aria-controls={TRACK_ID}
-                    aria-current={i === active ? "true" : undefined}
-                    aria-label={`Kundenstimme von ${item.name}`}
-                    className="group grid size-11 cursor-pointer place-items-center rounded-full"
-                  >
-                    <span
-                      aria-hidden
-                      className={cn(
-                        "size-2 rounded-full transition-[background-color,scale] duration-200 ease-out",
-                        i === active ? "scale-125 bg-white" : "bg-white/40 group-hover:bg-white/75"
-                      )}
-                    />
-                  </button>
-                ))}
-              </div>
-              <StepButton direction={1} onClick={() => go(1)} />
-            </div>
-
-            <p className="sr-only" aria-live="polite" aria-atomic="true">
-              {`Kundenstimme ${active + 1} von ${COUNT}: ${ITEMS[active].name}`}
-            </p>
+        <div ref={regionRef} role="region" aria-roledescription="Karussell" aria-label="Kundenstimmen" onKeyDown={onKeyDown} className="mt-14 md:mt-20">
+          <div
+            ref={stageRef}
+            id={TRACK_ID}
+            className="relative h-[462px] touch-pan-y lg:h-[640px]"
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            onPointerCancel={() => {
+              swipeStart.current = null;
+            }}
+            onClickCapture={onClickCapture}
+          >
+            {ITEMS.map((voice, i) => (
+              <ArcCard
+                key={voice.youtube}
+                i={i}
+                voice={voice}
+                centre={i === active}
+                wheel={wheel}
+                spread={spread}
+                radius={radius}
+                onSelect={() => {
+                  focusCentre.current = regionRef.current?.contains(document.activeElement) ?? false;
+                  goTo(i);
+                }}
+              />
+            ))}
           </div>
-        </Reveal>
+
+          {/* The centre voice's words. All four share one grid cell, so the controls below never jump. */}
+          <div className="mx-auto mt-8 grid max-w-[600px] text-center md:mt-12">
+            {ITEMS.map((voice, i) => {
+              const on = i === active;
+              return (
+                <motion.figure
+                  key={voice.youtube}
+                  aria-hidden={!on}
+                  inert={!on}
+                  className="col-start-1 row-start-1"
+                  initial={false}
+                  animate={{ opacity: on ? 1 : 0, y: on ? 0 : 10 }}
+                  transition={{ duration: 0.45, ease: EASE, delay: on ? 0.2 : 0 }}
+                >
+                  <blockquote className="text-[20px] leading-[1.45] tracking-[-0.01em] text-balance text-white md:text-[22px]">
+                    <p>„{voice.quote}“</p>
+                  </blockquote>
+                  <figcaption className="mt-5">
+                    <span className="block font-medium text-white">{voice.name}</span>
+                    <span className="t-small mt-1 block">{voice.role}</span>
+                  </figcaption>
+                </motion.figure>
+              );
+            })}
+          </div>
+
+          <div className="mt-10 flex items-center justify-center gap-3 md:mt-12">
+            <StepButton direction={-1} onClick={() => go(-1)} />
+            <div className="flex items-center">
+              {ITEMS.map((item, i) => (
+                <button
+                  key={item.youtube}
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-controls={TRACK_ID}
+                  aria-current={i === active ? "true" : undefined}
+                  aria-label={`Kundenstimme von ${item.name}`}
+                  className="group grid size-11 cursor-pointer place-items-center rounded-full"
+                >
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "size-2 rounded-full transition-[background-color,scale] duration-200 ease-out",
+                      i === active ? "scale-125 bg-white" : "bg-white/40 group-hover:bg-white/75"
+                    )}
+                  />
+                </button>
+              ))}
+            </div>
+            <StepButton direction={1} onClick={() => go(1)} />
+          </div>
+
+          <p className="sr-only" aria-live="polite" aria-atomic="true">
+            {`Kundenstimme ${active + 1} von ${COUNT}: ${ITEMS[active].name}`}
+          </p>
+        </div>
       </Container>
     </Section>
   );
 }
 
-/** One voice: the 9:16 portrait (the play button), then the quote and who said it. */
-function VoiceCard({
+/** One portrait on the arc. Its place follows the wheel: upright in the centre, tilted and dimmed to the sides. */
+function ArcCard({
+  i,
   voice,
-  index,
-  v,
-  offset,
-  from,
+  centre,
+  wheel,
+  spread,
+  radius,
   onSelect,
 }: {
+  i: number;
   voice: Voice;
-  index: number;
-  v: number;
-  offset: number;
-  from: number;
+  centre: boolean;
+  wheel: MotionValue<number>;
+  spread: MotionValue<number>;
+  radius: MotionValue<number>;
   onSelect: () => void;
 }) {
   const triggerRef = useRef<HTMLButtonElement>(null!);
-  const centre = offset === 0;
   const playLabel = `Video von ${voice.name} abspielen`;
 
   // MorphingDialogTrigger hard-codes an English aria-label ("Open dialog …"); give the play button its German name.
@@ -235,60 +295,67 @@ function VoiceCard({
     triggerRef.current?.setAttribute("aria-label", playLabel);
   }, [playLabel]);
 
+  // Signed distance from the centre in cards, wrapped into [-COUNT/2, COUNT/2): a card leaving one edge comes back
+  // at the other, where it is fully transparent.
+  const rel = useTransform(() => {
+    const d = i - wheel.get() + COUNT / 2;
+    return ((d % COUNT) + COUNT) % COUNT - COUNT / 2;
+  });
+  const far = useTransform(() => Math.min(Math.abs(rel.get()), 1));
+  const angle = useTransform(() => rel.get() * STEP * spread.get());
+  const x = useTransform(() => radius.get() * Math.sin(rad(angle.get())));
+  const y = useTransform(() => radius.get() * (1 - Math.cos(rad(angle.get()))));
+  const scale = useTransform(() => 1 - (1 - SIDE_SCALE) * far.get());
+  const opacity = useTransform(() => Math.min(1, Math.max(0, 2 - Math.abs(rel.get()))));
+  const shade = useTransform(() => 0.55 * far.get());
+  const zIndex = useTransform(() => 10 - Math.round(Math.abs(rel.get()) * 2));
+  const pointerEvents = useTransform(() => (Math.abs(rel.get()) > 1.5 ? "none" : "auto"));
+
   return (
     <motion.div
-      data-v={v}
+      data-card
+      data-i={i}
       role="group"
       aria-roledescription="Kundenstimme"
-      aria-label={`${index + 1} von ${COUNT}`}
-      className="relative col-start-1 row-start-1 w-full"
-      style={{ originY: 0 }}
-      initial={{ x: slotX(v - from), scale: SIDE_SCALE, opacity: 0 }}
-      animate={{ x: slotX(offset), scale: centre ? 1 : SIDE_SCALE, opacity: 1 }}
-      exit="gone"
-      // A leaving card reads the strip's new position from AnimatePresence (custom) and slides out the way it is going.
-      variants={{ gone: (pos: number) => ({ x: slotX(v - pos), scale: SIDE_SCALE, opacity: 0 }) }}
-      transition={SLIDE}
+      aria-label={`${i + 1} von ${COUNT}: ${voice.name}`}
+      aria-hidden={!centre}
+      style={{ x, y, rotate: angle, scale, opacity, zIndex, pointerEvents }}
+      className="absolute top-0 left-1/2 -ml-[120px] w-[240px] will-change-transform lg:-ml-[160px] lg:w-[320px]"
     >
-      <figure>
-        {/* Side cards: only the portrait dims; it leaves the tab order (the arrows, dots and keys move the carousel). */}
-        <motion.div inert={!centre} initial={false} animate={{ opacity: centre ? 1 : 0.5 }} transition={SLIDE}>
-          <MorphingDialog transition={MORPH}>
-            <MorphingDialogTrigger
-              triggerRef={triggerRef}
-              className="frame group block aspect-[9/16] w-full bg-deep select-none focus-visible:outline-offset-[-4px]"
+      {/* Side cards leave the tab order; the arrows, dots and keys turn the arc. */}
+      <div inert={!centre}>
+        <MorphingDialog transition={MORPH}>
+          <MorphingDialogTrigger
+            triggerRef={triggerRef}
+            className="frame group block aspect-[9/16] w-full bg-deep shadow-[0_40px_80px_-30px_rgb(0_0_0/0.9)] select-none focus-visible:outline-offset-[-4px]"
+            style={{ borderRadius: 24 }}
+          >
+            <Image src={voice.img} alt="" fill sizes={SIZES} draggable={false} className="object-cover object-top" />
+            {/* Dims the portrait on the sides; a shade, not opacity, so the cards behind never show through. */}
+            <motion.span aria-hidden style={{ opacity: shade }} className="absolute inset-0 bg-page" />
+            <span
+              aria-hidden
+              className={cn(
+                "absolute top-1/2 left-1/2 grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-page shadow-[0_12px_32px_-8px_rgb(0_0_0/0.6)] transition-[scale,background-color,opacity] duration-300 ease-out group-hover:scale-[1.06] group-hover:bg-white",
+                centre ? "opacity-100" : "opacity-0"
+              )}
+            >
+              {/* Nudged 2px right: a triangle's visual centre sits left of its box centre. */}
+              <Play strokeWidth={1.5} className="size-6 translate-x-[2px] fill-current" />
+            </span>
+          </MorphingDialogTrigger>
+          <MorphingDialogContainer>
+            <MorphingDialogContent
+              className="relative aspect-[9/16] h-[min(85vh,calc(100svh_-_9rem),160vw)] overflow-visible"
               style={{ borderRadius: 24 }}
             >
-              <Image src={voice.img} alt="" fill sizes={SIZES} draggable={false} className="object-cover object-top" />
-              <span
-                aria-hidden
-                className="absolute top-1/2 left-1/2 grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-page shadow-[0_12px_32px_-8px_rgb(0_0_0/0.6)] transition-[scale,background-color] duration-200 ease-out group-hover:scale-[1.06] group-hover:bg-white"
-              >
-                {/* Nudged 2px right: a triangle's visual centre sits left of its box centre. */}
-                <Play strokeWidth={1.5} className="size-6 translate-x-[2px] fill-current" />
-              </span>
-            </MorphingDialogTrigger>
-            <MorphingDialogContainer>
-              <MorphingDialogContent
-                className="relative aspect-[9/16] h-[min(85vh,calc(100svh_-_9rem),160vw)] overflow-visible"
-                style={{ borderRadius: 24 }}
-              >
-                <Player voice={voice} returnTo={triggerRef} />
-              </MorphingDialogContent>
-            </MorphingDialogContainer>
-          </MorphingDialog>
-        </motion.div>
+              <Player voice={voice} returnTo={triggerRef} />
+            </MorphingDialogContent>
+          </MorphingDialogContainer>
+        </MorphingDialog>
+      </div>
 
-        <blockquote className="mt-6 text-[19px] leading-[1.45] tracking-[-0.01em] text-pretty text-white">
-          <p>„{voice.quote}“</p>
-        </blockquote>
-        <figcaption className="mt-5">
-          <span className="block font-medium text-white">{voice.name}</span>
-          <span className="t-small mt-1 block">{voice.role}</span>
-        </figcaption>
-      </figure>
-
-      {/* A side card is one large pointer target that brings it to the centre (keyboard: arrows, dots and keys). */}
+      {/* A side card is one large pointer target that turns it to the centre. */}
       {!centre && (
         <button
           type="button"
