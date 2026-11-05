@@ -36,6 +36,14 @@ The v5 rules (tokens in globals.css):
   under the cards below). Each card leads with its three results, then headline, text, quote, what was built, and
   the tools and area at its foot (no label above the headline). No pin, no scroll hijack.
 - Header: the six links show from 1280px; below that, the menu button (at 1024px the links wrapped to two lines).
+- Leistungen (2026-11-06, the developer found v1's drawings "like cartoons"): four new drawings in one fine-line
+  language (service-scenes.tsx): 1px hairlines that keep their screen width at every size, sky only on what moves,
+  soft comets, a faint dot grid, HTML labels at 13px (from sm) using only words from each service's own text. Agents:
+  process lanes into a processor chip, routed to three systems. Chatbots: three channels into a live conversation.
+  Callbots: a voice waveform, caller (off-white) and AI (sky) taking turns, over the call's progress. Marketing: a
+  funnel of flowing lines dropping off at four gates. Never thick outlines, icon figures or big words in boxes.
+- Leistungen stack: sticky on every window at least 600px tall, phones included (the developer asked for it). A
+  covered plate darkens under a shade of the page colour; never lower its opacity (the plates behind ghost through).
 
 # v4 (2026-11-06): It overrides the v3 brief below for the nine sections being redone.
 
