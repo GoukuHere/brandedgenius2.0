@@ -7,8 +7,9 @@ greys for the quiet half of headlines, matte #1d1d1c cards with white 8% hairlin
 sections, a cream #ecebe6 main button with dark text, and the teal accent on about 1% of the screen.
 
 The v5 rules (tokens in globals.css):
-- ONE flat black background, `--color-page` #111 (PageBackground has no glow or lines now). It replaces the client's
-  arventas.de navy; if the client wants navy back, add one faint royal glow to PageBackground (noted there).
+- ONE background on a black base, `--color-page` #111, carrying the same royal light and thin sky lines as before
+  (PageBackground). A flat black without them was tried first; the developer asked for the background back
+  (2026-11-06), so never drop these layers.
 - Text: off-white #f1f1ee (`--color-white` and `--color-ink`, so every `text-white` follows). Secondary text and
   the quiet half of headlines in the client's grey #969595 (`.tone`; the v4 `.outline-text` now renders the same).
 - Sky #69BFF8 only in small doses: dots, lines, progress, active states, small icons. Never a tinted area, a large

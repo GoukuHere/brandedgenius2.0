@@ -5,7 +5,8 @@
 /*
   Branded Genius v5 design tokens (2026-11-06, "black"): after the developer's reference (the 21st.dev Stipple Orb
   Landing, lagoon theme, dark mode), neutrals do the work and the brand blue is a small accent.
-  - One flat black page (#111), matte panels a step lighter, white hairlines at 8%.
+  - A black page (#111) under the same royal light and thin sky lines as before (PageBackground), matte panels a
+    step lighter, white hairlines at 8%.
   - Warm off-white text (--color-white and --color-ink are both #f1f1ee, so every `text-white` follows), and the
     client's own grey #969595 for secondary text and the quiet half of headlines.
   - Sky #69BFF8 only in small doses (dots, lines, progress, active states); royal in the logo, the hero film and the
