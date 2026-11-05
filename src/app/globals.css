@@ -276,3 +276,86 @@
     transition-duration: 0.01ms !important;
   }
 }
+/*
+  SpecularButton (React Bits, reactbits.dev), sized and coloured for this site: a glass pill whose thin edge light
+  (drawn by the component's WebGL canvas) follows the pointer when it comes near. Sizes match the site's buttons:
+  40, 48 and 56px tall. No backdrop blur (not needed here, and it costs a layer per button).
+*/
+@layer components {
+  .specular-button {
+    --sb-radius: 18px;
+    --sb-tint: #ffffff;
+    --sb-tint-opacity: 0.04;
+    --sb-text-color: #f5f5f5;
+
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    margin: 0;
+    border: 0;
+    border-radius: var(--sb-radius);
+    font: inherit;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.005em;
+    white-space: nowrap;
+    text-decoration: none;
+    color: var(--sb-text-color);
+    background: color-mix(in srgb, var(--sb-tint) calc(var(--sb-tint-opacity) * 100%), transparent);
+    box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.45);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 0.25s ease-out,
+      background-color 0.25s ease-out;
+  }
+  .specular-button:active {
+    transform: scale(0.97);
+  }
+  .specular-button:focus-visible {
+    outline: 2px solid var(--color-sky);
+    outline-offset: 3px;
+  }
+  .specular-button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .specular-button:disabled:active {
+    transform: none;
+  }
+  .specular-button--sm {
+    height: 40px;
+    padding: 0 18px;
+    font-size: 14px;
+  }
+  .specular-button--md {
+    height: 48px;
+    padding: 0 24px;
+    font-size: 15px;
+  }
+  .specular-button--lg {
+    height: 56px;
+    padding: 0 32px;
+    font-size: 16px;
+  }
+  .specular-button__light {
+    position: absolute;
+    inset: -24px;
+    z-index: 1;
+    display: block;
+    width: calc(100% + 48px);
+    height: calc(100% + 48px);
+    pointer-events: none;
+  }
+  .specular-button__label {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: inherit;
+  }
+}

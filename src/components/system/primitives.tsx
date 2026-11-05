@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import type { AnchorHTMLAttributes, ElementType, ReactNode } from "react";
+import { SpecularButton } from "@/components/ui/specular-button";
 import { cn } from "@/lib/utils";
 
 /* Shared building blocks for every section. Use these instead of re-styling the same things per section. */
@@ -81,42 +82,59 @@ type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { children: ReactNode
 
 const external = (href?: string) => (href?.startsWith("http") ? { target: "_blank", rel: "noopener" } : {});
 
-/** The brand's blue gradient pill, as on brandedgenius.de, with a lifting arrow. Primary action only. */
+/*
+  The two pill buttons are React Bits' SpecularButton (components/ui/specular-button.tsx): a thin edge light follows
+  the pointer when it comes near. Primary keeps the brand's royal-blue gradient with an ice-white light; secondary is
+  clear glass with a sky light. Both keep the lifting arrow.
+*/
+const ARROW = "size-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5";
+
+/** The brand's blue gradient pill, as on brandedgenius.de, with a specular edge light. Primary action only. */
 export function PrimaryLink({ children, className, size = "md", href, ...props }: LinkProps) {
   return (
-    <a
-      href={href}
+    <SpecularButton
+      href={href ?? "#"}
       {...external(href)}
       {...props}
+      size={size}
+      radius={999}
+      tint="#1a6fe0"
+      tintOpacity={0}
+      lineColor="#dcecff"
+      baseColor="#5f9ee8"
+      textColor="#ffffff"
+      idleIntensity={0.45}
       className={cn(
-        "group inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full font-medium whitespace-nowrap text-white transition-[filter,transform,box-shadow] duration-300 ease-out hover:brightness-110 active:scale-[0.98]",
-        "bg-[linear-gradient(180deg,#2a86ea_0%,#0f5fc4_55%,#004ba0_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.28),0_14px_34px_-14px_rgb(26_111_224/0.85)]",
-        size === "lg" ? "h-14 px-8 text-[16px]" : "h-12 px-6 text-[15px]",
+        "group bg-[linear-gradient(180deg,#2a86ea_0%,#0f5fc4_55%,#004ba0_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_14px_34px_-14px_rgb(26_111_224/0.85)] hover:brightness-110",
         className
       )}
     >
       {children}
-      <ArrowUpRight className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-    </a>
+      <ArrowUpRight className={ARROW} />
+    </SpecularButton>
   );
 }
 
-/** Quiet outline pill for the second action. */
+/** The quiet second action: clear glass with a sky edge light. */
 export function SecondaryLink({ children, className, size = "md", href, ...props }: LinkProps) {
   return (
-    <a
-      href={href}
+    <SpecularButton
+      href={href ?? "#"}
       {...external(href)}
       {...props}
-      className={cn(
-        "group inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-white/15 bg-white/[0.03] font-medium whitespace-nowrap text-white transition-[border-color,background-color,transform] duration-300 ease-out hover:border-white/35 hover:bg-white/[0.07] active:scale-[0.98]",
-        size === "lg" ? "h-14 px-8 text-[16px]" : "h-12 px-6 text-[15px]",
-        className
-      )}
+      size={size}
+      radius={999}
+      tint="#dcecff"
+      tintOpacity={0.04}
+      lineColor="#69bff8"
+      baseColor="#3a4c66"
+      textColor="#ffffff"
+      idleIntensity={0.32}
+      className={cn("group hover:bg-white/[0.07]", className)}
     >
       {children}
-      <ArrowUpRight className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-    </a>
+      <ArrowUpRight className={ARROW} />
+    </SpecularButton>
   );
 }
 
