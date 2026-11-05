@@ -7,9 +7,10 @@ greys for the quiet half of headlines, matte #1d1d1c cards with white 8% hairlin
 sections, a cream #ecebe6 main button with dark text, and the teal accent on about 1% of the screen.
 
 The v5 rules (tokens in globals.css):
-- ONE background on a black base, `--color-page` #111, carrying the same royal light and thin sky lines as before
+- ONE background on a black base, `--color-page` #111, carrying the thin sky lines (13%) and a faint royal light
   (PageBackground). A flat black without them was tried first; the developer asked for the background back
-  (2026-11-06), so never drop these layers.
+  (2026-11-06), so never drop these layers. Then "more darker, not that much blue shade": the light is a hint
+  (0.12 at the top right, 0.04 to 0.05 elsewhere), never a navy wash.
 - Text: off-white #f1f1ee (`--color-white` and `--color-ink`, so every `text-white` follows). Secondary text and
   the quiet half of headlines in the client's grey #969595 (`.tone`; the v4 `.outline-text` now renders the same).
 - Sky #69BFF8 only in small doses: dots, lines, progress, active states, small icons. Never a tinted area, a large
