@@ -27,8 +27,11 @@ The v5 rules (tokens in globals.css):
   tint), 16px corners (`rounded-panel`, also photos via `.frame`). Opaque stacks use #191919. A chip inside a panel
   is a step lighter (white 4.5%) with its own hairline. Only the header blurs.
 - Full-width hairlines (white 7%) between the page's sections (`main > * + *`) and above the footer.
-- One texture: FooterStipple, a still field of sky dots at the foot of the page, drawn once on a canvas, never
-  animated, faint behind the footer text. No orbs anywhere (the developer's rule).
+- One texture: FooterStipple at the foot of the page. Since 2026-11-06 ("make it more clean", "not animating with
+  mouse hover and scroll") it is a halftone: sky dots on an even 12px grid lit by one smooth glow rising from the
+  bottom centre (no random stipple, no haze). The glow rises and brightens with the scroll; on mouse and trackpad a
+  soft spotlight makes the dots near the cursor swell, anywhere over the footer. It draws only while something
+  changes and only on screen. No orbs anywhere (the developer's rule).
 - Left out on purpose: the reference's orb, its dashboard widgets with invented numbers, its uppercase mono labels.
 - Fallstudien (2026-11-06, the developer found v4's pinned sideways panels "not good at all"): after the reference's
   success stories, matte case cards in a native snap scroller, two side by side from 1280px (one with the next
