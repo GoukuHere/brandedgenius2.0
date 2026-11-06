@@ -15,7 +15,8 @@ import { ConceptHeader, ConceptLink, Grain, HeroFilm, LegalLine, useReducedMotio
   light in the brand gradient runs through the whole page and gives each part its shape, telling the client's own
   story from tool chaos to one system:
   - Hero: it sweeps in and loops round the film, then passes the claim (Strategisch, Automatisiert, Messbar).
-  - Problem: it tangles into a knot beside the six problems.
+  - Problem: the six problems are points on it, and between each two it is broken, like a cut cable: the tools are
+    tested but never connected. Each point lights up as the thread reaches it.
   - Leistungen: it splits into four strands, one under each service, which meet again on the right.
   - Fallstudien: it becomes one straight line rising to the right, with the case's three results on it.
   - Kontakt: it ends at the main button, whose edge light carries it on.
@@ -31,7 +32,47 @@ type Pt = [number, number];
 type Box = { x1: number; y1: number; x2: number; y2: number; w: number; h: number; cx: number; cy: number };
 type Piece = { id: string; d: string; y0: number; y1: number; lane?: boolean };
 type Station = { id: string; x: number; y: number; label: string; piece: string; at: number };
-type Layout = { w: number; h: number; pieces: Piece[]; stations: Station[] };
+/** A bead at a cut end of a broken link; it shows once its half has been drawn to (or from) it. */
+type Mark = { x: number; y: number; piece: string; at: number };
+type Layout = { w: number; h: number; pieces: Piece[]; stations: Station[]; marks: Mark[] };
+
+/**
+ * The desktop chain: each link runs like a circuit trace, down beside its problem, across in the gap between two
+ * problems (where it breaks, the second half a few pixels out of line), then down into the next point. It never
+ * crosses the problems' text. `rows` are the problems' boxes; the gap between two rows is where a link crosses.
+ */
+function railChain(points: Pt[], rows: Box[], shift: number): { pieces: Piece[]; marks: Mark[] } {
+  const pieces: Piece[] = [];
+  const marks: Mark[] = [];
+  for (let k = 0; k < points.length - 1; k++) {
+    const a = points[k];
+    const b = points[k + 1];
+    const ym = rows[k].y2;
+    const dir = Math.sign(b[0] - a[0]) || 1;
+    const mid = (a[0] + b[0]) / 2;
+    const cutA: Pt = [mid - 22 * dir, ym];
+    const cutB: Pt = [mid + 22 * dir, ym + shift];
+    pieces.push({ id: `p${k}a`, d: rounded([a, [a[0], ym], cutA], 24), y0: a[1] - 30, y1: ym });
+    pieces.push({ id: `p${k}b`, d: rounded([cutB, [b[0], ym + shift], b], 24), y0: ym + 24, y1: b[1] });
+    marks.push({ x: cutA[0], y: cutA[1], piece: `p${k}a`, at: 0.98 }, { x: cutB[0], y: cutB[1], piece: `p${k}b`, at: 0.02 });
+  }
+  return { pieces, marks };
+}
+
+/** The phone chain: straight down the gutter, broken between each two problems. */
+function chain(points: Pt[], bend: number, shift: number): { pieces: Piece[]; marks: Mark[] } {
+  const pieces: Piece[] = [];
+  const marks: Mark[] = [];
+  for (let k = 0; k < points.length - 1; k++) {
+    const a = points[k];
+    const b = points[k + 1];
+    const link = brokenLink(a, b, k % 2 === 0 ? bend : -bend, shift);
+    pieces.push({ id: `p${k}a`, d: link.first, y0: a[1] - 30, y1: link.cutA[1] });
+    pieces.push({ id: `p${k}b`, d: link.second, y0: link.cutB[1] + 30, y1: b[1] });
+    marks.push({ x: link.cutA[0], y: link.cutA[1], piece: `p${k}a`, at: 0.98 }, { x: link.cutB[0], y: link.cutB[1], piece: `p${k}b`, at: 0.02 });
+  }
+  return { pieces, marks };
+}
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const fx = (n: number) => n.toFixed(1);
@@ -54,8 +95,6 @@ function smoothRange(pts: Pt[], from: number, to: number): string {
   return d;
 }
 const smooth = (pts: Pt[]) => smoothRange(pts, 0, pts.length - 1);
-/** A path's commands without its opening move, to continue another path from the same point. */
-const continued = (d: string) => d.replace(/^M [^ ]+ [^ ]+/, "");
 
 /** Straight runs joined by rounded corners (radius r), for the parts of the thread that become rails. */
 function rounded(pts: Pt[], r: number): string {
@@ -74,18 +113,35 @@ function rounded(pts: Pt[], r: number): string {
   return `${d} L ${fx(end[0])} ${fx(end[1])}`;
 }
 
-/** The knot: a 2:3 Lissajous figure with a slight wobble, entered at its top and left at its bottom. */
-function knot(cx: number, cy: number, rx: number, ry: number): Pt[] {
-  const pts: Pt[] = [];
-  const t0 = -Math.PI / 6;
-  const span = 2 * Math.PI + Math.PI / 3;
-  const n = 72;
-  for (let i = 0; i <= n; i++) {
-    const t = t0 + (span * i) / n;
-    const wobble = 1 + 0.09 * Math.sin(5 * t + 1.3);
-    pts.push([cx + rx * wobble * Math.sin(2 * t + 0.9), cy + ry * Math.sin(3 * t)]);
-  }
-  return pts;
+/**
+ * A link between two problems that is broken in the middle: the thread runs from one towards the next, stops, and
+ * carries on from slightly out of line, like a cut cable. This is the problem section's own message ("Tools sind
+ * nicht verbunden", tested but never productive); further down, under the services, the thread runs unbroken.
+ * The link is a gentle curve (a quadratic Bézier bent sideways by `bend`); it is cut between 40% and 60% of its
+ * way, and the second half starts `shift` px off the first half's line.
+ */
+function brokenLink(a: Pt, b: Pt, bend: number, shift: number) {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  const nx = -(b[1] - a[1]) / len;
+  const ny = (b[0] - a[0]) / len;
+  const c: Pt = [(a[0] + b[0]) / 2 + nx * bend, (a[1] + b[1]) / 2 + ny * bend];
+  const at = (t: number): Pt => {
+    const u = 1 - t;
+    return [u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]];
+  };
+  // The control point of the part between t0 and t1: the curve's point at t0 plus half the span along its tangent.
+  const part = (t0: number, t1: number): [Pt, Pt, Pt] => {
+    const p = at(t0);
+    const d: Pt = [2 * (1 - t0) * (c[0] - a[0]) + 2 * t0 * (b[0] - c[0]), 2 * (1 - t0) * (c[1] - a[1]) + 2 * t0 * (b[1] - c[1])];
+    const k = (t1 - t0) / 2;
+    return [p, [p[0] + d[0] * k, p[1] + d[1] * k], at(t1)];
+  };
+  const [p0, c1, cutA] = part(0, 0.4);
+  const [q0, c2, q1] = part(0.6, 1);
+  const cutB: Pt = [q0[0] + nx * shift, q0[1] + ny * shift];
+  const c2s: Pt = [c2[0] + nx * shift * 0.5, c2[1] + ny * shift * 0.5];
+  const quad = (s: Pt, k: Pt, e: Pt) => `M ${fx(s[0])} ${fx(s[1])} Q ${fx(k[0])} ${fx(k[1])} ${fx(e[0])} ${fx(e[1])}`;
+  return { first: quad(p0, c1, cutA), second: quad(cutB, c2s, q1), cutA, cutB };
 }
 
 /** Where the straight results line runs inside its box, as fractions: from its high right end to its low left end. */
@@ -97,7 +153,9 @@ type Anchors = {
   hero: Box;
   film: Box;
   problem: Box;
-  knot: Box;
+  /** The six problems' points, in order, and the problems' own boxes. */
+  pnodes: Box[];
+  pitems: Box[];
   servicesHead: Box;
   lanes: Box[];
   line: Box | null;
@@ -106,13 +164,13 @@ type Anchors = {
 };
 
 function desktop(a: Anchors, w: number): Omit<Layout, "w" | "h"> {
-  const { hero: H, film: F, knot: K, servicesHead: SH, lanes, button: B } = a;
+  const { hero: H, film: F, pnodes, pitems, servicesHead: SH, lanes, button: B } = a;
   const line = a.line!;
   const pieces: Piece[] = [];
 
-  // One route from the left edge, round the film, past the claim, into the knot beside the problems, round it and
-  // down the right margin; then the thread becomes rails (a spine down the left of the services, one strand along
-  // the top of each service, a spine down the right where they meet again).
+  // One route from the left edge, round the film and past the claim to the first problem; then the broken chain
+  // through the six problems; then down the right margin, where the thread becomes rails (a spine down the left of
+  // the services, one strand along the top of each service, a spine down the right where they meet again).
   const first = lanes[0];
   const last = lanes[lanes.length - 1];
   const leftX = first.x1 + 4;
@@ -122,8 +180,9 @@ function desktop(a: Anchors, w: number): Omit<Layout, "w" | "h"> {
   const mergeY = last.y2 + 30;
   const R = 36;
   const heroEnd: Pt = [F.x1 - 0.03 * F.w, H.y2 - 40];
-  const loops = knot(K.cx, K.cy, K.w * 0.42, K.h * 0.4);
-  const out = loops[loops.length - 1];
+  const points = pnodes.map((n): Pt => [n.cx, n.cy]);
+  const p1 = points[0];
+  const p6 = points[points.length - 1];
   const route: Pt[] = [
     [-40, H.y1 + 168],
     [w * 0.2, H.y1 + 140],
@@ -134,24 +193,20 @@ function desktop(a: Anchors, w: number): Omit<Layout, "w" | "h"> {
     [F.x1 + 0.76 * F.w, F.y2 + 18],
     [F.x1 + 0.36 * F.w, F.y2 + 44],
     heroEnd,
-    [heroEnd[0] + 0.1 * w, heroEnd[1] + 110],
-    [loops[0][0], loops[0][1] - 70],
-    ...loops,
-    [out[0] - 10, out[1] + 70],
-    [rightX, out[1] + 180],
-    [rightX, underY - 70],
+    [(heroEnd[0] + p1[0]) / 2, (heroEnd[1] + p1[1]) / 2 + 30],
+    p1,
   ];
-  const iHeroEnd = 8;
-  const iKnot = 11;
-  const iOut = iKnot + loops.length;
-  const iLast = route.length - 1;
-  pieces.push({ id: "hero", d: smoothRange(route, 0, iHeroEnd), y0: H.y1 + 60, y1: heroEnd[1] });
-  pieces.push({ id: "to-knot", d: smoothRange(route, iHeroEnd, iKnot), y0: heroEnd[1], y1: K.y1 - 10 });
-  pieces.push({ id: "knot", d: smoothRange(route, iKnot, iOut), y0: K.y1 - 40, y1: K.y2 + 30 });
+  pieces.push({ id: "hero", d: smoothRange(route, 0, 8), y0: H.y1 + 60, y1: heroEnd[1] });
+  pieces.push({ id: "to-p1", d: smoothRange(route, 8, 10), y0: heroEnd[1], y1: p1[1] });
+  const links = railChain(points, pitems, 9);
+  pieces.push(...links.pieces);
+  // From the last problem down past its text, across to the right margin, then back under the Leistungen header to
+  // the rails, unbroken from here on.
+  const below = pitems[pitems.length - 1].y2;
   pieces.push({
     id: "to-split",
-    d: smoothRange(route, iOut, iLast) + continued(rounded([route[iLast], [rightX, underY], [leftX, underY], [leftX, first.y1]], 48)),
-    y0: K.y2 + 30,
+    d: rounded([p6, [p6[0], below], [rightX, below], [rightX, underY], [leftX, underY], [leftX, first.y1]], 48),
+    y0: p6[1] + 10,
     y1: first.y1 - 40,
   });
   pieces.push({ id: "spine-l", d: rounded([[leftX, first.y1 - 8], [leftX, last.y1]], R), y0: first.y1 - 120, y1: last.y1 - 60 });
@@ -180,16 +235,17 @@ function desktop(a: Anchors, w: number): Omit<Layout, "w" | "h"> {
 
   // The claim, as three stations on the thread where it leaves the film.
   const stations: Station[] = HERO.claim.map((label, i) => ({ id: `claim-${i}`, x: 0, y: 0, label, piece: "hero", at: 0.82 + i * 0.07 }));
-  return { pieces, stations };
+  return { pieces, stations, marks: links.marks };
 }
 
 function phone(a: Anchors, w: number): Omit<Layout, "w" | "h"> {
-  const { hero: H, film: F, knot: K, servicesHead: SH, lanes, nodes, button: B } = a;
+  const { hero: H, film: F, pnodes, servicesHead: SH, lanes, nodes, button: B } = a;
   const g = 16; // the gutter the thread runs down
   const pieces: Piece[] = [];
   const heroEnd: Pt = [g, H.y2];
-  const loops = knot(K.cx, K.cy, K.w * 0.42, K.h * 0.4);
-  const out = loops[loops.length - 1];
+  const points = pnodes.map((n): Pt => [n.cx, n.cy]);
+  const p1 = points[0];
+  const p6 = points[points.length - 1];
   const split: Pt = [g, SH.y2 + 20];
   const route: Pt[] = [
     [-20, F.y1 - 26],
@@ -201,21 +257,15 @@ function phone(a: Anchors, w: number): Omit<Layout, "w" | "h"> {
     [g, F.y2 + 64],
     [g, F.y2 + 140],
     heroEnd,
-    [g, K.y1 - 70],
-    [loops[0][0], loops[0][1] - 40],
-    ...loops,
-    [out[0], out[1] + 36],
-    [g, K.y2 + 70],
-    [g, (K.y2 + split[1]) / 2],
-    split,
+    [g, (heroEnd[1] + p1[1]) / 2],
+    p1,
   ];
-  const iHeroEnd = 8;
-  const iKnot = 11;
-  const iOut = iKnot + loops.length + 1;
-  pieces.push({ id: "hero", d: smoothRange(route, 0, iHeroEnd), y0: F.y1 - 20, y1: heroEnd[1] });
-  pieces.push({ id: "to-knot", d: smoothRange(route, iHeroEnd, iKnot), y0: heroEnd[1] - 200, y1: K.y1 });
-  pieces.push({ id: "knot", d: smoothRange(route, iKnot, iOut), y0: K.y1 - 40, y1: K.y2 + 40 });
-  pieces.push({ id: "to-split", d: smoothRange(route, iOut, route.length - 1), y0: K.y2 + 60, y1: split[1] });
+  pieces.push({ id: "hero", d: smoothRange(route, 0, 8), y0: F.y1 - 20, y1: heroEnd[1] });
+  pieces.push({ id: "to-p1", d: smoothRange(route, 8, 10), y0: heroEnd[1] - 200, y1: p1[1] });
+  // Down the gutter through the six problems, broken between each two.
+  const links = chain(points, 0, 7);
+  pieces.push(...links.pieces);
+  pieces.push({ id: "to-split", d: smooth([p6, [g, (p6[1] + split[1]) / 2], split]), y0: p6[1] + 10, y1: split[1] });
   lanes.forEach((lane, i) => {
     const y = lane.y1;
     pieces.push({ id: `lane-${i}`, lane: true, d: rounded([[g, y - 24], [g, y], [w - 20, y]], 20), y0: y - 260, y1: y + 40 });
@@ -225,7 +275,7 @@ function phone(a: Anchors, w: number): Omit<Layout, "w" | "h"> {
   nodes.forEach((n) => trunk.push([g, n.cy]));
   trunk.push([g, B.y1 - 90], [B.cx, B.y1 - 30], [B.cx, B.y1 - 2]);
   pieces.push({ id: "trunk", d: smooth(trunk), y0: split[1], y1: B.y1 });
-  return { pieces, stations: [] };
+  return { pieces, stations: [], marks: links.marks };
 }
 
 /** Measures the anchors (data-thread) inside the root and builds the thread; again whenever the layout changes. */
@@ -251,12 +301,13 @@ function useThreadLayout(root: RefObject<HTMLDivElement | null>) {
       const hero = one("hero");
       const film = one("film");
       const problem = one("problem");
-      const knotBox = one("knot");
+      const pnodes = all("pnode");
+      const pitems = all("pitem");
       const servicesHead = one("services-head");
       const lanes = all("lane");
       const button = one("button");
-      if (!hero || !film || !problem || !knotBox || !servicesHead || lanes.length < 2 || !button) return;
-      const anchors: Anchors = { hero, film, problem, knot: knotBox, servicesHead, lanes, line: one("line"), nodes: all("node"), button };
+      if (!hero || !film || !problem || pnodes.length < 2 || pitems.length !== pnodes.length || !servicesHead || lanes.length < 2 || !button) return;
+      const anchors: Anchors = { hero, film, problem, pnodes, pitems, servicesHead, lanes, line: one("line"), nodes: all("node"), button };
       const w = r.width;
       const wide = w >= 1024 && !!anchors.line;
       const built = wide ? desktop(anchors, w) : phone(anchors, w);
@@ -266,7 +317,7 @@ function useThreadLayout(root: RefObject<HTMLDivElement | null>) {
         const y1 = Math.min(p.y1, maxRead);
         return { ...p, y1, y0: Math.min(p.y0, y1 - 60) };
       });
-      setLayout({ w, h: el.scrollHeight, pieces, stations: built.stations });
+      setLayout({ w, h: el.scrollHeight, pieces, stations: built.stations, marks: built.marks });
     };
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(build);
@@ -343,6 +394,17 @@ function Thread({ root, layout }: { root: RefObject<HTMLDivElement | null>; layo
       labels.current?.querySelectorAll<HTMLElement>("[data-at]").forEach((node) => {
         node.dataset.on = heroCur >= Number(node.dataset.at) ? "1" : "0";
       });
+      // The beads at the cut ends appear once their half has been drawn to (or from) them.
+      el.querySelectorAll<SVGCircleElement>("[data-mark]").forEach((mark) => {
+        const p = pieces.find((x) => x.id === mark.dataset.mark);
+        const at = Number(mark.dataset.at);
+        mark.style.opacity = p && (at > 0.5 ? p.cur >= at : p.cur > at) ? "1" : "0";
+      });
+      // Each problem lights up when the thread reaches it.
+      host.querySelectorAll<HTMLElement>("[data-thread='pnode']").forEach((node) => {
+        const r = node.getBoundingClientRect();
+        node.dataset.on = reduced || read >= r.top + r.height / 2 - top - 6 ? "1" : "0";
+      });
       if (moving) raf = requestAnimationFrame(frame);
     };
     const kick = () => {
@@ -379,11 +441,15 @@ function Thread({ root, layout }: { root: RefObject<HTMLDivElement | null>; layo
         </defs>
         {layout.pieces.map((p) => (
           <g key={p.id} strokeLinecap="round" strokeLinejoin="round">
-            <path data-piece={p.id} d={p.d} stroke="#69bff8" strokeOpacity="0.06" strokeWidth="22" />
-            <path data-piece={p.id} d={p.d} stroke="#69bff8" strokeOpacity="0.14" strokeWidth="8" />
+            {/* The glow layers end flat, so two pieces meeting end to end don't double their glow into a ring. */}
+            <path data-piece={p.id} d={p.d} stroke="#69bff8" strokeOpacity="0.06" strokeWidth="22" strokeLinecap="butt" />
+            <path data-piece={p.id} d={p.d} stroke="#69bff8" strokeOpacity="0.14" strokeWidth="8" strokeLinecap="butt" />
             <path data-piece={p.id} d={p.d} stroke={p.lane ? "url(#c2-lane)" : "url(#c2-body)"} strokeWidth="2.6" />
             <path data-piece={p.id} d={p.d} stroke="#eaf6ff" strokeOpacity="0.8" strokeWidth="1" />
           </g>
+        ))}
+        {layout.marks.map((m, i) => (
+          <circle key={`mark-${i}`} data-mark={m.piece} data-at={m.at} cx={m.x} cy={m.y} r="3.4" fill="#b9e2ff" style={{ opacity: 0, transition: "opacity 300ms" }} />
         ))}
         {layout.pieces.map((p) => (
           <g key={`tip-${p.id}`} data-tip={p.id} style={{ opacity: 0, transition: "opacity 300ms" }}>
@@ -457,23 +523,34 @@ function Hero() {
   );
 }
 
+/*
+  The problems are points on the thread, and the thread between them is broken: it runs halfway, stops, and goes on
+  out of line. That is the section's message (tested but not productive, tools not connected); under the services
+  the thread runs unbroken. On a desktop the points zig-zag down the right; on a phone they sit in the gutter.
+*/
 function Problem() {
   return (
     <section id="problem" data-thread="problem" className="relative">
       <div aria-hidden className="pointer-events-none absolute top-1/2 right-[-6%] -z-10 h-[90%] w-[70%] -translate-y-1/2 bg-[radial-gradient(closest-side,rgb(0_75_160/0.3),rgb(0_75_160/0))]" />
-      <div className="relative z-10 mx-auto grid max-w-[1360px] grid-cols-1 gap-x-16 pt-24 pr-6 pb-24 pl-10 [grid-template-areas:'head''knot''list'] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:px-12 lg:pt-36 lg:pb-40 lg:[grid-template-areas:'head_knot''list_knot']">
-      <div className="[grid-area:head]">
-        <Heading title={PROBLEM.title} accent={PROBLEM.accent} />
-      </div>
-      <div data-thread="knot" className="mx-auto my-6 aspect-square w-full max-w-[300px] [grid-area:knot] lg:my-0 lg:max-w-[560px] lg:self-center" />
-      <ol data-reveal-group className="mt-2 [grid-area:list] lg:mt-12">
-        {PROBLEM.items.map((item, i) => (
-          <li key={item.title} className="flex items-baseline gap-4 border-t border-white/10 py-4 last:border-b">
-            <span className="num w-6 shrink-0 text-[14px] text-sky">{String(i + 1).padStart(2, "0")}</span>
-            <span className="text-[17px] leading-[1.35] text-white/88 lg:text-[19px]">{item.title}</span>
-          </li>
-        ))}
-      </ol>
+      <div className="relative z-10 mx-auto grid max-w-[1360px] grid-cols-1 gap-x-16 pt-24 pr-6 pb-24 pl-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:px-12 lg:pt-36 lg:pb-40">
+        <div className="lg:sticky lg:top-32 lg:self-start">
+          <Heading title={PROBLEM.title} accent={PROBLEM.accent} />
+          <p data-reveal="up" data-rd="2" className="t-body mt-6 max-w-[440px]">
+            {PROBLEM.text}
+          </p>
+        </div>
+        <ol className="mt-10 lg:mt-0">
+          {PROBLEM.items.map((item, i) => (
+            <li key={item.title} data-thread="pitem" className={cn("relative flex items-start gap-5 py-5 lg:py-8", i % 2 === 1 && "lg:pl-[38%]")}>
+              <span data-thread="pnode" data-on="0" className="c2-node absolute top-[27px] -left-[30.5px] lg:static lg:mt-[7px]" />
+              <span className="min-w-0">
+                <span className="num block text-[13px] text-sky">{String(i + 1).padStart(2, "0")}</span>
+                <span className="mt-1 block text-[18px] leading-[1.3] font-medium text-white lg:text-[20px]">{item.title}</span>
+                <span className="mt-1.5 block max-w-[380px] text-[15px] leading-[1.5] text-white/58">{item.text}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );
