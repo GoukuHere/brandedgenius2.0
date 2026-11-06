@@ -17,6 +17,7 @@ import { VoicesSection } from "@/components/sections/voices";
 import { WhySection } from "@/components/sections/why";
 import { WorkshopSection } from "@/components/sections/workshop";
 import { RevealObserver } from "@/components/system/reveal-observer";
+import { SmoothScroll } from "@/components/system/smooth-scroll";
 
 // The client's own section order from brandedgenius.de (the second film removed at the developer's request).
 export default function Home() {
@@ -43,6 +44,7 @@ export default function Home() {
       </main>
       <Footer />
       <RevealObserver />
+      <SmoothScroll />
     </>
   );
 }

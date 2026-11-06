@@ -144,6 +144,7 @@ export function CasesSection() {
             role="region"
             aria-roledescription="Karussell"
             aria-labelledby={HEADING_ID}
+            data-lenis-prevent-horizontal
             className="@container -mx-5 mt-4 snap-x snap-mandatory scroll-px-5 overflow-x-auto overscroll-x-contain [scrollbar-width:none] md:-mx-8 md:scroll-px-8 [&::-webkit-scrollbar]:hidden"
           >
             <ol
