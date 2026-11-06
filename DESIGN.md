@@ -58,6 +58,10 @@ The v5 rules (tokens in globals.css):
   - Ablauf photos drift slightly slower than the page (CSS scroll timelines; browsers without them stay still).
   - Desktop mouse: every glass panel catches a soft light and a sky edge under the pointer (MagicCard panels keep
     their own). The header lights the link of the section being read, with a sliding sky dot.
+  - Warum's team photo (the developer: "seems smaller at start and as we scroll ... becomes larger smoothly"): the
+    pinned expansion from a small frame to full screen now runs on every window at least 560px tall (desktops
+    needed 720px, which most laptop windows with display scaling are not). Shorter windows get a lighter version:
+    the stacked photo grows from 80% to full size as it comes up the screen.
   - One trigger (RevealObserver, once per element) and CSS only: opacity, translate, scale, clip-path and
     background positions. Never `transform` in these keyframes (Motion owns it on many elements), never a fill
     that outlives the entrance, never a hidden state without script (`@media (scripting: enabled)`) or with

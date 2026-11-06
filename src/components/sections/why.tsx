@@ -67,9 +67,14 @@ function accentWordStyle(segment: string, index: number, segments: string[]) {
   return { color: accentColourAt((before + segment.length / 2) / total) };
 }
 
-// Where the stage pins: desktops at least 720px tall, and portrait phones and tablets at least 560px tall.
+/*
+  Where the stage pins: desktops, and portrait phones and tablets, at least 560px tall. Desktops needed 720px until
+  2026-11-07, when the developer's laptop window (under 720px with display scaling) showed only the plain stack and
+  asked for exactly this effect; the frame's size is capped against the screen height, so headline, frame and caption
+  still fit at 560px.
+*/
 const PIN =
-  "(prefers-reduced-motion: no-preference) and (width >= 64rem) and (height >= 45rem), " +
+  "(prefers-reduced-motion: no-preference) and (width >= 64rem) and (height >= 35rem), " +
   "(prefers-reduced-motion: no-preference) and (width < 64rem) and (aspect-ratio <= 4/5) and (height >= 35rem)";
 
 // The runway's timeline, as fractions of the pinned scroll.
@@ -97,14 +102,22 @@ const CLOSED = `inset(50% 50% 50% 50% round ${RADIUS}px)`;
   frame's size is capped against 100svh, so the headline, the frame and the caption always fit the smaller screen.
   The negative scroll margin cancels the page's 96px scroll padding, so the navigation's "Über uns" lands exactly
   where the stage starts to pin, with the headline, the framed photo and the caption all in view.
+
+  Where the stage does not pin but motion is allowed (very short windows, phones on their side), the stacked photo
+  still grows: it starts smaller and more rounded as it comes up the screen and reaches its full width by the middle
+  of the screen (a CSS scroll timeline; browsers without one show it at full size).
 */
 const CSS = `
 .why-veil{display:none}
+@keyframes why-grow{from{scale:.8;border-radius:44px}to{scale:1;border-radius:16px}}
+@media (prefers-reduced-motion: no-preference){@supports (animation-timeline: view()){
+  .why-frame{animation:why-grow linear both;animation-timeline:view();animation-range:entry 0% cover 45%}
+}}
 @media ${PIN}{
   .why-section{padding-top:0;scroll-margin-top:-96px}
   .why-runway{height:240svh}
   .why-stage{position:sticky;top:0;height:100lvh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding-top:80px;padding-bottom:24px}
-  .why-frame{position:static;overflow:visible;width:min(72vw,calc((100svh - 300px) * 4 / 3));aspect-ratio:4/3;margin:24px auto 0;border-radius:${RADIUS}px}
+  .why-frame{position:static;overflow:visible;width:min(72vw,calc((100svh - 300px) * 4 / 3));aspect-ratio:4/3;margin:24px auto 0;border-radius:${RADIUS}px;animation:none}
   .why-frame::after{content:none}
   .why-layer{z-index:1;clip-path:var(--why-clip)}
   .why-img{inset:auto;left:0;top:0;width:var(--why-w);height:var(--why-h);transform-origin:0 0;transform:var(--why-tf)}
