@@ -609,3 +609,790 @@
     animation: c4-tile-in 1000ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--n, 0) * 85ms) backwards;
   }
 }
+
+/* ---------- Concept 5: Warp (space black, liquid chrome, a flight through depth) ---------- */
+
+.k5 {
+  position: relative;
+  isolation: isolate;
+  background: #03050a;
+  color: #eef3fb;
+  font-family: var(--font-geist), var(--font-sans), system-ui, sans-serif;
+}
+.k5 ::selection {
+  background: rgb(105 191 248 / 0.3);
+}
+.k5-glow {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(36% 40% at 50% 52%, rgb(26 111 224 / 0.17), rgb(26 111 224 / 0) 70%),
+    radial-gradient(120% 80% at 50% 125%, rgb(0 75 160 / 0.24), rgb(0 75 160 / 0) 60%),
+    #03050a;
+}
+/* One fixed stage seen through a 1100px lens; every station and frame moves in depth inside it. */
+.k5-stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  perspective: 1100px;
+  perspective-origin: 50% 50%;
+}
+.k5-station {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  will-change: transform, opacity;
+}
+.k5-frame-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  max-width: 1400px;
+  height: 100%;
+  margin: auto;
+  padding: 92px 24px 76px;
+}
+@media (min-width: 1024px) {
+  .k5-frame-content {
+    padding: 104px 64px 84px;
+  }
+}
+@media (min-width: 1280px) {
+  /* Room on the left for the station gauge. */
+  .k5-frame-content {
+    padding-left: 210px;
+  }
+}
+.k5-tunnel-frame {
+  position: absolute;
+  inset: 4vh 3vw;
+  border-radius: 44px;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.3),
+    0 0 70px -18px rgb(105 191 248 / 0.32);
+}
+
+.k5-display {
+  font-family: var(--font-unbounded), sans-serif;
+  font-weight: 500;
+  /* Unbounded is wide: from 21px on a phone, where the longest compound still fits, to 64px. */
+  font-size: clamp(1.32rem, 0.4rem + 3.8vw, 4rem);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  color: #f2f6fc;
+  text-wrap: balance;
+}
+.k5-h2 {
+  font-family: var(--font-unbounded), sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.3rem, 0.75rem + 1.9vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: #f2f6fc;
+  text-wrap: balance;
+}
+.k5-accent {
+  background: linear-gradient(100deg, #ffffff 0%, #c7d3e4 45%, #69bff8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.k5-lead {
+  font-size: 17px;
+  line-height: 1.6;
+  color: rgb(238 243 251 / 0.66);
+}
+.k5-mono {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+/* The LED displays draw their text in the bold monospace: at matrix resolution it reads like a real LED font. */
+.k5-led {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+.k5-chrome[data-chrome-ready] {
+  color: transparent;
+}
+
+.k5-btn {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 24px;
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.4s ease,
+    background-color 0.3s ease,
+    filter 0.3s ease;
+}
+.k5-btn:active {
+  transform: scale(0.97);
+}
+.k5-btn-sm {
+  height: 42px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+/* Polished chrome: a metal gradient with a glint that runs across now and then. */
+.k5-btn-chrome {
+  color: #05070c;
+  background: linear-gradient(180deg, #ffffff 0%, #dfe6ef 42%, #9aa8bb 52%, #e9eef5 100%);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    inset 0 -1px 0 rgb(0 0 0 / 0.25),
+    0 10px 30px -10px rgb(105 191 248 / 0.45);
+}
+.k5-btn-chrome::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(105deg, transparent 30%, rgb(255 255 255 / 0.95) 48%, transparent 66%);
+  transform: translateX(-120%);
+  animation: k5-glint 5s ease-in-out 1.6s infinite;
+}
+.k5-btn-chrome:hover {
+  filter: brightness(1.05);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    inset 0 -1px 0 rgb(0 0 0 / 0.25),
+    0 14px 40px -10px rgb(105 191 248 / 0.75);
+}
+.k5-btn-ghost {
+  color: #eef3fb;
+  background: rgb(255 255 255 / 0.04);
+  box-shadow: inset 0 0 0 1px rgb(200 214 232 / 0.35);
+}
+.k5-btn-ghost:hover {
+  background: rgb(105 191 248 / 0.12);
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.8),
+    0 0 30px -8px rgb(105 191 248 / 0.6);
+}
+@keyframes k5-glint {
+  0%,
+  72% {
+    transform: translateX(-120%);
+  }
+  86%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* Problem panels: dark glass with a chrome hairline and a light that passes now and then. */
+.k5-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, rgb(22 32 52 / 0.8), rgb(8 12 22 / 0.8));
+  box-shadow:
+    inset 0 0 0 1px rgb(200 214 232 / 0.14),
+    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    0 30px 60px -30px rgb(0 0 0 / 0.8);
+}
+@media (min-width: 1024px) {
+  .k5-card {
+    min-height: 150px;
+    padding: 22px 24px;
+  }
+}
+.k5-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 35%, rgb(105 191 248 / 0.14) 50%, transparent 65%);
+  transform: translateX(-100%);
+  animation: k5-sweep 6s ease-in-out calc(var(--k, 0) * 0.6s) infinite;
+}
+@keyframes k5-sweep {
+  0%,
+  60% {
+    transform: translateX(-100%);
+  }
+  82%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+.k5-led-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: #69bff8;
+  box-shadow: 0 0 10px 2px rgb(105 191 248 / 0.7);
+  animation: k5-blink 2.4s ease-in-out infinite;
+}
+@keyframes k5-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.k5-module {
+  position: relative;
+  border-radius: 18px;
+  padding: 14px;
+  background: rgb(14 22 40 / 0.72);
+  box-shadow: inset 0 0 0 1px rgb(200 214 232 / 0.12);
+  transition:
+    box-shadow 0.4s ease,
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.4s ease;
+}
+@media (min-width: 1024px) {
+  .k5-module {
+    padding: 14px 14px 20px;
+  }
+}
+.k5-module.is-active {
+  background: rgb(18 34 64 / 0.88);
+  transform: translateY(-6px);
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.7),
+    0 0 40px -10px rgb(105 191 248 / 0.55);
+}
+.k5-scene svg {
+  mix-blend-mode: screen;
+}
+.k5-chip {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(238 243 251 / 0.72);
+  background: rgb(255 255 255 / 0.04);
+  box-shadow: inset 0 0 0 1px rgb(200 214 232 / 0.2);
+  cursor: pointer;
+  transition:
+    color 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.k5-chip.is-active {
+  color: #05070c;
+  background: linear-gradient(180deg, #ffffff, #cfd8e4);
+  box-shadow: 0 0 24px -6px rgb(105 191 248 / 0.65);
+}
+/* The film as a hologram: a sky edge, a deep blue light, fine scan lines and a slow scanning band. */
+.k5-holo {
+  box-shadow:
+    0 0 0 1px rgb(105 191 248 / 0.38),
+    0 40px 120px -30px rgb(26 111 224 / 0.6),
+    0 0 80px -20px rgb(105 191 248 / 0.35);
+}
+.k5-scan {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 3px);
+}
+.k5-scan::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 30%;
+  background: linear-gradient(180deg, transparent, rgb(105 191 248 / 0.13), transparent);
+  transform: translateY(-100%);
+  animation: k5-scanline 4.6s linear infinite;
+}
+@keyframes k5-scanline {
+  to {
+    transform: translateY(340%);
+  }
+}
+/* The light at the end of the flight, behind the last station. */
+.k5-portal {
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(40% 40% at 50% 50%, rgb(220 236 255 / 0.3), rgb(105 191 248 / 0.13) 40%, transparent 70%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .k5-btn-chrome::before,
+  .k5-card::after,
+  .k5-led-dot,
+  .k5-scan::after {
+    animation: none;
+  }
+}
+
+/* The service drawings' word labels need room; in the small modules of concepts 5 and 6 they stay off. */
+.k5-scene [aria-hidden] > div,
+.k6-screen [aria-hidden] > div {
+  display: none;
+}
+
+/* ---------- Concept 6: System (a light plan the camera flies over) ---------- */
+
+.k6 {
+  --k6-bg: #eef2f7;
+  --k6-ink: #0a0e15;
+  --k6-royal: #004ba0;
+  --k6-sky: #69bff8;
+  position: relative;
+  isolation: isolate;
+  background: var(--k6-bg);
+  color: var(--k6-ink);
+  font-family: var(--font-sora), var(--font-sans), system-ui, sans-serif;
+}
+.k6 ::selection {
+  background: rgb(0 75 160 / 0.18);
+}
+.k6-viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 60% at 50% 45%, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0) 70%),
+    var(--k6-bg);
+}
+/* The plan: positioned from its top-left corner, so the camera's translate and scale map directly to it. */
+.k6-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+/* The blueprint grid reaches well past the plan, so it fills the screen in the whole-system view too. */
+.k6-world::before {
+  content: "";
+  position: absolute;
+  inset: -3000px;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(0 75 160 / 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 75 160 / 0.07) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+.k6-world.is-moving {
+  will-change: transform;
+}
+
+.k6-room {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px rgb(10 14 21 / 0.06),
+    0 50px 100px -50px rgb(10 30 70 / 0.35),
+    0 12px 30px -20px rgb(10 30 70 / 0.2);
+  transition: box-shadow 0.6s ease;
+}
+@media (min-width: 768px) {
+  .k6-room {
+    border-radius: 32px;
+  }
+}
+.k6-room.is-active {
+  box-shadow:
+    0 0 0 1.5px rgb(0 75 160 / 0.3),
+    0 60px 120px -50px rgb(0 75 160 / 0.4),
+    0 12px 30px -20px rgb(10 30 70 / 0.2);
+}
+
+/* Type: sizes in plan units (the camera scales the room as a whole). */
+/* Sized so "KI-Automatisierung," always fits its column on one line (measured): 30px on a phone, 54px on the plan. */
+.k6-display {
+  font-weight: 300;
+  font-size: 30px;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+.k6-h2 {
+  font-weight: 300;
+  font-size: 26px;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.k6-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgb(10 14 21 / 0.62);
+}
+@media (min-width: 768px) {
+  .k6-display {
+    font-size: 54px;
+  }
+  .k6-h2 {
+    font-size: 40px;
+  }
+  .k6-body {
+    font-size: 16.5px;
+  }
+}
+.k6-mono {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+.k6-logo img {
+  filter: brightness(0);
+  opacity: 0.9;
+}
+
+.k6-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  height: 50px;
+  padding: 0 22px;
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.35s ease,
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.k6-btn:active {
+  transform: scale(0.97);
+}
+.k6-btn-sm {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+.k6-btn-ink {
+  background: var(--k6-ink);
+  color: #ffffff;
+  box-shadow: 0 10px 24px -12px rgb(10 14 21 / 0.6);
+}
+.k6-btn-ink:hover {
+  background: var(--k6-royal);
+  box-shadow: 0 12px 30px -12px rgb(0 75 160 / 0.7);
+}
+.k6-btn-line {
+  color: var(--k6-ink);
+  box-shadow: inset 0 0 0 1.5px rgb(10 14 21 / 0.18);
+}
+.k6-btn-line:hover {
+  color: var(--k6-royal);
+  box-shadow: inset 0 0 0 1.5px var(--k6-royal);
+}
+
+/* The film in a device: a light bezel and a soft shadow. */
+.k6-device {
+  box-shadow:
+    0 0 0 1px rgb(10 14 21 / 0.08),
+    0 0 0 7px #f3f5f8,
+    0 0 0 8px rgb(10 14 21 / 0.07),
+    0 34px 70px -34px rgb(10 30 70 / 0.45);
+}
+.k6-status {
+  padding: 7px 11px;
+  border-radius: 9px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgb(10 14 21 / 0.45);
+  background: #f1f4f8;
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease,
+    box-shadow 0.5s ease;
+}
+.k6-status.is-on {
+  color: #ffffff;
+  background: var(--k6-royal);
+  box-shadow: 0 0 22px -4px rgb(0 75 160 / 0.55);
+}
+.k6-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--k6-royal);
+  box-shadow: 0 0 0 3px rgb(0 75 160 / 0.14);
+  animation: k6-blink 2.2s ease-in-out infinite;
+}
+@keyframes k6-blink {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* The problem room is a diagnosis: each finding slides in and a scan bar runs under it when the camera arrives. */
+.k6-scan-list {
+  display: grid;
+  gap: 6px;
+  align-content: center;
+}
+.k6-scan-list li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 10px;
+  padding: 11px 13px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #f5f7fa;
+}
+@media (min-width: 768px) {
+  .k6-scan-list li {
+    padding: 13px 16px;
+  }
+}
+.k6-scan-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--k6-royal), var(--k6-sky));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+.k6-room.is-active .k6-scan-list li {
+  animation: k6-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 110ms + 200ms) both;
+}
+.k6-room.is-active .k6-scan-bar {
+  animation: k6-scan 1.3s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 150ms + 380ms) both;
+}
+@keyframes k6-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes k6-scan {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.k6-module {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: #f5f7fa;
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.4s ease,
+    background-color 0.3s ease;
+}
+@media (min-width: 768px) {
+  .k6-module {
+    padding: 12px 12px 18px;
+  }
+}
+.k6-module:hover {
+  background: #ffffff;
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 1px rgb(0 75 160 / 0.25),
+    0 20px 40px -20px rgb(0 75 160 / 0.4);
+}
+.k6-room.is-active .k6-module {
+  animation: k6-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 120ms + 250ms) both;
+}
+.k6-screen {
+  background: #0d1630;
+}
+.k6-screen svg {
+  mix-blend-mode: screen;
+}
+.k6-tab {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgb(10 14 21 / 0.6);
+  background: #f1f4f8;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+.k6-tab:hover {
+  color: var(--k6-ink);
+}
+.k6-tab.is-active {
+  color: #ffffff;
+  background: var(--k6-ink);
+}
+/* Each result is read off by a scanning light from left to right. */
+.k6-metric {
+  position: relative;
+}
+.k6-figure {
+  display: block;
+  font-weight: 300;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  color: var(--k6-royal);
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 768px) {
+  .k6-figure {
+    font-size: 72px;
+  }
+}
+.k6-room.is-active .k6-figure {
+  animation: k6-read 1.1s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 150ms + 250ms) both;
+}
+@keyframes k6-read {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* The wiring: faint royal lines with sky signals running along them. */
+.k6-wire {
+  stroke: rgb(0 75 160 / 0.2);
+  stroke-width: 2.5;
+}
+.k6-wire-thin {
+  stroke-width: 2;
+  stroke-dasharray: 6 8;
+}
+.k6-pulse {
+  stroke: var(--k6-sky);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 26 1600;
+  animation: k6-pulse 3.4s linear infinite;
+}
+.k6-pulse-short {
+  stroke-width: 3;
+  stroke-dasharray: 14 700;
+  animation-duration: 2.4s;
+}
+@keyframes k6-pulse {
+  from {
+    stroke-dashoffset: 1626;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+/* The client's tools on the plan, sized to read in the whole-system view. */
+.k6-tool {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-radius: 16px;
+  white-space: nowrap;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 30px;
+  color: var(--k6-ink);
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1.5px rgb(10 14 21 / 0.08),
+    0 20px 40px -20px rgb(10 30 70 / 0.35);
+  transform: translate(-50%, -50%);
+}
+.k6-tool .k6-dot {
+  width: 12px;
+  height: 12px;
+}
+/* The core: the Branded Genius mark on a white tile with a royal light. */
+.k6-core {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 240px;
+  height: 240px;
+  border-radius: 56px;
+  background: #ffffff;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 0 2px rgb(0 75 160 / 0.25),
+    0 0 0 18px rgb(0 75 160 / 0.06),
+    0 40px 90px -30px rgb(0 75 160 / 0.6);
+  animation: k6-breathe 4s ease-in-out infinite;
+}
+@keyframes k6-breathe {
+  50% {
+    box-shadow:
+      0 0 0 2px rgb(0 75 160 / 0.4),
+      0 0 0 30px rgb(0 75 160 / 0.04),
+      0 40px 100px -30px rgb(0 75 160 / 0.75);
+  }
+}
+.k6-overview-title {
+  position: absolute;
+  top: 96px;
+  left: 28px;
+  /* Narrow enough to sit in the empty top-left of the plan in the whole-system view. */
+  max-width: min(440px, calc(100vw - 56px));
+  padding: 18px 22px;
+  border-radius: 18px;
+  pointer-events: none;
+  background: rgb(255 255 255 / 0.78);
+  box-shadow: 0 0 0 1px rgb(10 14 21 / 0.06);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.k6-overview-title.is-on {
+  opacity: 1;
+  transform: none;
+}
+.k6-minimap {
+  padding: 8px;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.82);
+  box-shadow:
+    inset 0 0 0 1px rgb(10 14 21 / 0.08),
+    0 10px 30px -15px rgb(10 30 70 / 0.35);
+  backdrop-filter: blur(8px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .k6-dot,
+  .k6-pulse,
+  .k6-core {
+    animation: none;
+  }
+}
+
+/* Reduced motion: the rooms stand one under the other instead of on the plan. */
+.k6-room.is-static {
+  position: relative;
+  min-height: 640px;
+}
