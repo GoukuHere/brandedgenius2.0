@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { MotionProvider } from "@/components/system/motion-provider";
 import { PageBackground } from "@/components/system/page-background";
+import { VersionNav } from "@/components/system/version-nav";
 import "./globals.css";
 
 /*
@@ -33,6 +34,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <PageBackground />
         <MotionProvider>{children}</MotionProvider>
+        {/* Every version the client reviews (v1 the homepage, v2 to v7 the layout concepts), on every page. */}
+        <VersionNav />
       </body>
     </html>
   );

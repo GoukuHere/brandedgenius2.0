@@ -8,9 +8,9 @@ const display = Unbounded({ subsets: ["latin"], variable: "--font-unbounded", di
 const body = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
 
-// Layout concept 5 for the client's review (2026-11-07). Not linked from the homepage and kept out of search engines.
+// Version v6 (layout concept 5) for the client's review (2026-11-07). Reached from the version switcher on every page; kept out of search engines.
 export const metadata: Metadata = {
-  title: "Konzept 5: Warp | Branded Genius",
+  title: "v6: Warp | Branded Genius",
   robots: { index: false, follow: false },
 };
 

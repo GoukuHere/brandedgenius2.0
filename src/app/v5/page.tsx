@@ -7,9 +7,9 @@ import "@/components/concepts/concepts.css";
 // by next/font at build time.
 const sans = Instrument_Sans({ subsets: ["latin"], axes: ["wdth"], variable: "--font-inst", display: "swap" });
 
-// Layout concept 4 for the client's review (2026-11-07). Not linked from the homepage and kept out of search engines.
+// Version v5 (layout concept 4) for the client's review (2026-11-07). Reached from the version switcher on every page; kept out of search engines.
 export const metadata: Metadata = {
-  title: "Konzept 4: Kobalt | Branded Genius",
+  title: "v5: Kobalt | Branded Genius",
   robots: { index: false, follow: false },
 };
 

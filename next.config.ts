@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // The versions are v1 (the homepage) to v7. The layout concepts first lived at /konzept-1 to /konzept-6; those
+  // addresses (and /v1) keep working.
+  async redirects() {
+    return [
+      { source: "/v1", destination: "/", permanent: false },
+      ...[1, 2, 3, 4, 5, 6].map((n) => ({ source: `/konzept-${n}`, destination: `/v${n + 1}`, permanent: false })),
+    ];
+  },
 };
 
 export default nextConfig;

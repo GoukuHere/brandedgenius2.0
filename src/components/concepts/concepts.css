@@ -1,8 +1,8 @@
 /*
-  Layout concepts (2026-11-07). The client found the live page "too standard" and asked for two completely
-  different layout designs with more gradient colour before the next round. They live at /konzept-1 (Kapitel) and
-  /konzept-2 (Der blaue Faden), both kept out of search engines. Only these two routes import this file; the
-  homepage does not change.
+  Layout concepts (2026-11-07). The client found the live page "too standard" and asked for completely different
+  layout designs with more gradient colour before the next round. Six were made; they are versions v2 to v7 at
+  /v2 (Kapitel), /v3 (Der blaue Faden), /v4 (Papier), /v5 (Kobalt), /v6 (Warp) and /v7 (System), all kept out of
+  search engines (v1 is the homepage). Only those routes import this file; the homepage does not change.
 
   Shared: the brand blues as deep gradients with film grain (so large fields read rich, never flat or banded), a
   new button family (royal fill with a sky rim and a passing light; a quiet outline; a comet edge for the thread

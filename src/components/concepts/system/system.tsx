@@ -477,7 +477,7 @@ function Minimap({ world, view, near }: { world: World; view: MotionValue<{ x: n
   const go = (stopIndex: number) => window.scrollTo({ top: stopScroll(stopIndex), behavior: "smooth" });
   const stopOf = useMemo(() => Object.fromEntries(STOPS.map((s, i) => [s.kind === "room" ? s.id : "overview", i])), []);
   return (
-    <nav aria-label="Plan" className="k6-minimap fixed right-3 bottom-3 z-40 md:right-5 md:bottom-5" style={{ width: W + 16, height: H + 16 }}>
+    <nav aria-label="Plan" className="k6-minimap fixed right-3 bottom-3 z-40 md:right-5 md:bottom-[76px]" style={{ width: W + 16, height: H + 16 }}>
       <div className="relative" style={{ width: W, height: H }}>
         {ROOMS.map((r) => {
           const rr = world.rooms[r.id];
