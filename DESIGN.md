@@ -63,7 +63,8 @@ The v5 rules (tokens in globals.css):
     needed 720px, which most laptop windows with display scaling are not). Shorter windows get a lighter version:
     the stacked photo grows from 80% to full size as it comes up the screen.
   - Smooth scrolling (the developer asked for it; Lenis 1.3.27 in system/smooth-scroll.tsx): the wheel and the
-    trackpad glide, touch keeps the phone's own scrolling, in-page links glide and still land on the page's scroll
+    trackpad glide (lerp 0.065, wheel steps at 65%: the developer found Lenis's defaults "way too fast"), touch
+    keeps the phone's own scrolling, in-page links glide and still land on the page's scroll
     padding and scroll margins, it pauses while the phone menu or the video player holds the page, sideways swipes
     over the Fallstudien cards stay native (data-lenis-prevent-horizontal), and reduced motion gets no Lenis. v1
     dropped Lenis after the client found the page slow, so keep it this light.

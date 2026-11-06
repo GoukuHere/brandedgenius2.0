@@ -23,8 +23,11 @@ export function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
 
+    // Slower and heavier than Lenis's defaults (the developer found 0.1 and 1.0 "way too fast" and no different from
+    // the browser's own scrolling): each wheel step travels 65% as far and glides to rest over about a second.
     const lenis = new Lenis({
-      lerp: 0.1,
+      lerp: 0.065,
+      wheelMultiplier: 0.65,
       smoothWheel: true,
       syncTouch: false,
       anchors: true,
