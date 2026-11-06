@@ -253,7 +253,7 @@ function ServicesChapter({ progress }: { progress: MotionValue<number> }) {
             return (
               <motion.div
                 key={item.id}
-                animate={{ flexGrow: open ? 3.6 : 1 }}
+                animate={{ flexGrow: open ? 3 : 1 }}
                 transition={{ duration: 0.85, ease: EASE }}
                 style={{ flexBasis: 0 }}
                 className={cn(
@@ -269,7 +269,7 @@ function ServicesChapter({ progress }: { progress: MotionValue<number> }) {
                   aria-expanded={open}
                   onClick={() => setPicked({ index: i, at: step })}
                   className={cn(
-                    "flex w-full cursor-pointer items-start gap-4 p-4 text-left md:flex-col md:p-6",
+                    "flex w-full cursor-pointer items-start gap-4 p-4 text-left md:flex-col md:p-5 xl:p-6",
                     open ? "shrink-0 md:gap-3" : "min-h-0 flex-1 md:justify-between"
                   )}
                 >
@@ -277,7 +277,14 @@ function ServicesChapter({ progress }: { progress: MotionValue<number> }) {
                     <span className={cn("num text-[15px] transition-colors duration-500", open ? "text-sky" : "text-white/40")}>{String(i + 1).padStart(2, "0")}</span>
                     {!open && <Plus aria-hidden className="hidden size-4 text-white/45 md:block" />}
                   </span>
-                  <span className={cn("text-[18px] leading-[1.25] font-medium tracking-[-0.01em] md:text-[21px]", open ? "text-white" : "text-white/80")}>{item.title}</span>
+                  <span
+                    className={cn(
+                      "text-[18px] leading-[1.25] font-medium tracking-[-0.01em] [hyphens:manual] md:text-[19px] xl:text-[21px]",
+                      open ? "text-white" : "text-white/80"
+                    )}
+                  >
+                    {item.title}
+                  </span>
                 </button>
                 <AnimatePresence initial={false}>
                   {open && (
@@ -290,8 +297,10 @@ function ServicesChapter({ progress }: { progress: MotionValue<number> }) {
                     >
                       <p className="max-w-[520px] text-[15px] leading-[1.55] text-white/72 md:text-[16px]">{item.text}</p>
                       {scene && (
-                        <div className="c1-scene mt-auto hidden overflow-hidden rounded-[12px] bg-[#071a3d] shadow-[inset_0_0_0_1px_rgb(105_191_248/0.14)] sm:block">
-                          <ServiceAnimation id={scene} playing />
+                        <div className="mt-auto pt-5">
+                          <div className="c1-scene hidden overflow-hidden rounded-[12px] bg-[#071a3d] shadow-[inset_0_0_0_1px_rgb(105_191_248/0.14)] sm:block">
+                            <ServiceAnimation id={scene} playing />
+                          </div>
                         </div>
                       )}
                       <a

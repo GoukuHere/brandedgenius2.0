@@ -260,6 +260,25 @@
 
 /* ---------- Concept 2: Der blaue Faden ---------- */
 
+/* One canvas for the whole page: deep navy at the top, deepening into royal towards the results and the end. */
+.c2-canvas {
+  background: linear-gradient(180deg, #030914 0%, #040e24 24%, #04112b 46%, #061a40 70%, #0a2a63 100%);
+}
+
+/* The claim's stations on the thread: each appears once the thread has reached it. */
+.c2-station {
+  transform: translate(-3.5px, -50%);
+  opacity: 0;
+  translate: 0 6px;
+  transition:
+    opacity 700ms ease,
+    translate 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.c2-station[data-on="1"] {
+  opacity: 1;
+  translate: 0 0;
+}
+
 .c2-fade-top {
   background: linear-gradient(180deg, rgb(2 7 18 / 0.92) 0%, rgb(2 7 18 / 0.6) 55%, rgb(2 7 18 / 0) 100%);
 }
