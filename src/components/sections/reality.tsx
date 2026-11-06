@@ -39,8 +39,8 @@ const REVEAL = 0.45;
 const SHOWN = "inset(0% 0% 0% 0%)";
 const HIDDEN = "inset(100% 0% 0% 0%)";
 
-// reality/05 is portrait (798x922): keep the face and the clock in the landscape crops.
-const FOCUS: Partial<Record<number, string>> = { 4: "object-[50%_20%]" };
+// The photos are landscape and crop well from their centre, except "unsicher" (index 3), whose three faces sit high.
+const FOCUS: Partial<Record<number, string>> = { 3: "object-[50%_25%]" };
 
 const RISE: { hidden: Variant; visible: Variant } = {
   hidden: { opacity: 0, y: 16 },
@@ -257,6 +257,7 @@ export function RealitySection() {
                     src={item.img}
                     alt={item.title}
                     fill
+                    quality={85}
                     sizes="(min-width: 768px) 640px, 100vw"
                     className={cn("object-cover", FOCUS[index])}
                   />
@@ -303,6 +304,7 @@ function PanelPhoto({ item, index, layer, duration }: { item: Reason; index: num
           src={item.img}
           alt={item.title}
           fill
+          quality={85}
           sizes="(min-width: 1024px) 720px, 100vw"
           className={cn("object-cover", FOCUS[index])}
         />

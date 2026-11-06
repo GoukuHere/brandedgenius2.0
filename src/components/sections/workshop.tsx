@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 const HOVER_INTENT_MS = 80; // sweeping the pointer across the row does not flick every panel open
 
 // Where each photo's subject sits, so the narrow collapsed panels still show the person, not the wall.
-const FOCUS = ["43% 50%", "45% 50%", "45% 50%", "34% 50%"];
+const FOCUS = ["43% 50%", "50% 50%", "45% 50%", "68% 50%"];
 
 // The open panel is 2.4 / 5.4 of the row: about 520px inside the 1280px container.
 const PANEL_SIZES = "(min-width: 1280px) 520px, 44vw";
@@ -129,6 +129,7 @@ export function WorkshopSection() {
                       src={format.img}
                       alt={format.title}
                       fill
+                      quality={85}
                       sizes={PANEL_SIZES}
                       style={{ objectPosition: FOCUS[i] }}
                       className={cn("object-cover transition-opacity duration-500 ease-out-expo", on ? "opacity-100" : "opacity-70")}
@@ -182,6 +183,7 @@ export function WorkshopSection() {
                     src={format.img}
                     alt={format.title}
                     fill
+                    quality={85}
                     sizes={CARD_SIZES}
                     style={{ objectPosition: FOCUS[i] }}
                     className="object-cover"

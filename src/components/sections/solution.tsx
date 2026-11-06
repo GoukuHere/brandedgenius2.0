@@ -165,7 +165,7 @@ export function SolutionSection() {
               className="motion-reduce:!transform-none [@media(hover:none)]:!transform-none"
             >
               <div className="frame aspect-[4/3] bg-deep">
-                <Image src={SOLUTION.img} alt={SOLUTION.imgAlt} fill sizes="(min-width:1024px) 600px, 100vw" className="object-cover" />
+                <Image src={SOLUTION.img} alt={SOLUTION.imgAlt} fill quality={85} sizes="(min-width:1024px) 600px, 100vw" className="object-cover" />
               </div>
             </Tilt>
 

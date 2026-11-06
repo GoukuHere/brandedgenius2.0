@@ -82,7 +82,7 @@ const SLIDE = 0.3; // how far each headline line travels, in stage widths
 const RADIUS = 28;
 const VEIL = 0.35;
 const DEPTH = 1.15; // how much closer than "fits the frame" the photo starts
-const RATIO = 1600 / 1194; // team-group.webp
+const RATIO = 2400 / 1792; // team.webp
 const FOCUS_Y = 0.2; // full screen, a wide screen crops the photo's height: keep the heads in, cut more of the legs
 
 // The full-screen layer starts closed, so nothing shows before the frame has been measured.
@@ -297,9 +297,10 @@ export function WhySection() {
                       className="why-img absolute inset-0"
                     >
                       <Image
-                        src="/media/photos/team-group.webp"
+                        src="/media/photos/team.webp"
                         alt="Roman Tränkle und das Team von Branded Genius"
                         fill
+                        quality={85}
                         sizes="(max-aspect-ratio: 4/3) 134vh, 100vw"
                         className="object-cover object-[50%_20%]"
                       />

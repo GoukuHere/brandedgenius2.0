@@ -24,8 +24,11 @@ import { cn } from "@/lib/utils";
 
 type Step = (typeof PROCESS.steps)[number];
 
-/* Every photo crops well to 4:3 from its centre except 05, whose graphic sits on the right edge. */
-const FOCUS: Partial<Record<string, string>> = { "/media/process/05.webp": "object-[85%_50%]" };
+/* Every photo crops well to 4:3 from its centre except two wide ones: "filtern", whose person stands at the right edge, and "analyse", whose left consultant sits at the left edge. */
+const FOCUS: Partial<Record<string, string>> = {
+  "/media/process/filtern.webp": "object-[90%_50%]",
+  "/media/process/analyse.webp": "object-[35%_50%]",
+};
 
 /** How many of the ascending marks the value has reached. */
 function countReached(marks: number[], value: number) {
@@ -229,6 +232,7 @@ const ProcessStep = memo(function ProcessStep({
           src={step.img}
           alt=""
           fill
+          quality={85}
           sizes="(min-width:1024px) 520px, 100vw"
           className={cn("object-cover transition-opacity duration-300 ease-out", FOCUS[step.img], active ? "opacity-100" : "opacity-70")}
         />

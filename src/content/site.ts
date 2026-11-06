@@ -69,27 +69,27 @@ export const REALITY = {
   accent: "nicht produktiv werden.",
   text: "Viele Unternehmen investieren in KI-Tools, doch ohne klare Strategie und Struktur bleiben Potenziale ungenutzt und Ergebnisse aus.",
   items: [
-    { title: "Keine klare KI-Roadmap", text: "KI-Tools werden ausprobiert, aber ohne strukturierten Umsetzungsplan.", img: "/media/reality/01.webp" },
+    { title: "Keine klare KI-Roadmap", text: "KI-Tools werden ausprobiert, aber ohne strukturierten Umsetzungsplan.", img: "/media/reality/roadmap.webp" },
     {
       title: "Tool-Chaos statt System",
       text: "Viele Tools werden genutzt, aber nicht sinnvoll miteinander verbunden oder in einen klaren Prozess integriert.",
-      img: "/media/reality/02.webp",
+      img: "/media/reality/tool-chaos.webp",
     },
     {
       title: "Manuelle Prozesse bleiben bestehen",
       text: "Wiederkehrende Aufgaben kosten weiterhin Zeit und Ressourcen, obwohl sie automatisiert werden könnten.",
-      img: "/media/reality/03.webp",
+      img: "/media/reality/manuell.webp",
     },
     {
       title: "Mitarbeiter sind unsicher",
       text: "Teams wissen nicht, welche Tools sie nutzen dürfen oder wie KI richtig eingesetzt werden soll.",
-      img: "/media/reality/04.webp",
+      img: "/media/reality/unsicher.webp",
     },
-    { title: "Datenschutz wird zu spät berücksichtigt", text: "Compliance und interne Regeln werden häufig erst am Ende berücksichtigt.", img: "/media/reality/05.webp" },
+    { title: "Datenschutz wird zu spät berücksichtigt", text: "Compliance und interne Regeln werden häufig erst am Ende berücksichtigt.", img: "/media/reality/datenschutz.webp" },
     {
       title: "Keine KPIs und keine klare Wirkung",
       text: "KI wird getestet, aber der Business-Impact wird nicht gemessen oder transparent ausgewertet.",
-      img: "/media/reality/06.webp",
+      img: "/media/reality/kpis.webp",
     },
   ],
 };
@@ -146,7 +146,7 @@ export const SOLUTION = {
   primary: "KI-Potenzialanalyse anfragen",
   secondary: "Unsere Lösung entdecken",
   // The left column of the original's Lösung section: the photo and two cards.
-  img: "/media/photos/vorher-nachher.webp",
+  img: "/media/photos/desk.webp",
   imgAlt: "Roman Tränkle am Schreibtisch vor dem Branded Genius Logo",
   cards: [
     { title: "Klarer Plan", items: ["Analyse", "Priorisierung", "Roadmap"] },
@@ -337,13 +337,13 @@ export const PROCESS = {
   accent: "strukturierten Umsetzung.",
   text: "Ein klarer Prozess mit transparenten Meilensteinen – damit KI nicht bei Ideen bleibt, sondern produktiv in Ihrem Unternehmen ankommt.",
   steps: [
-    { title: "KI-Potenzialanalyse", text: "Wir analysieren Ihre Prozesse und identifizieren die größten Hebel für Automatisierung und KI.", img: "/media/process/01.webp" },
-    { title: "Anwendungsfälle filtern", text: "Wir bewerten mögliche Anwendungsfälle nach Impact, Aufwand und realistischem Nutzen.", img: "/media/process/02.webp" },
-    { title: "KI-Roadmap", text: "Sie erhalten einen klaren Fahrplan mit priorisierten Schritten für die Umsetzung.", img: "/media/process/03.webp" },
-    { title: "Pilotprojekt", text: "Wir starten mit einem klar definierten, realistisch umsetzbaren Use Case.", img: "/media/process/04.webp" },
-    { title: "Implementierung", text: "Automatisierungen, Workflows und KI-Agenten werden sicher in Ihre bestehenden Prozesse integriert.", img: "/media/process/05.webp" },
-    { title: "Praxistraining", text: "Ihr Team lernt, die neuen Systeme sicher, effizient und produktiv im Alltag zu nutzen.", img: "/media/process/06.webp" },
-    { title: "Optimierung & Skalierung", text: "Wir messen Ergebnisse, optimieren laufend und skalieren erfolgreiche Prozesse Schritt für Schritt.", img: "/media/process/07.webp" },
+    { title: "KI-Potenzialanalyse", text: "Wir analysieren Ihre Prozesse und identifizieren die größten Hebel für Automatisierung und KI.", img: "/media/process/analyse.webp" },
+    { title: "Anwendungsfälle filtern", text: "Wir bewerten mögliche Anwendungsfälle nach Impact, Aufwand und realistischem Nutzen.", img: "/media/process/filtern.webp" },
+    { title: "KI-Roadmap", text: "Sie erhalten einen klaren Fahrplan mit priorisierten Schritten für die Umsetzung.", img: "/media/process/roadmap.webp" },
+    { title: "Pilotprojekt", text: "Wir starten mit einem klar definierten, realistisch umsetzbaren Use Case.", img: "/media/process/pilot.webp" },
+    { title: "Implementierung", text: "Automatisierungen, Workflows und KI-Agenten werden sicher in Ihre bestehenden Prozesse integriert.", img: "/media/process/implementierung.webp" },
+    { title: "Praxistraining", text: "Ihr Team lernt, die neuen Systeme sicher, effizient und produktiv im Alltag zu nutzen.", img: "/media/process/training.webp" },
+    { title: "Optimierung & Skalierung", text: "Wir messen Ergebnisse, optimieren laufend und skalieren erfolgreiche Prozesse Schritt für Schritt.", img: "/media/process/skalierung.webp" },
   ],
 };
 
@@ -402,10 +402,10 @@ export const WORKSHOP = {
   author: "Roman Tränkle",
   formatsLabel: "Unsere Workshop-Formate",
   formats: [
-    { title: "Vor-Ort Workshops", text: "Interaktive Hands-on-Workshops direkt in Ihrem Unternehmen vor Ort.", img: "/media/workshop/01.webp" },
-    { title: "Online Seminare", text: "Kompakte Live-Online-Trainings mit praxisnahen Übungen und individuellem Austausch.", img: "/media/workshop/02.webp" },
-    { title: "Leadership Workshops", text: "Strategische Entscheidungskompetenz und Zukunftssicherheit für Führungskräfte und Vorstände.", img: "/media/workshop/03.webp" },
-    { title: "Individuelle Trainings", text: "Maßgeschneiderte Schulungsinhalte für spezifische Fachabteilungen und konkrete Anwendungsfälle.", img: "/media/workshop/04.webp" },
+    { title: "Vor-Ort Workshops", text: "Interaktive Hands-on-Workshops direkt in Ihrem Unternehmen vor Ort.", img: "/media/workshop/vor-ort.webp" },
+    { title: "Online Seminare", text: "Kompakte Live-Online-Trainings mit praxisnahen Übungen und individuellem Austausch.", img: "/media/workshop/online.webp" },
+    { title: "Leadership Workshops", text: "Strategische Entscheidungskompetenz und Zukunftssicherheit für Führungskräfte und Vorstände.", img: "/media/workshop/leadership.webp" },
+    { title: "Individuelle Trainings", text: "Maßgeschneiderte Schulungsinhalte für spezifische Fachabteilungen und konkrete Anwendungsfälle.", img: "/media/workshop/individuell.webp" },
   ],
   topicsLabel: "Themenbeispiele",
   topics: [

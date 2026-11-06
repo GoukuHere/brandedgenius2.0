@@ -47,6 +47,20 @@ The v5 rules (tokens in globals.css):
   funnel of flowing lines dropping off at four gates. Never thick outlines, icon figures or big words in boxes.
 - Leistungen stack: sticky on every window at least 600px tall, phones included (the developer asked for it). A
   covered plate darkens under a shade of the page colour; never lower its opacity (the plates behind ghost through).
+- Photos (2026-11-06, the developer: "All the images already used are all AI ... currently all images are in low
+  quality"; the client asked for "better stunning pics"). Every photo without Roman is a real Pexels photo (free for
+  commercial use, no credit required), downloaded at its original size and resized with lanczos: Realitaet and
+  Workshops 2000px wide, Ablauf 1800px, WebP quality 86. next/image serves them at quality 85
+  (`images.qualities` [75, 85]): the dark scenes band at the default 75. Every photo with Roman is the client's own
+  original at its full size (team 2400px, training 1800px, workshops and desk 1600px), never a smaller copy. On the
+  two workshop photos the AI's garbled slide lettering is softened like an out-of-focus background. Picks: low-key
+  real scenes for the problems (Realitaet), natural rooms for Ablauf and Workshops; no logos, no readable foreign
+  text, no stock clichés (shrugs, thumbs up, hacker hoodies). No grade on top: each photo keeps its own light.
+  Pexels ids: reality roadmap 6814533, tool-chaos 11404176, manuell 36713389, unsicher 7731379, datenschutz
+  37730211, kpis 18706593; process analyse 36766694, filtern 30535639, roadmap 39205088, pilot 6804071,
+  implementierung 16129724, skalierung 12969403; workshop online 7643888, individuell 5324985. New file names on
+  purpose, so no cache can serve an old photo. Roman's photos can be regenerated with Gemini (the developer's
+  Antigravity CLI keeps his face), but its output stops near 1 megapixel, below the client's originals.
 
 # v4 (2026-11-06): It overrides the v3 brief below for the nine sections being redone.
 
