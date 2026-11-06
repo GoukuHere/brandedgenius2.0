@@ -47,6 +47,22 @@ The v5 rules (tokens in globals.css):
   funnel of flowing lines dropping off at four gates. Never thick outlines, icon figures or big words in boxes.
 - Leistungen stack: sticky on every window at least 600px tall, phones included (the developer asked for it). A
   covered plate darkens under a shade of the page colour; never lower its opacity (the plates behind ghost through).
+- Motion v6 (2026-11-07, the developer approved a top-to-bottom plan "so page looks more happening", after the
+  client's "maybe little bit more animation"). One entrance language on top of every section's own piece (nothing
+  that moved before was removed):
+  - Every Heading: the title's words rise out of masks one after another, then the blue phrase fills left to right.
+    The text and buttons beside it follow (data-reveal="up" with data-rd steps of 150ms).
+  - Lists rise one after another (data-reveal-group); photos open from their bottom edge and settle
+    (data-reveal="photo"); hairlines draw (data-reveal="rule" / "rule-y"); the contact checks tick in.
+  - The hairline between sections draws out from the centre. The hero's blue phrase gets one light sweep.
+  - Ablauf photos drift slightly slower than the page (CSS scroll timelines; browsers without them stay still).
+  - Desktop mouse: every glass panel catches a soft light and a sky edge under the pointer (MagicCard panels keep
+    their own). The header lights the link of the section being read, with a sliding sky dot.
+  - One trigger (RevealObserver, once per element) and CSS only: opacity, translate, scale, clip-path and
+    background positions. Never `transform` in these keyframes (Motion owns it on many elements), never a fill
+    that outlives the entrance, never a hidden state without script (`@media (scripting: enabled)`) or with
+    reduced motion. Figures never count up; the background stays still (the client allowed one animated
+    background, the footer glow).
 - Photos (2026-11-06, the developer: "All the images already used are all AI ... currently all images are in low
   quality"; the client asked for "better stunning pics"). Every photo without Roman is a real Pexels photo (free for
   commercial use, no credit required), downloaded at its original size and resized with lanczos: Realitaet and

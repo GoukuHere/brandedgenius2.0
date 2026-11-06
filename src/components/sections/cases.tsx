@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CaseCard, caseCardId } from "@/components/sections/cases-panel";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { Reveal } from "@/components/system/reveal";
 import { CASES } from "@/content/site";
 import { cn } from "@/lib/utils";
 
@@ -115,7 +114,7 @@ export function CasesSection() {
   return (
     <Section id="use-cases">
       <Container>
-        <Reveal y={12} className="xl:grid xl:grid-cols-[minmax(0,1fr)_400px] xl:items-end xl:gap-x-16">
+        <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_400px] xl:items-end xl:gap-x-16">
           <div id={HEADING_ID}>
             {/* The continuation (the white-to-sky phrase) gets its own line. */}
             <Heading
@@ -124,15 +123,17 @@ export function CasesSection() {
               className="max-w-[760px] text-[2.25rem] md:text-[2.75rem] xl:text-[3rem] [&>.accent]:block"
             />
           </div>
-          <p className="t-lead mt-6 max-w-[580px] xl:mt-0">{CASES.text}</p>
-        </Reveal>
+          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[580px] xl:mt-0">
+            {CASES.text}
+          </p>
+        </div>
 
-        <div className="mt-10 flex items-center justify-between gap-6 md:mt-14">
+        <div data-reveal="up" data-rd="2" className="mt-10 flex items-center justify-between gap-6 md:mt-14">
           <CaseNav first={view.first} last={view.last} onSelect={goTo} />
           <div className="hidden shrink-0 gap-3 lg:flex">{arrows}</div>
         </div>
 
-        <Reveal delay={0.1}>
+        <div>
           {/*
             A full-bleed snap scroller (no scrollbar) and a size container for the card widths. Its padding keeps the
             first card on the content edge and leaves room for the focus ring and the cards' shadow.
@@ -145,13 +146,19 @@ export function CasesSection() {
             aria-labelledby={HEADING_ID}
             className="@container -mx-5 mt-4 snap-x snap-mandatory scroll-px-5 overflow-x-auto overscroll-x-contain [scrollbar-width:none] md:-mx-8 md:scroll-px-8 [&::-webkit-scrollbar]:hidden"
           >
-            <ol ref={trackRef} role="list" className="flex w-max items-start gap-4 px-5 pt-2 pb-10 md:gap-6 md:px-8 xl:items-stretch">
+            <ol
+              ref={trackRef}
+              data-reveal-group
+              data-rd="3"
+              role="list"
+              className="flex w-max items-start gap-4 px-5 pt-2 pb-10 md:gap-6 md:px-8 xl:items-stretch"
+            >
               {ITEMS.map((item, index) => (
                 <CaseCard key={item.name} item={item} index={index} />
               ))}
             </ol>
           </div>
-        </Reveal>
+        </div>
 
         <div className="-mt-3 flex justify-center gap-3 lg:hidden">{arrows}</div>
       </Container>

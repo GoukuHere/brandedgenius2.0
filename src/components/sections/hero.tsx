@@ -100,7 +100,7 @@ export function Hero() {
             </span>
             <span className="-mb-[0.12em] block overflow-hidden pb-[0.2em]">
               <motion.span className="block" {...line(0.38)}>
-                <span className="accent">{HERO.accent}</span>
+                <span className="accent accent-sweep">{HERO.accent}</span>
               </motion.span>
             </span>
           </h1>

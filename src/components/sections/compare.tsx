@@ -77,10 +77,12 @@ export function CompareSection() {
   return (
     <Section id="unterschied" className="pb-12 md:pb-16 lg:[@media(min-height:720px)]:pb-12">
       <Container>
-        <Reveal className="max-w-[920px]">
+        <div className="max-w-[920px]">
           <Heading title={COMPARE.title} accent={COMPARE.accent} />
-          <p className="t-lead mt-6 max-w-[600px]">{COMPARE.text}</p>
-        </Reveal>
+          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[600px]">
+            {COMPARE.text}
+          </p>
+        </div>
 
         <Reveal delay={0.1} className="mt-12 md:mt-16">
           <div ref={panelRef} className="glass relative grid overflow-hidden rounded-panel lg:grid-cols-2">

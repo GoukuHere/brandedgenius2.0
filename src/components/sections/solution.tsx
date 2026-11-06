@@ -4,7 +4,6 @@ import { motion, useTransform } from "motion/react";
 import Image from "next/image";
 import { Fragment, useRef } from "react";
 import { Container, Heading, PrimaryLink, SecondaryLink, Section } from "@/components/system/primitives";
-import { Reveal } from "@/components/system/reveal";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { Tilt } from "@/components/ui/tilt";
 import { LINKS, SOLUTION } from "@/content/site";
@@ -144,34 +143,37 @@ export function SolutionSection() {
     <Section id="loesung">
       <Container>
         <div className="grid gap-y-12 lg:grid-cols-2 lg:items-center lg:gap-x-16 xl:gap-x-20">
-          <Reveal className="lg:col-start-2 lg:row-start-1">
+          <div className="lg:col-start-2 lg:row-start-1">
             <Heading
               title={SOLUTION.title}
               accent={SOLUTION.accent}
               className="max-w-[600px] text-[36px] sm:text-[44px] lg:text-[48px] xl:text-[50px]"
             />
-            <p className="t-lead mt-6 max-w-[520px]">{SOLUTION.text}</p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[520px]">
+              {SOLUTION.text}
+            </p>
+            <div data-reveal="up" data-rd="3" className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               {/* The original opens the hosted contact form here and the booking widget from the second button. */}
               <PrimaryLink href={LINKS.contact}>{SOLUTION.primary}</PrimaryLink>
               <SecondaryLink href={LINKS.booking}>{SOLUTION.secondary}</SecondaryLink>
             </div>
-          </Reveal>
+          </div>
 
-          <Reveal className="order-first lg:order-none lg:col-start-1 lg:row-start-1">
+          {/* The photo opens from its bottom edge, then the two cards rise in under it. */}
+          <div className="order-first lg:order-none lg:col-start-1 lg:row-start-1">
             <Tilt
               rotationFactor={5}
               springOptions={{ stiffness: 150, damping: 22, mass: 0.6 }}
               className="motion-reduce:!transform-none [@media(hover:none)]:!transform-none"
             >
-              <div className="frame aspect-[4/3] bg-deep">
+              <div data-reveal="photo" className="frame aspect-[4/3] bg-deep">
                 <Image src={SOLUTION.img} alt={SOLUTION.imgAlt} fill quality={85} sizes="(min-width:1024px) 600px, 100vw" className="object-cover" />
               </div>
             </Tilt>
 
             {/* The two cards from the original, under the photo. Side by side once there are 400px for them. */}
             <div className="@container mt-4">
-              <ol role="list" className="grid gap-3 @min-[400px]:grid-cols-2">
+              <ol data-reveal-group data-rd="3" role="list" className="grid gap-3 @min-[400px]:grid-cols-2">
                 {SOLUTION.cards.map((card, i) => (
                   <li key={card.title} className="glass rounded-panel p-5">
                     <p className="text-[16px] leading-snug font-medium text-white">
@@ -187,7 +189,7 @@ export function SolutionSection() {
                 ))}
               </ol>
             </div>
-          </Reveal>
+          </div>
         </div>
 
         <ol role="list" className="mt-20 grid md:mt-28 md:grid-cols-3 md:gap-x-8 lg:mt-32 lg:gap-x-16 xl:gap-x-24">

@@ -103,13 +103,14 @@ export function ProblemSection() {
     <Section className="overflow-x-clip">
       <Container>
         <div className="lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-10">
-          <Reveal className="lg:col-span-7">
+          {/* The heading plays its own word-by-word entrance; the text and the facts follow it. */}
+          <div className="lg:col-span-7">
             <Heading title={PROBLEM.title} accent={PROBLEM.accent} />
-          </Reveal>
-          <Reveal className="mt-6 lg:col-span-5 lg:mt-0" delay={0.08}>
+          </div>
+          <Reveal className="mt-6 lg:col-span-5 lg:mt-0" delay={0.3}>
             <p className="t-lead">{PROBLEM.text}</p>
           </Reveal>
-          <Reveal className="mt-8 lg:col-span-5 lg:col-start-8" delay={0.14}>
+          <Reveal className="mt-8 lg:col-span-5 lg:col-start-8" delay={0.42}>
             <Facts />
           </Reveal>
         </div>

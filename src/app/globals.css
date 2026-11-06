@@ -254,7 +254,13 @@
     there either, and the hero's last row sits close to its foot): the first line is above the third block.
   */
   main > * + * + * {
-    border-top: 1px solid rgb(255 255 255 / 0.07);
+    /* Painted as a 1px background in the (transparent) border, so it can draw out from the centre (motion block). */
+    border-top: 1px solid transparent;
+    background-image: linear-gradient(rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.07));
+    background-position: 50% 0;
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+    background-origin: border-box;
   }
 }
 
@@ -352,5 +358,291 @@
     display: inline-flex;
     align-items: center;
     gap: inherit;
+  }
+}
+
+/*
+  Motion v6 (2026-11-07). The developer asked for the page to look "more happening" from top to bottom, after the
+  client's "maybe little bit more animation". One language for every section, on top of each section's own piece:
+  - Headings (Heading in primitives.tsx): the title's words rise out of a mask one after another, then the
+    white-to-sky phrase fills with its colour from left to right. Once, when the heading scrolls into view.
+  - Blocks: data-reveal="up" (a short rise and fade), data-reveal-group (its children one after another),
+    data-reveal="photo" (the photo opens from its bottom edge and settles, the move the Realitaet photo uses),
+    data-reveal="rule" / "rule-y" (a hairline draws), data-reveal="tick" (a check draws after its line).
+  - The hairline between sections draws out from the centre. The hero's blue phrase gets one light sweep.
+  - Ablauf photos (data-parallax) drift slightly slower than the page where scroll timelines exist.
+  - Desktop mouse: every glass panel catches a soft light under the pointer and its edge lights up near it (the
+    case cards and problem cards keep their own MagicCard light).
+  RevealObserver sets data-shown once per element; CSS does the rest. Everything is gated on scripting and on
+  motion being allowed: without either, every element simply stands in place. Only opacity, translate, scale,
+  clip-path and background positions animate (the individual transform properties, so an element's own
+  transform from Motion is never overridden), and the keyframes fill backwards only, so each element returns
+  to its own styles once its entrance is over.
+*/
+@property --glass-hover {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@keyframes bg-reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes bg-reveal-photo {
+  from {
+    clip-path: inset(100% 0 0 0 round var(--radius-panel));
+  }
+  to {
+    clip-path: inset(0 0 0 0 round var(--radius-panel));
+  }
+}
+@keyframes bg-photo-settle {
+  from {
+    scale: calc(var(--photo-scale, 1) + 0.08);
+  }
+  to {
+    scale: var(--photo-scale, 1);
+  }
+}
+@keyframes bg-photo-drift {
+  from {
+    translate: 0 -4%;
+  }
+  to {
+    translate: 0 4%;
+  }
+}
+@keyframes bg-rule-x {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+@keyframes bg-rule-y {
+  from {
+    scale: 1 0;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+@keyframes bg-tick {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes bg-accent-sweep {
+  from {
+    background-position: 130% 0, 0 0;
+  }
+  to {
+    background-position: -30% 0, 0 0;
+  }
+}
+
+@layer components {
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    /* Headings: each word in a mask (.rw) a little taller than its line, so accents and descenders are never cut. */
+    [data-reveal="heading"] .rw {
+      display: inline-block;
+      clip-path: inset(-0.35em -0.2em -0.35em -0.2em);
+    }
+    [data-reveal="heading"] .rw > span {
+      display: inline-block;
+      translate: 0 calc(100% + 0.6em);
+      transition: translate 1000ms var(--ease-out-expo) calc(var(--i, 0) * 40ms);
+    }
+    [data-reveal="heading"][data-shown] .rw > span {
+      translate: 0 0;
+    }
+    /*
+      The phrase's own gradient (100deg, #f1f1ee, #dcecff at 38%, #69bff8) on a layer 2.5 times as wide: its first
+      40% covers the phrase exactly as .accent does at rest, a soft edge follows, then it is clear; before the
+      entrance the clear part covers the phrase entirely, so not a letter shows until the fill passes.
+    */
+    [data-reveal="heading"] .accent {
+      background-image: linear-gradient(100deg, #f1f1ee 0%, #dcecff 15.2%, #69bff8 40%, rgb(105 191 248 / 0) 50%);
+      background-size: 250% 100%;
+      background-repeat: no-repeat;
+      background-position: 100% 0;
+      transition: background-position 1400ms var(--ease-out-expo) var(--accent-delay, 250ms);
+    }
+    [data-reveal="heading"][data-shown] .accent {
+      background-position: 0 0;
+    }
+
+    /* Blocks and groups. */
+    [data-reveal="up"]:not([data-shown]),
+    [data-reveal="tick"]:not([data-shown]),
+    [data-reveal-group]:not([data-shown]) > * {
+      opacity: 0;
+    }
+    [data-reveal="up"][data-shown],
+    [data-reveal="tick"][data-shown] {
+      animation: bg-reveal-up 900ms var(--ease-out-expo) var(--rd, 120ms) backwards;
+    }
+    [data-reveal-group][data-shown] > * {
+      animation: bg-reveal-up 900ms var(--ease-out-expo) calc(var(--rd, 0ms) + var(--n, 0) * 90ms) backwards;
+    }
+    [data-reveal-group] > :nth-child(2) {
+      --n: 1;
+    }
+    [data-reveal-group] > :nth-child(3) {
+      --n: 2;
+    }
+    [data-reveal-group] > :nth-child(4) {
+      --n: 3;
+    }
+    [data-reveal-group] > :nth-child(5) {
+      --n: 4;
+    }
+    [data-reveal-group] > :nth-child(6) {
+      --n: 5;
+    }
+    [data-reveal-group] > :nth-child(7) {
+      --n: 6;
+    }
+    [data-reveal-group] > :nth-child(n + 8) {
+      --n: 7;
+    }
+
+    /* Photos open from the bottom edge while the picture settles. */
+    [data-reveal="photo"]:not([data-shown]) {
+      clip-path: inset(100% 0 0 0);
+    }
+    [data-reveal="photo"][data-shown] {
+      animation: bg-reveal-photo 1100ms var(--ease-out-expo) var(--rd, 0ms) backwards;
+    }
+    [data-reveal="photo"][data-shown] img {
+      animation: bg-photo-settle 1700ms var(--ease-out-expo) var(--rd, 0ms) backwards;
+    }
+
+    /* Hairlines draw: across from the left, or down from the top. */
+    [data-reveal="rule"] {
+      transform-origin: 0 50%;
+    }
+    [data-reveal="rule"]:not([data-shown]) {
+      scale: 0 1;
+    }
+    [data-reveal="rule"][data-shown] {
+      animation: bg-rule-x 1100ms var(--ease-out-expo) var(--rd, 0ms) backwards;
+    }
+    [data-reveal="rule-y"] {
+      transform-origin: 50% 0;
+    }
+    [data-reveal="rule-y"]:not([data-shown]) {
+      scale: 1 0;
+    }
+    [data-reveal="rule-y"][data-shown] {
+      animation: bg-rule-y 900ms var(--ease-out-expo) var(--rd, 0ms) backwards;
+    }
+
+    /* A check draws from the left just after its line rises. */
+    [data-reveal="tick"][data-shown] svg {
+      animation: bg-tick 500ms ease-out calc(var(--rd, 120ms) + 180ms) backwards;
+    }
+
+    /* The hairline between sections draws out from the centre. */
+    main > * + * + * {
+      transition: background-size 1500ms var(--ease-out-expo) 80ms;
+    }
+    main > * + * + *:not([data-shown]) {
+      background-size: 0% 1px;
+    }
+
+    /* The hero's blue phrase: one light passes across it after the headline has landed. */
+    .accent-sweep {
+      background-image:
+        linear-gradient(100deg, rgb(255 255 255 / 0) 42%, rgb(255 255 255 / 0.95) 50%, rgb(255 255 255 / 0) 58%),
+        linear-gradient(100deg, #f1f1ee 0%, #dcecff 38%, #69bff8 100%);
+      background-size: 250% 100%, 100% 100%;
+      background-repeat: no-repeat;
+      animation: bg-accent-sweep 1700ms cubic-bezier(0.45, 0, 0.25, 1) 1500ms both;
+    }
+
+    /* Ablauf photos drift slightly slower than the page (scroll timelines only; elsewhere they stay still). */
+    @supports (animation-timeline: view()) {
+      [data-parallax] {
+        --photo-scale: 1.1;
+      }
+      [data-parallax] img {
+        scale: var(--photo-scale);
+        animation: bg-photo-drift linear both;
+        animation-timeline: view();
+      }
+      [data-parallax][data-reveal="photo"][data-shown] img {
+        animation:
+          bg-photo-settle 1700ms var(--ease-out-expo) var(--rd, 0ms) backwards,
+          bg-photo-drift linear both;
+        animation-timeline: auto, view();
+      }
+    }
+  }
+
+  /* The mouse light on glass panels (desktop mouse only). The header bar and MagicCard panels keep their own. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .glass:not(.glass-blur, .group\/magic) {
+      background-image: radial-gradient(
+        420px circle at var(--mx, 50%) var(--my, 50%),
+        rgb(255 255 255 / calc(0.07 * var(--glass-hover))),
+        rgb(255 255 255 / 0) 70%
+      );
+      transition: --glass-hover 500ms ease;
+    }
+    .glass:not(.glass-blur, .group\/magic):hover {
+      --glass-hover: 1;
+    }
+    .glass:not(.glass-blur, .group\/magic)::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      padding: 1px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(
+        240px circle at var(--mx, 50%) var(--my, 50%),
+        rgb(105 191 248 / calc(0.75 * var(--glass-hover))),
+        rgb(105 191 248 / 0) 70%
+      );
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask:
+        linear-gradient(#000 0 0) content-box exclude,
+        linear-gradient(#000 0 0);
+    }
+  }
+}
+
+/* Entrance delays for the motion block, in steps of 150ms: data-rd="1" to "5" (inherited by a group's children). */
+@layer components {
+  [data-rd="1"] {
+    --rd: 150ms;
+  }
+  [data-rd="2"] {
+    --rd: 300ms;
+  }
+  [data-rd="3"] {
+    --rd: 450ms;
+  }
+  [data-rd="4"] {
+    --rd: 600ms;
+  }
+  [data-rd="5"] {
+    --rd: 750ms;
   }
 }

@@ -18,11 +18,47 @@ const EASE = [0.16, 1, 0.3, 1] as const;
   it: the button's 12px plus its 8px inset. A pill bar around a 12px button would pinch the gap at the corner.
   v5: as in the developer's reference, the header's button is the dark second style, so the cream main button
   leads in the content; the phone menu keeps the cream one.
+  v6 (2026-11-07): the link of the section being read lights up (white, with a small sky dot that slides from link
+  to link). A section counts while it holds the line at 35% of the screen height; between linked sections (Ablauf,
+  Impact, ...) no link is lit. The phone menu marks the same link.
 */
+
+/** Which linked section holds the reading line (35% down the screen), if any. */
+function useCurrentSection() {
+  const [current, setCurrent] = useState<string | null>(null);
+  useEffect(() => {
+    const targets = NAV.map((item) => ({ href: item.href, el: document.querySelector<HTMLElement>(item.href) }));
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      const line = window.innerHeight * 0.35;
+      const hit = targets.find(({ el }) => {
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.top <= line && rect.bottom > line;
+      });
+      setCurrent(hit ? hit.href : null);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
+  return current;
+}
+
 export function Header() {
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const current = useCurrentSection();
 
   useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 24));
 
@@ -58,16 +94,31 @@ export function Header() {
 
         <nav aria-label="Hauptnavigation" className="hidden xl:block">
           <ul className="flex items-center gap-0.5">
-            {NAV.map((item) => (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  className="block rounded-[10px] px-3.5 py-2 text-[15px] text-ink/75 transition-colors duration-200 hover:bg-white/[0.06] hover:text-white xl:px-4"
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
+            {NAV.map((item) => {
+              const on = current === item.href;
+              return (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    aria-current={on ? "true" : undefined}
+                    className={cn(
+                      "relative block rounded-[10px] px-3.5 py-2 text-[15px] transition-colors duration-200 hover:bg-white/[0.06] hover:text-white xl:px-4",
+                      on ? "text-white" : "text-ink/75"
+                    )}
+                  >
+                    {item.label}
+                    {on && (
+                      <motion.span
+                        layoutId="nav-current"
+                        aria-hidden
+                        transition={{ type: "spring", stiffness: 380, damping: 34 }}
+                        className="absolute inset-x-0 bottom-[3px] mx-auto size-1 rounded-full bg-sky"
+                      />
+                    )}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -106,8 +157,14 @@ export function Header() {
             <ul className="space-y-1">
               {NAV.map((item) => (
                 <li key={item.href}>
-                  <a href={item.href} onClick={() => setOpen(false)} className="block py-3 text-[24px] font-medium tracking-[-0.02em] text-white">
+                  <a
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    aria-current={current === item.href ? "true" : undefined}
+                    className="flex items-center gap-3 py-3 text-[24px] font-medium tracking-[-0.02em] text-white"
+                  >
                     {item.label}
+                    {current === item.href && <span aria-hidden className="size-1.5 rounded-full bg-sky" />}
                   </a>
                 </li>
               ))}

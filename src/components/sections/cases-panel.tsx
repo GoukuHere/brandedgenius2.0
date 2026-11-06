@@ -33,7 +33,7 @@ export const CaseCard = memo(function CaseCard({ item, index }: { item: CaseStud
               Phones: one result per row (figure left, label right) between hairlines. From sm: three columns between
               vertical hairlines, the figure over its label. The figures never wrap.
             */}
-            <ul role="list" className="border-b border-white/[0.08] pb-5 sm:grid sm:grid-cols-3">
+            <ul data-reveal-group data-rd="4" role="list" className="border-b border-white/[0.08] pb-5 sm:grid sm:grid-cols-3">
               {item.metrics.map((metric) => (
                 <li
                   key={metric.label}

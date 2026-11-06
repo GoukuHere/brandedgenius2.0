@@ -4,7 +4,6 @@ import { motion, useMotionValue, useMotionValueEvent, useTransform, type MotionV
 import { createRef, useCallback, useEffect, useRef, useState, useSyncExternalStore, type FocusEvent, type ReactNode, type RefObject } from "react";
 import { isSceneId, ServiceAnimation, type SceneId } from "@/components/sections/service-scenes";
 import { Container, Heading, Section, TextLink } from "@/components/system/primitives";
-import { Reveal } from "@/components/system/reveal";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { MagicCard } from "@/components/ui/magic-card";
 import { LINKS, SERVICES } from "@/content/site";
@@ -151,13 +150,17 @@ function Plate({
               <ServiceAnimation id={service.id} playing={front} className="lg:[@media(min-height:600px)]:max-w-[calc((100svh_-_440px)_*_2.6667)]" />
             </div>
             <div className="mt-6 grid gap-4 sm:mt-8 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-10 lg:mt-9 lg:gap-14">
-              <h3 className="text-[26px] leading-[1.15] font-medium tracking-[-0.015em] text-balance text-white sm:text-[30px] lg:text-[32px]">
+              {/* Number, title and text rise in as the plate comes up to the front. */}
+              <h3
+                data-reveal="up"
+                className="text-[26px] leading-[1.15] font-medium tracking-[-0.015em] text-balance text-white sm:text-[30px] lg:text-[32px]"
+              >
                 <span aria-hidden className="num mr-3 text-silver">
                   {String(index + 1).padStart(2, "0")}.
                 </span>
                 {keepCompounds(service.title)}
               </h3>
-              <div>
+              <div data-reveal="up" data-rd="2">
                 <p className="t-body">{service.text}</p>
                 <TextLink href={LINKS.contact} className="pointer-events-auto mt-3 min-h-11">
                   {service.cta}
@@ -195,13 +198,17 @@ export function ServicesSection() {
   return (
     <Section id="leistungen">
       <Container>
-        <Reveal y={12} className="max-w-[820px]">
+        <div className="max-w-[820px]">
           <Heading title={SERVICES.title} accent={SERVICES.accent} />
-          <p className="t-lead mt-6 max-w-[620px]">{SERVICES.text}</p>
-          <TextLink href={LINKS.contact} className="mt-5 min-h-11">
-            {SERVICES.cta}
-          </TextLink>
-        </Reveal>
+          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[620px]">
+            {SERVICES.text}
+          </p>
+          <div data-reveal="up" data-rd="3" className="mt-5">
+            <TextLink href={LINKS.contact} className="min-h-11">
+              {SERVICES.cta}
+            </TextLink>
+          </div>
+        </div>
 
         <div role="list" className="relative">
           {ITEMS.map((service, i) => (

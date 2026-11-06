@@ -3,7 +3,6 @@
 import { motion, useMotionValueEvent, useSpring, type Variants } from "motion/react";
 import { useRef, useState } from "react";
 import { Container, Heading } from "@/components/system/primitives";
-import { Reveal } from "@/components/system/reveal";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { PROMISE } from "@/content/site";
 import { cn } from "@/lib/utils";
@@ -59,13 +58,13 @@ export function PromiseSection() {
           </div>
 
           <div className="min-w-0">
-            <Reveal>
+            <div>
               <Heading
                 title={TITLE}
                 accent={PROMISE.accent}
                 className="max-w-[880px] text-[length:clamp(2.125rem,1.25rem+2.2vw,3.25rem)]"
               />
-            </Reveal>
+            </div>
 
             <StepLabel step={step} />
 

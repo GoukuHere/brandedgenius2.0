@@ -328,10 +328,13 @@ export function WhySection() {
             {WHY.reasons.map((reason) => (
               <motion.li key={reason.title} variants={RISE} transition={{ duration: 0.7, ease: EASE }}>
                 {/* A hairline that starts at a filled sky dot and fades out along the column. */}
-                <div
-                  aria-hidden
-                  className="relative h-px bg-[linear-gradient(90deg,rgb(105_191_248/0.5),rgb(255_255_255/0.08)_45%)]"
-                >
+                <div aria-hidden className="relative h-px">
+                  {/* The line draws out from its dot once the reason has risen in. */}
+                  <span
+                    data-reveal="rule"
+                    data-rd="3"
+                    className="absolute inset-0 bg-[linear-gradient(90deg,rgb(105_191_248/0.5),rgb(255_255_255/0.08)_45%)]"
+                  />
                   <span className="absolute top-1/2 left-0 size-1.5 -translate-y-1/2 rounded-full bg-sky" />
                 </div>
                 <h3 className="mt-6 text-[20px] leading-snug font-medium tracking-[-0.01em] text-balance text-white">{reason.title}</h3>

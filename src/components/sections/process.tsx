@@ -4,7 +4,6 @@ import { motion, useMotionValue, useMotionValueEvent, useSpring, type MotionValu
 import Image from "next/image";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { Reveal } from "@/components/system/reveal";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { PROCESS } from "@/content/site";
 import { cn } from "@/lib/utils";
@@ -105,10 +104,12 @@ export function ProcessSection() {
   return (
     <Section id="prozess" className="overflow-x-clip lg:pb-14">
       <Container>
-        <Reveal y={12}>
+        <div>
           <Heading title={PROCESS.title} accent={PROCESS.accent} className="max-w-[820px]" />
-          <p className="t-lead mt-6 max-w-[620px]">{PROCESS.text}</p>
-        </Reveal>
+          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[620px]">
+            {PROCESS.text}
+          </p>
+        </div>
 
         <div ref={listRef} className="relative mt-14 md:mt-20">
           <Line fill={fill} />
@@ -223,6 +224,8 @@ const ProcessStep = memo(function ProcessStep({
         image is decorative to a screen reader.
       */}
       <div
+        data-reveal="photo"
+        data-parallax
         className={cn(
           "frame aspect-[4/3] w-full max-w-[520px] lg:row-start-1 lg:self-center",
           photoLeft ? "lg:col-start-1" : "lg:col-start-2"

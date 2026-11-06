@@ -15,7 +15,6 @@ import {
   type RefObject,
 } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { Reveal } from "@/components/system/reveal";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import {
   MorphingDialog,
@@ -174,10 +173,12 @@ export function VoicesSection() {
         {BACKDROP_CSS}
       </style>
       <Container>
-        <Reveal className="max-w-[760px]">
+        <div className="max-w-[760px]">
           <Heading title={VOICES.title} accent={VOICES.accent} />
-          <p className="t-lead mt-6 max-w-[560px]">{VOICES.text}</p>
-        </Reveal>
+          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[560px]">
+            {VOICES.text}
+          </p>
+        </div>
 
         <div ref={regionRef} role="region" aria-roledescription="Karussell" aria-label="Kundenstimmen" onKeyDown={onKeyDown} className="mt-14 md:mt-20">
           <div

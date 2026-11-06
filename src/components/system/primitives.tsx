@@ -1,5 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
-import type { AnchorHTMLAttributes, ElementType, ReactNode } from "react";
+import type { AnchorHTMLAttributes, CSSProperties, ElementType, ReactNode } from "react";
 import { SpecularButton } from "@/components/ui/specular-button";
 import { cn } from "@/lib/utils";
 
@@ -30,10 +30,40 @@ function keepCompounds(text: string): ReactNode {
   );
 }
 
+/** The step between two words of a heading's entrance, in ms (the CSS multiplies `--i` by the same 40ms). */
+const WORD_STEP = 40;
+
+/**
+ * The title's words, each in a mask (`.rw`) for the heading's entrance (motion block in globals.css). The spaces stay
+ * plain text between the masks, so lines break exactly where they did; a compound stays whole as before. Without
+ * script or with reduced motion the masks are plain inline spans.
+ */
+function maskedWords(text: string, first: number): ReactNode {
+  let index = first;
+  return text.split(/(\s+)/).map((part, i) => {
+    if (!part.trim()) return part;
+    const word = (
+      <span key={i} className="rw">
+        <span style={{ "--i": index } as CSSProperties}>
+          {part.includes("-") ? <span className="whitespace-nowrap">{part}</span> : part}
+        </span>
+      </span>
+    );
+    index += 1;
+    return word;
+  });
+}
+
+const wordCount = (text: string) => text.split(/\s+/).filter(Boolean).length;
+
 /**
  * A headline in the brand face: the title in off-white and its continuation (`accent`, the copy's own second
  * phrase) in the client's white-to-sky gradient, a step lighter, exactly as in the hero. Every heading on the page
  * works this way since 2026-11-06 (the developer chose white and blue over the reference's white and grey).
+ *
+ * Entrance (v6, 2026-11-07): when the heading scrolls into view (RevealObserver), the title's words rise out of
+ * their masks one after another and the blue phrase then fills with its colour from left to right. Pure CSS on
+ * server markup; nothing is hidden without script or with reduced motion.
  */
 export function Heading({
   title,
@@ -52,16 +82,22 @@ export function Heading({
   accentFirst?: boolean;
 }) {
   const cls = size === "display" ? "t-display" : size === "h3" ? "t-h3" : "t-h2";
-  const accentEl = accent ? <span className="accent">{keepCompounds(accent)}</span> : null;
+  // The phrase fills once the title's words are on their way (or first, when it leads), so it always lands last.
+  const accentDelay = accentFirst ? 0 : wordCount(title) * WORD_STEP + 200;
+  const accentEl = accent ? (
+    <span className="accent" style={{ "--accent-delay": `${accentDelay}ms` } as CSSProperties}>
+      {keepCompounds(accent)}
+    </span>
+  ) : null;
   return (
-    <Tag className={cn(cls, className)}>
+    <Tag data-reveal="heading" className={cn(cls, className)}>
       {accentFirst && accentEl ? (
         <>
-          {accentEl} {keepCompounds(title)}
+          {accentEl} {maskedWords(title, 5)}
         </>
       ) : (
         <>
-          {keepCompounds(title)}
+          {maskedWords(title, 0)}
           {accentEl ? <> {accentEl}</> : null}
         </>
       )}

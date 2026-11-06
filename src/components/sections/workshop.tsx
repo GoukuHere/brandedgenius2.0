@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { WorkshopTopics } from "@/components/sections/workshop-topics";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { Reveal } from "@/components/system/reveal";
 import { WORKSHOP } from "@/content/site";
 import { cn } from "@/lib/utils";
 
@@ -97,24 +96,35 @@ export function WorkshopSection() {
   return (
     <Section id="ki-workshop">
       <Container>
-        <Reveal className="grid gap-y-10 lg:grid-cols-12 lg:gap-x-8">
+        <div className="grid gap-y-10 lg:grid-cols-12 lg:gap-x-8">
           <div className="lg:col-span-6">
             <Heading title={WORKSHOP.title} accent={WORKSHOP.accent} />
-            <p className="mt-4 text-[20px] leading-[1.4] font-medium tracking-[-0.01em] text-silver">{WORKSHOP.tagline}</p>
-            <p className="t-lead mt-4 max-w-[560px]">{WORKSHOP.text}</p>
+            <p data-reveal="up" data-rd="2" className="mt-4 text-[20px] leading-[1.4] font-medium tracking-[-0.01em] text-silver">
+              {WORKSHOP.tagline}
+            </p>
+            <p data-reveal="up" data-rd="3" className="t-lead mt-4 max-w-[560px]">
+              {WORKSHOP.text}
+            </p>
           </div>
 
+          {/* Roman's quote: its sky rule draws down first, then the words and his name appear. */}
           <figure className="lg:col-span-5 lg:col-start-8 lg:pt-1.5">
-            <blockquote className="border-l border-sky pl-6 text-[22px] leading-[1.42] tracking-[-0.01em] text-pretty text-white/90 sm:text-[24px] xl:text-[26px]">
-              <p>„{WORKSHOP.quote}“</p>
+            <blockquote className="relative pl-6 text-[22px] leading-[1.42] tracking-[-0.01em] text-pretty text-white/90 sm:text-[24px] xl:text-[26px]">
+              <span aria-hidden data-reveal="rule-y" data-rd="2" className="absolute inset-y-0 left-0 w-px bg-sky" />
+              <p data-reveal="up" data-rd="4">
+                „{WORKSHOP.quote}“
+              </p>
             </blockquote>
-            <figcaption className="mt-4 pl-[25px] text-[15px] leading-normal text-silver">{WORKSHOP.author}</figcaption>
+            <figcaption data-reveal="up" data-rd="5" className="mt-4 pl-6 text-[15px] leading-normal text-silver">
+              {WORKSHOP.author}
+            </figcaption>
           </figure>
-        </Reveal>
+        </div>
 
-        <Reveal className="mt-16 md:mt-24">
+        <div className="mt-16 md:mt-24">
           {/* Desktop: the image accordion. */}
-          <ul role="list" aria-label={WORKSHOP.formatsLabel} className="hidden gap-4 lg:flex">
+          {/* The four photo panels rise in one after another. */}
+          <ul data-reveal-group data-rd="1" role="list" aria-label={WORKSHOP.formatsLabel} className="hidden gap-4 lg:flex">
             {WORKSHOP.formats.map((format, i) => {
               const on = i === active;
               const textId = `${baseId}-format-${i}`;
@@ -178,7 +188,7 @@ export function WorkshopSection() {
           <ul role="list" aria-label={WORKSHOP.formatsLabel} className="grid gap-y-12 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-14 lg:hidden">
             {WORKSHOP.formats.map((format, i) => (
               <li key={format.title}>
-                <div className="frame aspect-[3/2]">
+                <div data-reveal="photo" className="frame aspect-[3/2]">
                   <Image
                     src={format.img}
                     alt={format.title}
@@ -199,7 +209,7 @@ export function WorkshopSection() {
               </li>
             ))}
           </ul>
-        </Reveal>
+        </div>
 
         <WorkshopTopics />
       </Container>

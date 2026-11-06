@@ -126,12 +126,16 @@ export function RealitySection() {
   return (
     <Section id="realitaet">
       <Container>
-        <InView variants={RISE} transition={{ duration: 0.8, ease: EASE }} viewOptions={VIEW}>
-          <div className="lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-10">
-            <Heading title={REALITY.title} accent={REALITY.accent} className="lg:col-span-7" />
-            <p className="t-lead mt-6 max-w-[520px] lg:col-span-4 lg:col-start-9 lg:mt-0">{REALITY.text}</p>
-          </div>
-        </InView>
+        <div className="lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-10">
+          <Heading title={REALITY.title} accent={REALITY.accent} className="lg:col-span-7" />
+          <p
+            data-reveal="up"
+            data-rd="2"
+            className="t-lead mt-6 max-w-[520px] lg:col-span-4 lg:col-start-9 lg:mt-0"
+          >
+            {REALITY.text}
+          </p>
+        </div>
 
         {/* Desktop: a quiet index on the left, the photo as the one big object on the right. */}
         <div
@@ -141,8 +145,10 @@ export function RealitySection() {
           className="mt-16 hidden lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-16"
         >
           <div className="lg:col-span-5">
-          <InView variants={RISE} transition={{ duration: 0.8, ease: EASE }} viewOptions={VIEW}>
+            {/* The six reasons rise in one after another (data-reveal-group), then the index runs as before. */}
             <div
+              data-reveal-group
+              data-rd="1"
               role="tablist"
               aria-orientation="vertical"
               aria-label={`${REALITY.title} ${REALITY.accent}`}
@@ -200,7 +206,6 @@ export function RealitySection() {
                 );
               })}
             </div>
-          </InView>
           </div>
 
           <div id={panelId} role="tabpanel" aria-labelledby={tabId(view.active)} className="lg:col-span-7">

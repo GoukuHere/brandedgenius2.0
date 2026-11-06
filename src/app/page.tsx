@@ -16,6 +16,7 @@ import { SystemSection } from "@/components/sections/system-hub";
 import { VoicesSection } from "@/components/sections/voices";
 import { WhySection } from "@/components/sections/why";
 import { WorkshopSection } from "@/components/sections/workshop";
+import { RevealObserver } from "@/components/system/reveal-observer";
 
 // The client's own section order from brandedgenius.de (the second film removed at the developer's request).
 export default function Home() {
@@ -41,6 +42,7 @@ export default function Home() {
         <CtaSection />
       </main>
       <Footer />
+      <RevealObserver />
     </>
   );
 }

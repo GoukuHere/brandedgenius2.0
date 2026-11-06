@@ -1,6 +1,5 @@
 import { ArrowUpRight, Check } from "lucide-react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { Reveal } from "@/components/system/reveal";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { CTA, LINKS } from "@/content/site";
 
@@ -24,17 +23,20 @@ export function CtaSection() {
   return (
     <Section id="kontakt">
       <Container>
-        <Reveal>
+        <div data-reveal="up">
           <div className="glass glass-lit rounded-panel p-6 md:p-14">
             <BorderBeam colorFrom="#69bff8" colorTo="#004ba0" duration={16} size={260} />
 
             <div className="grid gap-12 lg:grid-cols-12 lg:gap-x-8">
               <div className="lg:col-span-7">
                 <Heading title={CTA.title} accent={CTA.accent} className="max-w-[640px]" />
-                <p className="t-lead mt-6 max-w-[560px]">{CTA.text}</p>
+                <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[560px]">
+                  {CTA.text}
+                </p>
                 <ul role="list" className="mt-8 flex flex-col gap-3">
-                  {CTA.checks.map((check) => (
-                    <li key={check} className="flex items-center gap-3 text-[16px] leading-[1.5] text-white/80">
+                  {/* Each check ticks in after its line has risen. */}
+                  {CTA.checks.map((check, i) => (
+                    <li key={check} data-reveal="tick" data-rd={i + 3} className="flex items-center gap-3 text-[16px] leading-[1.5] text-white/80">
                       <Check aria-hidden strokeWidth={1.5} className="size-4 shrink-0 text-sky" />
                       {check}
                     </li>
@@ -42,7 +44,7 @@ export function CtaSection() {
                 </ul>
               </div>
 
-              <ul role="list" className="lg:col-span-5 lg:col-start-8 lg:self-end">
+              <ul data-reveal-group data-rd="3" role="list" className="lg:col-span-5 lg:col-start-8 lg:self-end">
                 {ACTIONS.map((action, i) => (
                   <li key={action.href}>
                     {i > 0 && <div aria-hidden className="rule" />}
@@ -71,7 +73,7 @@ export function CtaSection() {
               </ul>
             </div>
           </div>
-        </Reveal>
+        </div>
       </Container>
     </Section>
   );

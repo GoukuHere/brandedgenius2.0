@@ -178,13 +178,15 @@ export function SystemSection() {
   return (
     <Section id="system">
       <Container>
-        <Reveal>
+        <div>
           <Heading title={SYSTEM.title} accent={SYSTEM.accent} className="max-w-[880px]" />
-          <p className="t-lead mt-6 max-w-[620px]">{SYSTEM.text}</p>
-          <PrimaryLink href={LINKS.analysis} className="mt-9">
-            {SYSTEM.cta}
-          </PrimaryLink>
-        </Reveal>
+          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[620px]">
+            {SYSTEM.text}
+          </p>
+          <div data-reveal="up" data-rd="3" className="mt-9">
+            <PrimaryLink href={LINKS.analysis}>{SYSTEM.cta}</PrimaryLink>
+          </div>
+        </div>
 
         <Reveal className="mt-16 md:mt-24">
           <div
