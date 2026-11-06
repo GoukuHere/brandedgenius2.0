@@ -4,13 +4,13 @@ import { ArrowUpRight, Plus } from "lucide-react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform, type MotionValue } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { ServiceAnimation, isSceneId } from "@/components/sections/service-scenes";
+import { isSceneId } from "@/components/sections/service-scenes";
 import { Heading } from "@/components/system/primitives";
 import { RevealObserver } from "@/components/system/reveal-observer";
 import { SmoothScroll } from "@/components/system/smooth-scroll";
 import { CASES, CTA, HERO, LINKS, PROBLEM, REALITY, SERVICES } from "@/content/site";
 import { cn } from "@/lib/utils";
-import { ConceptHeader, ConceptLink, Grain, HeroFilm, LegalLine, useReducedMotion } from "../shared";
+import { ClientScene, ConceptHeader, ConceptLink, Grain, HeroFilm, LegalLine, useReducedMotion } from "../shared";
 
 /*
   Concept 1, "Kapitel" (2026-11-07). The homepage as a short run of full-screen chapters instead of a long run of
@@ -299,7 +299,7 @@ function ServicesChapter({ progress }: { progress: MotionValue<number> }) {
                       {scene && (
                         <div className="mt-auto pt-5">
                           <div className="c1-scene hidden overflow-hidden rounded-[12px] bg-[#071a3d] shadow-[inset_0_0_0_1px_rgb(105_191_248/0.14)] sm:block">
-                            <ServiceAnimation id={scene} playing />
+                            <ClientScene id={scene} />
                           </div>
                         </div>
                       )}

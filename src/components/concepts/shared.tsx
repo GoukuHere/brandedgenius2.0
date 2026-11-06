@@ -2,8 +2,9 @@
 
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef, useSyncExternalStore, type AnchorHTMLAttributes, type ReactNode } from "react";
+import { useEffect, useRef, useSyncExternalStore, type AnchorHTMLAttributes, type CSSProperties, type ReactNode } from "react";
 import { BrandLogo } from "@/components/layout/brand-logo";
+import { SCENE_ASPECT, ServiceAnimation, type SceneId } from "@/components/sections/service-scenes";
 import { FOOTER, HEADER, LINKS, MEDIA, NAV } from "@/content/site";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +30,34 @@ export function ConceptLink({ children, className, variant = "solid", size = "lg
   );
 }
 
+/**
+ * A heading's words, each in a mask that the page's entrance (RevealObserver + the heading rules in globals.css)
+ * lifts when the heading scrolls into view. `tone` colours a later run of words (the copy's second phrase). Works on
+ * any background; nothing is hidden without script or with reduced motion.
+ */
+export function RevealWords({ text, accent, accentClass, first = 0 }: { text: string; accent?: string; accentClass?: string; first?: number }) {
+  const words = (s: string, start: number, cls?: string) =>
+    s
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((w, i) => (
+        <span key={`${start}-${i}`}>
+          <span className="rw">
+            <span className={cls} style={{ "--i": start + i } as CSSProperties}>
+              {w}
+            </span>
+          </span>{" "}
+        </span>
+      ));
+  const head = words(text, first);
+  return (
+    <>
+      {head}
+      {accent ? words(accent, first + head.length, accentClass) : null}
+    </>
+  );
+}
+
 export function Grain({ className }: { className?: string }) {
   return <div aria-hidden className={cn("c-grain", className)} />;
 }
@@ -42,6 +71,22 @@ const subscribeReduced = (onChange: () => void) => {
 /** prefers-reduced-motion, safe to hydrate: false on the server and while hydrating, then the real value. */
 export function useReducedMotion() {
   return useSyncExternalStore(subscribeReduced, () => window.matchMedia(REDUCED).matches, () => false);
+}
+
+const subscribeNothing = () => () => {};
+/** False on the server and while hydrating, true once the page runs in the browser. */
+export function useMounted() {
+  return useSyncExternalStore(subscribeNothing, () => true, () => false);
+}
+
+/**
+ * A service drawing that renders only in the browser. Its coordinates are computed with floating point, and the
+ * server and the browser round the last digits differently, which React reports as a hydration mismatch. Until the
+ * page runs, an empty box of the drawing's size holds its place, so nothing shifts.
+ */
+export function ClientScene({ id }: { id: SceneId }) {
+  const mounted = useMounted();
+  return mounted ? <ServiceAnimation id={id} playing /> : <div aria-hidden className="w-full" style={{ aspectRatio: SCENE_ASPECT }} />;
 }
 
 /**
