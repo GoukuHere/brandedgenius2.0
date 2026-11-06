@@ -159,7 +159,13 @@ function planFor(stage: DOMRect, frame: DOMRect): Plan {
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const lerp = (from: number, to: number, t: number) => from + (to - from) * t;
 const easeIn = (t: number) => t * t;
-const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+/*
+  The photo's opening curve. A sine ease (2026-11-07): the earlier cubic held the photo still for the first ~200px
+  of the pin while the headline left, so the stage sat empty around a small photo. With the sine it grows from the
+  first pixel, and it is still only about 10% open when the headline has gone (15% of the runway), so its edge
+  never reaches the headline while that is visible.
+*/
+const easeInOut = (t: number) => 0.5 - Math.cos(Math.PI * t) / 2;
 const px = (value: number) => `${value.toFixed(2)}px`;
 
 /** Keeps hyphenated German compounds whole, as the Heading primitive does, so "KI-Beratung" never breaks after "KI-". */
