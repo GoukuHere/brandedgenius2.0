@@ -6,6 +6,7 @@ import { Bloom, EffectComposer, Noise, Vignette } from "@react-three/postprocess
 import { Suspense, useEffect, useRef } from "react";
 import * as THREE from "three";
 import { CASES, MEDIA, SERVICES } from "@/content/site";
+import { AdaptiveDensity } from "../crystal/adaptive";
 import { band, clamp01, damp, listenPointer, mix, pinProgress, pointer, sectionWeights } from "../crystal/track";
 import { SHARD_SLOTS_DESK, SHARD_SLOTS_PHONE } from "./slots";
 
@@ -554,6 +555,7 @@ export function ObsidianStage({ reduced }: { reduced: boolean }) {
           <Stage reduced={reduced} />
           <Room />
         </Suspense>
+        <AdaptiveDensity />
         {!phone && (
           <EffectComposer multisampling={4}>
             <Bloom intensity={0.55} luminanceThreshold={0.62} luminanceSmoothing={0.2} mipmapBlur />

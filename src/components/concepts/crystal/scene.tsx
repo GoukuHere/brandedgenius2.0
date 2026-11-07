@@ -6,6 +6,7 @@ import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { AdaptiveDensity } from "./adaptive";
 import { band, clamp01, damp, listenPointer, mix, pinProgress, pointer, sectionWeights } from "./track";
 
 /*
@@ -76,12 +77,12 @@ function useMonogram(): Mono {
     const extrude = (path: (typeof svg.paths)[number], depth: number, bevel: number) => {
       const g = new THREE.ExtrudeGeometry(SVGLoader.createShapes(path), {
         depth,
-        curveSegments: 56,
+        curveSegments: 28,
         bevelEnabled: true,
         bevelThickness: bevel,
         bevelSize: bevel * 0.6,
         bevelOffset: -bevel * 0.3,
-        bevelSegments: 8,
+        bevelSegments: 6,
       });
       g.translate(0, 0, -depth / 2);
       g.applyMatrix4(toWorld);
@@ -135,6 +136,13 @@ const scratch = {
   clip: "",
   frame: 0,
   look: { x: 0, y: 0 },
+  // For the frame drawer: the glass material, whether the crystal is drawn, whether it has barely moved this frame,
+  // where it was last frame, and whether the glass's extra passes sit out the next frame.
+  glass: null as GlassMaterial | null,
+  shown: true,
+  still: false,
+  last: { x: 0, y: 0, s: 0, rx: 0, ry: 0, rz: 0 },
+  skip: false,
 };
 
 const BANDS = [
@@ -217,6 +225,7 @@ function Crystal({ reduced }: { reduced: boolean }) {
   const pupil = useRef<THREE.Mesh>(null);
   const glass = useRef<GlassMaterial | null>(null);
   const frostShell = useRef<THREE.MeshStandardMaterial>(null);
+  const frostMesh = useRef<THREE.Mesh>(null);
   const { camera, size } = useThree();
   const dom = useRef<Dom | null>(null);
   const cur = useRef<Pose>({ ...DESK.hero });
@@ -296,6 +305,19 @@ function Crystal({ reduced }: { reduced: boolean }) {
     g.scale.setScalar(scale);
     g.updateMatrixWorld();
 
+    // How far the crystal moved since the last frame, in screen pixels (position, size, and turn at its edge).
+    const pxPerUnit = size.width / vw;
+    const L = scratch.last;
+    const spin = Math.abs(g.rotation.x - L.rx) + Math.abs(g.rotation.y - L.ry) + Math.abs(g.rotation.z - L.rz);
+    const moved = Math.max(Math.abs(g.position.x - L.x), Math.abs(g.position.y - L.y), Math.abs(scale - L.s) * WIDTH, spin * scale * (WIDTH / 2)) * pxPerUnit;
+    scratch.still = moved < 0.6;
+    L.x = g.position.x;
+    L.y = g.position.y;
+    L.s = scale;
+    L.rx = g.rotation.x;
+    L.ry = g.rotation.y;
+    L.rz = g.rotation.z;
+
     // The glass: crystal clear, or clouded while the problems are read.
     const m = glass.current;
     if (m) {
@@ -304,7 +326,25 @@ function Crystal({ reduced }: { reduced: boolean }) {
       m.anisotropicBlur = 0.04 + c.frost * 1.4;
       m.chromaticAberration = 0.07 * (1 - c.frost * 0.6);
     }
-    if (frostShell.current) frostShell.current.opacity = c.frost * 0.62;
+    const frostOpacity = c.frost * 0.62;
+    if (frostShell.current) frostShell.current.opacity = frostOpacity;
+    if (frostMesh.current) frostMesh.current.visible = frostOpacity > 0.003;
+
+    // Nothing to draw while the crystal is off the screen, or wholly behind the open film: hide it, which also stops
+    // the glass's two extra render passes (drei skips them for an invisible material).
+    const filmRect = d.film?.getBoundingClientRect();
+    const halfW = ((c.fw * size.width) / 2) * 1.3;
+    const halfH = halfW * 0.72;
+    const px = c.fx * size.width;
+    const py = c.fy * size.height;
+    const offscreen = px + halfW < 0 || px - halfW > size.width || py + halfH < 0 || py - halfH > size.height;
+    const covered =
+      !!filmRect && open >= 0.999 && px - halfW >= filmRect.left && px + halfW <= filmRect.right && py - halfH >= filmRect.top && py + halfH <= filmRect.bottom;
+    const shown = !offscreen && !covered;
+    g.visible = shown;
+    if (m) m.visible = shown;
+    scratch.glass = m;
+    scratch.shown = shown;
 
     // The light inside: the hero's royal and sky, grey while clouded, one palette per service.
     const svc = SERVICE_LIGHT[k];
@@ -313,7 +353,7 @@ function Crystal({ reduced }: { reduced: boolean }) {
     mixPalette(scratch.light, HERO_LIGHT, scratch.target, clamp01(c.light));
     mixPalette(scratch.light, scratch.light, FROST_LIGHT, clamp01(c.frost * 1.6));
     scratch.frame += 1;
-    if (scratch.frame % 2 === 0 || reduced) {
+    if (shown && (scratch.frame % 2 === 0 || reduced)) {
       const bd = getBackdrop();
       paintBackdrop(bd.ctx, t, scratch.light);
       bd.texture.needsUpdate = true;
@@ -341,7 +381,7 @@ function Crystal({ reduced }: { reduced: boolean }) {
     }
 
     // The film opens out of the eye: a circle the size of the black disk, around the disk, growing to open the frame.
-    if (d.film) {
+    if (d.film && filmRect && filmRect.bottom > -80 && filmRect.top < vh + 80) {
       const toPx = (v: THREE.Vector3) => {
         v.project(camera);
         return [((v.x + 1) / 2) * size.width, ((1 - v.y) / 2) * size.height];
@@ -349,7 +389,7 @@ function Crystal({ reduced }: { reduced: boolean }) {
       const [ex, ey] = toPx(scratch.a.set(EYE_LOCAL.x, EYE_LOCAL.y, DISK_FRONT).applyMatrix4(g.matrixWorld));
       const [rx, ry] = toPx(scratch.b.set(EYE_LOCAL.x + EYE.disk * S, EYE_LOCAL.y, DISK_FRONT).applyMatrix4(g.matrixWorld));
       const diskPx = Math.hypot(rx - ex, ry - ey);
-      const r = d.film.getBoundingClientRect();
+      const r = filmRect;
       const cx = ex - r.left;
       const cy = ey - r.top;
       const far = Math.max(Math.hypot(cx, cy), Math.hypot(r.width - cx, cy), Math.hypot(cx, r.height - cy), Math.hypot(r.width - cx, r.height - cy));
@@ -373,7 +413,7 @@ function Crystal({ reduced }: { reduced: boolean }) {
           backside
           backsideThickness={0.3}
           thickness={0.62}
-          samples={size.width < 768 ? 4 : 6}
+          samples={size.width < 768 ? 3 : 4}
           resolution={size.width < 768 ? 512 : 1024}
           backsideResolution={size.width < 768 ? 256 : 512}
           roughness={0}
@@ -390,7 +430,7 @@ function Crystal({ reduced }: { reduced: boolean }) {
           clearcoatRoughness={0.04}
         />
       </mesh>
-      <mesh geometry={mono.glass} scale={1.004} renderOrder={2}>
+      <mesh ref={frostMesh} geometry={mono.glass} scale={1.004} renderOrder={2} visible={false}>
         <meshStandardMaterial ref={frostShell} color="#ffffff" roughness={1} metalness={0} transparent opacity={0} depthWrite={false} />
       </mesh>
       <mesh geometry={mono.ring} material={materials.chrome} />
@@ -417,6 +457,24 @@ function Studio() {
   );
 }
 
+/**
+ * Draws each frame (in place of R3F's own render). While the crystal has barely moved (under a pixel), the glass's
+ * two extra passes (the scene behind it and its back faces) run on every other frame only: drei skips them for a
+ * frame when the material is hidden at that moment, and the crystal turns it back on before the draw. A refraction
+ * one frame old cannot be seen at that speed; any faster and every frame is full again.
+ */
+function Draw() {
+  useFrame((state) => {
+    state.gl.render(state.scene, state.camera);
+    const m = scratch.glass;
+    if (m && scratch.shown && scratch.still) {
+      scratch.skip = !scratch.skip;
+      if (scratch.skip) m.visible = false;
+    } else scratch.skip = false;
+  }, 1);
+  return null;
+}
+
 export function CrystalStage({ reduced }: { reduced: boolean }) {
   return (
     <div aria-hidden className="k8-stage">
@@ -431,6 +489,8 @@ export function CrystalStage({ reduced }: { reduced: boolean }) {
           <Crystal reduced={reduced} />
           <Studio />
         </Suspense>
+        <AdaptiveDensity />
+        <Draw />
       </Canvas>
     </div>
   );
