@@ -1,0 +1,260 @@
+/*
+  v9 "Obsidian": the room's near-black, light columns of royal and sky (the stage), off-white type, the sky for
+  accents. Hubot Sans set wide (125%) for headlines, at its normal width for reading.
+*/
+.k9 {
+  --k9-bg: #04070c;
+  --k9-ink: #eef3f8;
+  --k9-ink-2: rgb(238 243 248 / 0.66);
+  --k9-ink-3: rgb(238 243 248 / 0.46);
+  --k9-line: rgb(238 243 248 / 0.12);
+  --k9-sky: #69bff8;
+  --k9-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-hubot), ui-sans-serif, system-ui, sans-serif;
+  background: var(--k9-bg);
+  color: var(--k9-ink);
+}
+.k9 ::selection {
+  background: rgb(105 191 248 / 0.4);
+}
+
+.k9-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.k9-headband {
+  position: fixed;
+  inset: 0 0 auto;
+  height: 120px;
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(4 7 12 / 0.9) 0%, rgb(4 7 12 / 0.6) 50%, rgb(4 7 12 / 0) 100%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent);
+  mask-image: linear-gradient(180deg, #000 55%, transparent);
+}
+
+/* Type. One heading treatment: off-white, the second phrase in a light that runs from ice to sky. */
+.k9-h1,
+.k9-h2,
+.k9-h2-xl,
+.k9-h3-lg {
+  font-stretch: 125%;
+  font-weight: 560;
+  color: var(--k9-ink);
+}
+.k9-h1 {
+  font-size: clamp(29px, 3.75vw, 60px);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+.k9-h2 {
+  font-size: clamp(25px, 2.6vw, 42px);
+  line-height: 1.08;
+  letter-spacing: -0.032em;
+}
+.k9-h2-xl {
+  font-size: clamp(27px, 3.3vw, 54px);
+  line-height: 1.05;
+  letter-spacing: -0.034em;
+}
+.k9-h3-lg {
+  font-size: clamp(22px, 1.9vw, 30px);
+  line-height: 1.12;
+  letter-spacing: -0.026em;
+}
+.k9-h3 {
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+}
+.k9-accent {
+  background-image: linear-gradient(180deg, #e3f2ff 0%, #9fd6fb 45%, #4fa9ee 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.k9-lead {
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: var(--k9-ink-2);
+}
+.k9-body {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--k9-ink-2);
+}
+.k9-small {
+  font-size: 14.5px;
+  line-height: 1.58;
+  color: var(--k9-ink-2);
+}
+.k9-num {
+  font-size: 12.5px;
+  line-height: 1.2;
+  color: var(--k9-sky);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.k9-claim {
+  gap: 24px;
+  font-size: 14px;
+  color: var(--k9-ink-3);
+}
+
+/* Buttons: 12px corners. Ice-white with dark type, or dark glass with a lit edge. */
+.k9-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 20px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 560;
+  white-space: nowrap;
+  transition:
+    background-color 300ms ease,
+    box-shadow 400ms var(--k9-ease),
+    transform 400ms var(--k9-ease);
+}
+.k9-btn:active {
+  transform: translateY(1px);
+}
+.k9-btn:focus-visible,
+.k9-link:focus-visible {
+  outline: 2px solid var(--k9-sky);
+  outline-offset: 3px;
+}
+.k9-btn-sm {
+  height: 42px;
+  padding: 0 15px;
+  font-size: 13.5px;
+}
+.k9-btn-ice {
+  color: #04101f;
+  background: linear-gradient(180deg, #ffffff 0%, #dcecfb 100%);
+  box-shadow:
+    inset 0 -1px 0 rgb(0 40 100 / 0.18),
+    0 0 0 1px rgb(255 255 255 / 0.4),
+    0 12px 34px -12px rgb(105 191 248 / 0.55);
+}
+.k9-btn-ice:hover {
+  box-shadow:
+    inset 0 -1px 0 rgb(0 40 100 / 0.18),
+    0 0 0 1px rgb(255 255 255 / 0.6),
+    0 16px 40px -12px rgb(105 191 248 / 0.75);
+}
+.k9-btn-glass {
+  color: var(--k9-ink);
+  background: rgb(255 255 255 / 0.06);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.14),
+    inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+.k9-btn-glass:hover {
+  background: rgb(255 255 255 / 0.11);
+}
+.k9-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14.5px;
+  font-weight: 560;
+  color: var(--k9-sky);
+  border-radius: 6px;
+}
+
+/* The labels at the shards' places (desktop only: the page shows them with lg:grid, so no display here). */
+.k9-tag {
+  gap: 6px;
+  width: 220px;
+  text-align: center;
+  justify-items: center;
+}
+.k9-tag-title {
+  font-size: 14.5px;
+  line-height: 1.35;
+  font-weight: 520;
+  color: var(--k9-ink);
+}
+
+/* Services: four marks, the one on screen lit. */
+.k9-step {
+  flex: 1;
+  padding-top: 12px;
+  border-top: 2px solid rgb(238 243 248 / 0.14);
+  transition: border-color 500ms var(--k9-ease);
+}
+.k9-step .k9-num {
+  color: var(--k9-ink-3);
+  transition: color 500ms var(--k9-ease);
+}
+.k9-step[data-on="true"] {
+  border-color: var(--k9-sky);
+}
+.k9-step[data-on="true"] .k9-num {
+  color: var(--k9-sky);
+}
+.k9-svc {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  translate: 0 18px;
+  pointer-events: none;
+  transition:
+    opacity 450ms ease,
+    translate 900ms var(--k9-ease);
+}
+.k9-svc[data-on="true"] {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+  transition-delay: 120ms;
+}
+
+/* Cases: the index of six, the one on the glass lit. */
+.k9-cases li {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 9px 0;
+  font-size: 15px;
+  color: var(--k9-ink-3);
+  border-top: 1px solid var(--k9-line);
+  transition: color 400ms ease;
+}
+.k9-cases li:last-child {
+  border-bottom: 1px solid var(--k9-line);
+}
+.k9-cases li[data-on="true"] {
+  color: var(--k9-ink);
+}
+.k9-cases li .k9-num {
+  color: var(--k9-ink-3);
+}
+.k9-cases li[data-on="true"] .k9-num {
+  color: var(--k9-sky);
+}
+
+.k9-legal {
+  border-top: 1px solid var(--k9-line);
+  font-size: 13px;
+  color: var(--k9-ink-3);
+}
+.k9-legal a:hover {
+  color: var(--k9-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .k9-svc {
+    transition: none;
+  }
+}
