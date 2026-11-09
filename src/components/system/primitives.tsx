@@ -129,6 +129,7 @@ export function PrimaryLink({ children, className, size = "md", href, ...props }
       href={href ?? "#"}
       {...external(href)}
       {...props}
+      data-kind="primary"
       size={size}
       radius={BUTTON_RADIUS}
       tint="#ecebe6"
@@ -152,6 +153,7 @@ export function SecondaryLink({ children, className, size = "md", href, ...props
       href={href ?? "#"}
       {...external(href)}
       {...props}
+      data-kind="secondary"
       size={size}
       radius={BUTTON_RADIUS}
       tint="#ffffff"

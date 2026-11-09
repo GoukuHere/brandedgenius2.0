@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 /*
   The version switcher (2026-11-07, the developer: "list all versions in nav as v1, v2 and so on"). Every version
   the client can review, on every page: v1 is the full homepage, v2 to v9 are the layout concepts in the order
-  they were made (v8 and v9, the white and the dark glass versions, added later on 2026-11-07). It floats at the bottom right (the one corner none of the versions uses; v7 lifts its minimap above it); on a desktop it
+  they were made (v8 and v9, the white and the dark glass versions, added later on 2026-11-07), and v10 is the
+  client's feedback from his two videos applied to v1 (2026-11-10). It floats at the bottom right (the one corner none of the versions uses; v7 lifts its minimap above it); on a desktop it
   shows all versions in a row, on a phone one button that opens the list. Links are full page loads, so each
   version starts from its own beginning (several of them run their own scroll stage).
 */
@@ -22,6 +23,7 @@ export const VERSIONS = [
   { href: "/v7", label: "v7", name: "System" },
   { href: "/v8", label: "v8", name: "Kristall" },
   { href: "/v9", label: "v9", name: "Obsidian" },
+  { href: "/v10", label: "v10", name: "Feedback" },
 ] as const;
 
 export function VersionNav() {

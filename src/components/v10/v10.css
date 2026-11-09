@@ -1,0 +1,422 @@
+/*
+  v10 (2026-11-10): the client's feedback version, from his two Loom videos. v1's layout, order, positions and
+  spacing ("version one looks very solid"), in v2's navy blues, panels and rounded corners ("this font and this style
+  with this colors, this roundings"), with v2's overlay from section to section instead of a hard cut, in normal
+  scrolling. Only /v10 imports this file.
+
+  - The theme tokens are re-pointed to v2's navy inside .v10, so every shared section (Compare, Ablauf, Workshop,
+    Partner, Kontakt, header, footer) follows without a copy.
+  - Each part of the page is a sheet: a rounded panel inset from the screen edge, with its own deep blue light and
+    grain. When a sheet has been read to its end it stays put, and the next one slides up over it while it sinks back
+    and darkens (stack.tsx). Nothing is pinned for reading; every scroll moves the page.
+*/
+
+.v10 {
+  --color-page: #040c1e;
+  --color-deep: #071737;
+  --color-panel: #0a1d44;
+  --color-panel-hi: #0f2754;
+  --color-silver: rgb(241 241 238 / 0.62);
+  --v10-gap: 8px;
+  --v10-radius: 26px;
+  position: relative;
+  isolation: isolate;
+  color: #f1f1ee;
+  background: #02060f;
+}
+@media (max-width: 767px) {
+  .v10 {
+    --v10-gap: 5px;
+    --v10-radius: 20px;
+  }
+}
+
+/* The ground behind and below the page (also where the browser overscrolls). */
+body:has(.v10) {
+  background: #02060f;
+}
+
+/* The black version's hairlines between sections do not belong on sheets. */
+.v10 main > * {
+  border-top: 0 !important;
+  background-image: none !important;
+}
+
+/* ---------- Sheets ---------- */
+
+.v10-slot {
+  position: relative;
+  padding: var(--v10-gap) var(--v10-gap) 0;
+}
+/* The first sheet comes up over the hero's last screen (the hero keeps that screen as its room, see hero.tsx). */
+.v10-hero + .v10-slot {
+  margin-top: -100svh;
+}
+
+/*
+  Position comes from the markup (a sheet in the stack is relative or sticky, the Problem panel absolute). A sheet
+  is at least one screen tall, so the next one can always cover all of it; shorter content sits in its middle.
+*/
+.v10-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - 2 * var(--v10-gap));
+  overflow: clip;
+  isolation: isolate;
+  border-radius: var(--v10-radius);
+  background-color: #050f24;
+  box-shadow: 0 -24px 70px -24px rgb(0 0 0 / 0.85);
+}
+/* The rim, above the content so the light layers never cover it. */
+.v10-sheet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    inset 0 0 0 1px rgb(255 255 255 / 0.05);
+  pointer-events: none;
+}
+
+/*
+  A sheet's ground (its light and grain) is a layer of its own. It is drawn once; whatever moves above it (a
+  drawing, the hub's light, a counter) then never repaints the gradients and the grain's blend under it.
+*/
+.v10-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: inherit;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* A sheet's light: fixed-size fields at its top and its foot, so a tall sheet never stretches them. */
+.v10-light {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.v10-light[data-light="a"] {
+  background:
+    radial-gradient(1100px 820px at 82% 0%, rgb(0 75 160 / 0.62), rgb(0 75 160 / 0) 72%),
+    radial-gradient(520px 420px at 80% 0%, rgb(105 191 248 / 0.16), rgb(105 191 248 / 0) 72%),
+    radial-gradient(900px 700px at 0% 100%, rgb(26 111 224 / 0.2), rgb(26 111 224 / 0) 72%),
+    linear-gradient(180deg, #071737 0%, #040c1e 100%);
+}
+.v10-light[data-light="b"] {
+  background:
+    radial-gradient(1000px 820px at 0% 0%, rgb(0 75 160 / 0.6), rgb(0 75 160 / 0) 72%),
+    radial-gradient(480px 400px at 18% 6%, rgb(105 191 248 / 0.13), rgb(105 191 248 / 0) 72%),
+    radial-gradient(900px 760px at 100% 100%, rgb(0 75 160 / 0.48), rgb(0 75 160 / 0) 72%),
+    linear-gradient(170deg, #081b40 0%, #030a18 100%);
+}
+.v10-light[data-light="c"] {
+  background:
+    radial-gradient(1000px 900px at 100% 8%, rgb(0 75 160 / 0.68), rgb(0 75 160 / 0) 72%),
+    radial-gradient(520px 440px at 84% 6%, rgb(105 191 248 / 0.18), rgb(105 191 248 / 0) 72%),
+    radial-gradient(900px 640px at 8% 100%, rgb(26 111 224 / 0.28), rgb(26 111 224 / 0) 72%),
+    linear-gradient(195deg, #09224f 0%, #040c1d 100%);
+}
+.v10-light[data-light="d"] {
+  background:
+    radial-gradient(1300px 760px at 50% 104%, rgb(26 111 224 / 0.7), rgb(26 111 224 / 0) 72%),
+    radial-gradient(640px 400px at 50% 100%, rgb(105 191 248 / 0.24), rgb(105 191 248 / 0) 72%),
+    radial-gradient(1000px 720px at 100% 0%, rgb(0 75 160 / 0.42), rgb(0 75 160 / 0) 72%),
+    linear-gradient(180deg, #04102b 0%, #072a60 100%);
+}
+
+/* Film grain over the light (v2's), under the content. */
+.v10-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+.v10-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Darkens a sheet while the next one covers it. Only its last screen is ever covered, so only that is shaded. */
+.v10-shade {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 45;
+  height: 100svh;
+  max-height: 100%;
+  background: #01040b;
+  opacity: 0;
+  pointer-events: none;
+  /* Its own layer, so darkening it is a compositor step and never repaints the sheet. */
+  will-change: opacity;
+}
+
+/* ---------- Surfaces inside the sheets ---------- */
+
+/* Cards and panels on navy: a lighter navy with a hairline and a top light. */
+.v10-card {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.065), rgb(255 255 255 / 0.03));
+  box-shadow: 0 24px 48px -28px rgb(1 4 12 / 0.9);
+}
+.v10-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.09),
+    inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  pointer-events: none;
+}
+
+/* The shared glass panels, a step lighter on navy than on black; the header bar in navy. */
+.v10 .glass {
+  background-color: rgb(255 255 255 / 0.05);
+}
+.v10 .glass-blur {
+  background-color: rgb(4 12 30 / 0.8);
+}
+
+/* A panel with its own royal light: the service plates and the three pillars. */
+.v10-plate {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background:
+    radial-gradient(70% 90% at 100% 0%, rgb(0 75 160 / 0.5), rgb(0 75 160 / 0) 70%),
+    radial-gradient(60% 70% at 0% 100%, rgb(26 111 224 / 0.2), rgb(26 111 224 / 0) 70%),
+    linear-gradient(165deg, #0a2150 0%, #061331 100%);
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.9);
+}
+.v10-plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  pointer-events: none;
+}
+
+/*
+  The service drawings are made for a matte grey plate; screened over navy, the plate turns blue and the lines stay
+  bright. A drawing redraws every frame while it plays, so it gets its own layer on an opaque navy, and its frames
+  never repaint what lies under it. With this and the sheets' own ground layer (.v10-bg), Leistungen went from 53
+  to 60 fps and System from 40 to 60 at 1.5x on the reference laptop's Intel GPU (headless Chrome, 2026-11-10).
+*/
+.v10-scene {
+  isolation: isolate;
+  background-color: #06142f;
+  will-change: transform;
+}
+.v10-scene svg {
+  mix-blend-mode: screen;
+}
+
+/*
+  3D icons (the client: "maybe here some 3D icons missing"). A glossy tile in the brand blues: lit from above, a
+  sheen over its upper half, a darker foot, a bevel and a soft cast shadow; the glyph embossed in white.
+*/
+.v10-icon3d {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  color: #fff;
+  background:
+    radial-gradient(90% 70% at 28% 8%, rgb(160 214 255 / 0.55), rgb(160 214 255 / 0) 60%),
+    linear-gradient(165deg, #3f9df2 0%, #0d62cc 42%, #003b86 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.55),
+    inset 0 -5px 10px rgb(0 22 66 / 0.55),
+    inset 0 0 0 1px rgb(105 191 248 / 0.5),
+    0 16px 26px -12px rgb(0 44 120 / 0.95),
+    0 3px 6px rgb(1 6 18 / 0.5);
+}
+.v10-icon3d::before {
+  content: "";
+  position: absolute;
+  inset: 2px 3px 52% 3px;
+  border-radius: 14px 14px 45% 45% / 14px 14px 14px 14px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.34), rgb(255 255 255 / 0.03));
+  pointer-events: none;
+}
+.v10-icon3d svg {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 2px 1.5px rgb(0 26 76 / 0.7));
+}
+.v10-icon3d-sm {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+}
+.v10-icon3d-sm::before {
+  border-radius: 11px 11px 45% 45% / 11px 11px 11px 11px;
+}
+.v10-icon3d-sm svg {
+  width: 21px;
+  height: 21px;
+}
+
+/* The testimonial arrows, beside the arc at its middle (the client: "better visible, not so in the bottom"). */
+.v10-step {
+  background-color: rgb(5 15 36 / 0.78);
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.5),
+    0 16px 32px -12px rgb(0 0 0 / 0.85);
+}
+.v10-step:hover {
+  background-color: #0857bd;
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.85),
+    0 18px 38px -12px rgb(26 116 224 / 0.7);
+}
+
+/*
+  The shared buttons in v2's colours: the main one royal with a sky rim and a passing light (as v2's), the second
+  one clear with a hairline. Their edge light (WebGL) is drawn for a cream button, so it is left out on the royal one.
+*/
+.v10 .specular-button[data-kind="primary"] {
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(100deg, #003a82 0%, #0857bd 52%, #1a74e0 100%);
+  background-size: 170% 100%;
+  background-position: 0% 0;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.26),
+    inset 0 0 0 1px rgb(105 191 248 / 0.38),
+    0 16px 36px -16px rgb(26 116 224 / 0.85);
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.4s ease,
+    background-position 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.v10 .specular-button[data-kind="primary"]:hover {
+  background-position: 100% 0;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.32),
+    inset 0 0 0 1px rgb(105 191 248 / 0.7),
+    0 20px 44px -14px rgb(105 191 248 / 0.6);
+}
+.v10 .specular-button[data-kind="primary"] .specular-button__light {
+  display: none;
+}
+.v10 .specular-button[data-kind="primary"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -70%;
+  z-index: 1;
+  width: 50%;
+  pointer-events: none;
+  background: linear-gradient(100deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.34), rgb(255 255 255 / 0));
+  transform: skewX(-18deg);
+  animation: v10-pass 6.5s cubic-bezier(0.45, 0, 0.25, 1) 2.2s infinite;
+}
+.v10 .specular-button[data-kind="primary"]:hover::before {
+  animation: v10-pass-once 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes v10-pass {
+  0% {
+    left: -70%;
+  }
+  22%,
+  100% {
+    left: 130%;
+  }
+}
+@keyframes v10-pass-once {
+  from {
+    left: -70%;
+  }
+  to {
+    left: 130%;
+  }
+}
+.v10 .specular-button[data-kind="primary"] .specular-button__label {
+  position: relative;
+  z-index: 2;
+}
+.v10 .specular-button[data-kind="secondary"] {
+  background-color: rgb(255 255 255 / 0.04);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
+}
+.v10 .specular-button[data-kind="secondary"]:hover {
+  background-color: rgb(105 191 248 / 0.1);
+}
+
+/* ---------- Hero ---------- */
+
+/* Below 1024px the film sits above the headline; its foot dissolves into the headline's ground. */
+@media (max-width: 1023px) {
+  .v10-film-phone {
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
+  }
+}
+
+/* The Problem photos fill the right of the panel and dissolve into its light towards the text (v2's). */
+.v10-photo-fade {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+}
+
+/* A story bar: fills over the reason's time on screen, then the next reason follows. */
+@keyframes v10-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.v10-bar-fill {
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.v10-bar-fill[data-state="done"] {
+  transform: scaleX(1);
+}
+.v10-bar-fill[data-state="running"] {
+  animation: v10-fill var(--v10-dwell, 5000ms) linear forwards;
+}
+.v10-bar-fill[data-state="running"][data-paused] {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v10 .specular-button[data-kind="primary"]::before {
+    animation: none;
+    display: none;
+  }
+  .v10-bar-fill[data-state="running"] {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
