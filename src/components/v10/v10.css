@@ -1,14 +1,11 @@
 /*
-  v10 (2026-11-10, reworked the same day after the developer went through the client's two Loom videos line by line):
-  v1's page, its sections, placement, type and spacing, in v2's light navy and rounded panels, with v2's overlay from
-  section to section in normal scrolling. Only the sections the client turned down change. Only /v10 imports this.
+  v10 (2026-11-10, rebuilt from v1 the same day): v1's page itself, its sections, order, placement, type, spacing and
+  behaviour, with only the changes the client asked for in his two Loom videos (as the developer went through them
+  line by line). The biggest one is colour: v2's light navy instead of v1's black, on one fixed background for the
+  whole page as in v1. No section slides over another; the page scrolls normally. Only /v10 imports this file.
 
-  - The theme tokens are re-pointed to v2's navy inside .v10, so every shared section (Ablauf, Workshop, Partner,
-    Kontakt, header, footer) follows without a copy.
-  - Each part of the page is a sheet: a rounded panel inset from the screen edge. Its light is v2's chapter light on
-    a layer that stays in view while the sheet scrolls, so every screen of every section is lit like v2's panels.
-    When a sheet has been read to its end it stays put and the next one slides up over it (stack.tsx); nothing else
-    happens to it.
+  The theme tokens are re-pointed to v2's navy inside .v10, so every v1 section used unchanged (Ablauf, Workshop,
+  Partner, Kontakt, header, footer) follows without a copy.
 */
 
 .v10 {
@@ -17,156 +14,41 @@
   --color-panel: #0a1d44;
   --color-panel-hi: #0f2754;
   --color-silver: rgb(241 241 238 / 0.62);
-  --v10-gap: 8px;
-  --v10-radius: 26px;
   position: relative;
   isolation: isolate;
   color: #f1f1ee;
-  background: #02060f;
-}
-@media (max-width: 767px) {
-  .v10 {
-    --v10-gap: 5px;
-    --v10-radius: 20px;
-  }
 }
 
-/* The ground behind and below the page (also where the browser overscrolls). */
+/* The ground below the page (where the browser overscrolls). */
 body:has(.v10) {
-  background: #02060f;
+  background: #061536;
 }
 
-/* The black version's hairlines between sections do not belong on sheets. */
-.v10 main > * {
-  border-top: 0 !important;
-  background-image: none !important;
-}
-
-/* ---------- Sheets ---------- */
-
-.v10-slot {
-  position: relative;
-  padding: var(--v10-gap) var(--v10-gap) 0;
-}
-/* The first sheet comes up over the hero's last screen (the hero keeps that screen as its room, see hero.tsx). */
-.v10-hero + .v10-slot {
-  margin-top: -100svh;
-}
+/* ---------- The one background ---------- */
 
 /*
-  Position comes from the markup (a sheet in the stack is relative or sticky, the Problem panel absolute). A sheet
-  is at least one screen tall, so the next one can always cover all of it; shorter content sits in its middle.
+  v1's single fixed background (V10Background) in v2's colours: the "light navy blue" of v2's closing panel, which
+  the client pointed at ("this kind of light navy blue ... keep that in the full page"), with its royal light from
+  the top left and its sky light from the foot, v1's thin flowing lines and v2's grain. Fixed, so it never repaints.
 */
-.v10-sheet {
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100svh - 2 * var(--v10-gap));
-  overflow: clip;
-  isolation: isolate;
-  border-radius: var(--v10-radius);
-  background-color: #050f24;
-  box-shadow: 0 -24px 70px -24px rgb(0 0 0 / 0.85);
-}
-/* The rim, above the content so the light layers never cover it. */
-.v10-sheet::after {
-  content: "";
+.v10-ground {
   position: absolute;
   inset: 0;
-  z-index: 50;
-  border-radius: inherit;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.07),
-    inset 0 0 0 1px rgb(255 255 255 / 0.05);
-  pointer-events: none;
+  background:
+    radial-gradient(70% 90% at 85% 110%, rgb(105 191 248 / 0.3), rgb(105 191 248 / 0) 70%),
+    radial-gradient(80% 100% at 10% -10%, rgb(0 75 160 / 0.7), rgb(0 75 160 / 0) 70%),
+    linear-gradient(160deg, #0a2a62 0%, #061536 100%);
 }
-
-/*
-  A sheet's ground (its light and grain) is a layer of its own. It is drawn once; whatever moves above it (a
-  drawing, the hub's light, a counter) then never repaints the gradients and the grain's blend under it.
-*/
-.v10-bg {
+.v10-ground-grain {
   position: absolute;
   inset: 0;
-  z-index: 0;
-  /* clip, not hidden: hidden would make this the light's scroll container and stop it sticking. */
-  overflow: clip;
-  isolation: isolate;
-  border-radius: inherit;
-  pointer-events: none;
-  will-change: transform;
-}
-
-/*
-  A sheet's light: v2's chapter lights (Kapitel, made for one screen) on a layer one screen tall that sticks to the
-  top of the screen while its sheet scrolls past, so each screen of a long section is lit the way v2's panels were.
-  Its own layer (will-change), moved by the compositor: scrolling never repaints it. The grain sits in it.
-*/
-.v10-light {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  pointer-events: none;
-  will-change: transform;
-}
-.v10-light::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.14;
+  opacity: 0.12;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 200px 200px;
 }
-/* v2 Start */
-.v10-light[data-light="a"] {
-  background:
-    radial-gradient(26% 32% at 76% 50%, rgb(105 191 248 / 0.26), rgb(105 191 248 / 0) 72%),
-    radial-gradient(60% 75% at 74% 58%, rgb(0 75 160 / 0.7), rgb(0 75 160 / 0) 72%),
-    radial-gradient(55% 60% at 0% 0%, rgb(26 111 224 / 0.16), rgb(26 111 224 / 0) 70%),
-    linear-gradient(180deg, #071737 0%, #040c1e 100%);
-}
-/* v2 Problem */
-.v10-light[data-light="b"] {
-  background:
-    radial-gradient(28% 34% at 22% 30%, rgb(105 191 248 / 0.16), rgb(105 191 248 / 0) 72%),
-    radial-gradient(62% 78% at 0% 0%, rgb(0 75 160 / 0.62), rgb(0 75 160 / 0) 72%),
-    radial-gradient(48% 60% at 100% 100%, rgb(0 75 160 / 0.5), rgb(0 75 160 / 0) 72%),
-    linear-gradient(155deg, #081b40 0%, #030a18 100%);
-}
-/* v2 Leistungen */
-.v10-light[data-light="c"] {
-  background:
-    radial-gradient(30% 36% at 82% 26%, rgb(105 191 248 / 0.22), rgb(105 191 248 / 0) 72%),
-    radial-gradient(58% 80% at 100% 12%, rgb(0 75 160 / 0.72), rgb(0 75 160 / 0) 72%),
-    radial-gradient(50% 50% at 10% 100%, rgb(26 111 224 / 0.3), rgb(26 111 224 / 0) 72%),
-    linear-gradient(205deg, #09224f 0%, #040c1d 100%);
-}
-/* v2 Fallstudien */
-.v10-light[data-light="d"] {
-  background:
-    radial-gradient(40% 34% at 50% 100%, rgb(105 191 248 / 0.3), rgb(105 191 248 / 0) 72%),
-    radial-gradient(85% 70% at 50% 112%, rgb(26 111 224 / 0.78), rgb(26 111 224 / 0) 72%),
-    radial-gradient(60% 55% at 100% 0%, rgb(0 75 160 / 0.45), rgb(0 75 160 / 0) 72%),
-    linear-gradient(180deg, #04102b 0%, #072a60 100%);
-}
-/* v2's closing panel: the "light navy blue" the client pointed at */
-.v10-light[data-light="e"] {
-  background:
-    radial-gradient(70% 90% at 85% 110%, rgb(105 191 248 / 0.38), rgb(105 191 248 / 0) 70%),
-    radial-gradient(80% 100% at 10% -10%, rgb(0 75 160 / 0.75), rgb(0 75 160 / 0) 70%),
-    linear-gradient(160deg, #0a2a62 0%, #061536 100%);
-}
 
-.v10-content {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  flex: 1 0 auto;
-  flex-direction: column;
-  justify-content: center;
-}
-
-/* ---------- Surfaces inside the sheets ---------- */
+/* ---------- Surfaces ---------- */
 
 /* Cards and panels on navy: a lighter navy with a hairline and a top light. */
 .v10-card {
@@ -228,8 +110,7 @@ body:has(.v10) {
 /*
   The service drawings are made for a matte grey plate; screened over navy, the plate turns blue and the lines stay
   bright. A drawing redraws every frame while it plays, so it gets its own layer on an opaque navy, and its frames
-  never repaint what lies under it. With this and the sheets' own ground layer (.v10-bg), Leistungen went from 53
-  to 60 fps and System from 40 to 60 at 1.5x on the reference laptop's Intel GPU (headless Chrome, 2026-11-10).
+  never repaint what lies under it.
 */
 .v10-scene {
   isolation: isolate;

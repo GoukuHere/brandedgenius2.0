@@ -3,33 +3,35 @@ import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { CtaSection } from "@/components/sections/cta";
 import { PartnersSection } from "@/components/sections/partners";
+import { ProcessSection } from "@/components/sections/process";
 import { WorkshopSection } from "@/components/sections/workshop";
 import { RevealObserver } from "@/components/system/reveal-observer";
+import { V10Background } from "@/components/v10/background";
 import { CasesSection } from "@/components/v10/cases";
 import { CompareSection } from "@/components/v10/compare";
 import { HeroIntoProblem } from "@/components/v10/hero";
 import { ImpactSection } from "@/components/v10/impact";
-import { ProcessSection } from "@/components/v10/process";
 import { PromiseSection } from "@/components/v10/promise";
 import { ReasonsSection } from "@/components/v10/reasons";
 import { ServicesSection } from "@/components/v10/services";
 import { SolutionSection } from "@/components/v10/solution";
-import { Sheet, StackMotion } from "@/components/v10/stack";
 import { SystemSection } from "@/components/v10/system-hub";
 import { VoicesSection } from "@/components/v10/voices";
 import { WhySection } from "@/components/v10/why";
 import "@/components/v10/v10.css";
 
 /*
-  Version v10 (2026-11-10, reworked the same day): the client's two Loom videos, as the developer went through them
-  line by line. v1's page (its sections in v1's order, placement, type and spacing, and the behaviour of the sections
-  he liked) in v2's light navy and rounded sheets, with v2's overlay between sections and normal scrolling. Changed
-  are only the parts he turned down: the hero is the film alone with its headline, zooming once into the top of v1's
-  Problem section; v2's reasons replace v1's problem cards and reasons list; Vorher/Nachher stands still; the pillars
-  are calm panels; the qualities sit in the hub; Use Cases and Warum carry less text. No smooth-scroll library.
-  Reached from the version switcher; kept out of search engines.
-
-  A sheet holds one section, or two where one alone would be much shorter than the screen.
+  Version v10 (2026-11-10, rebuilt from v1 the same day): v1's homepage (src/app/page.tsx) with only the changes the
+  client asked for in his two Loom videos, as the developer went through them line by line. Same sections in the same
+  order with v1's placement, type, spacing and behaviour; v1's own section files wherever a section is unchanged
+  (Ablauf, Workshop, Partner, Kontakt, header, footer); copies in components/v10 only where something changes:
+  - colour: v2's light navy on v1's one fixed background (V10Background), buttons in v2's royal;
+  - hero: only the film, its headline and the two actions, zooming once into the top of v1's Problem section, whose
+    six cards are left out; v2's reasons panel replaces v1's reasons list;
+  - Vorher/Nachher and Versprechen stand still, the pillars are calm panels, the qualities sit in the hub;
+  - Leistungen: v1's stacked plates in navy; Use Cases: results and headline only; Warum: titles only, with icons;
+    Impact with icons; testimonial arrows beside the card.
+  No section slides over another, and no smooth-scroll library: the page scrolls normally. Kept out of search engines.
 */
 export const metadata: Metadata = {
   title: "v10: Feedback | Branded Genius",
@@ -37,57 +39,33 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#02060f",
+  themeColor: "#061536",
 };
 
 export default function VersionZehn() {
   return (
     <div className="v10">
+      <V10Background />
       <Header />
       <main id="main" className="overflow-x-clip">
         <HeroIntoProblem />
-        <Sheet light="c">
-          <ReasonsSection />
-        </Sheet>
-        <Sheet light="e">
-          <CompareSection />
-          <PromiseSection />
-        </Sheet>
-        <Sheet light="a">
-          <SolutionSection />
-        </Sheet>
-        <Sheet light="b">
-          <SystemSection />
-        </Sheet>
-        <Sheet light="c">
-          <ServicesSection />
-        </Sheet>
-        <Sheet light="d">
-          <CasesSection />
-        </Sheet>
-        <Sheet light="e">
-          <ProcessSection />
-        </Sheet>
-        <Sheet light="a">
-          <WhySection />
-        </Sheet>
-        <Sheet light="c">
-          <ImpactSection />
-        </Sheet>
-        <Sheet light="b">
-          <WorkshopSection />
-        </Sheet>
-        <Sheet light="d">
-          <PartnersSection />
-          <VoicesSection />
-        </Sheet>
-        <Sheet light="e">
-          <CtaSection />
-          <Footer />
-        </Sheet>
+        <ReasonsSection />
+        <CompareSection />
+        <PromiseSection />
+        <SolutionSection />
+        <SystemSection />
+        <ServicesSection />
+        <CasesSection />
+        <ProcessSection />
+        <WhySection />
+        <ImpactSection />
+        <WorkshopSection />
+        <PartnersSection />
+        <VoicesSection />
+        <CtaSection />
       </main>
+      <Footer />
       <RevealObserver />
-      <StackMotion />
     </div>
   );
 }

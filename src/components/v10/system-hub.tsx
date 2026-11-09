@@ -102,9 +102,8 @@ export function SystemSection() {
   const reduced = useReducedMotionPref();
   const tabVisible = useTabVisible();
 
-  // Entrance: drawn while the stage rises from 85% of the screen until its foot is at 97%. v10: the sheet holds
-  // still once its foot reaches the foot of the screen (stack.tsx), so the circuit must be complete by then.
-  const progress = useSectionProgress(diagram, ["start 85%", "end 97%"]);
+  // Entrance: drawn while the stage rises from 62% of the screen until its centre passes 52%.
+  const progress = useSectionProgress(diagram, ["start 62%", "center 52%"]);
   const smooth = useSpring(progress, SCROLL_SPRING);
   // 1 on lg with motion allowed (set after mount); everywhere else the end state.
   const live = useMotionValue(0);

@@ -16,7 +16,7 @@ import { ProblemTop } from "./problem-top";
   beside it. On phones and portrait tablets the film sits at the top, full width (so the robots are never cropped
   away), with the headline and the actions under it. One stage is held while you scroll ZOOM of a screen: the hero
   flies past (it grows and fades) and the second section, the top of v1's Problem section, comes up out of the depth
-  into its place. That is the page's only zoom. Then, as everywhere on the page, the next sheet slides up over it.
+  into its place. That is the page's only zoom; from there the page simply scrolls on.
 
   The film plays only while the hero can be seen. Reduced motion: no zoom and no film (the last frame stands), the
   hero and the Problem panel simply cross-fade.
@@ -89,7 +89,7 @@ export function HeroIntoProblem() {
   const fade = (delay: number) => ({ initial: { opacity: 0, y: 18 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.9, delay, ease: EASE } });
 
   return (
-    <div className="v10-hero relative z-[1]" style={{ height: `${200 + ZOOM * 100}svh` }}>
+    <div className="relative" style={{ height: `${100 + ZOOM * 100}svh` }}>
       <div ref={stage} className="sticky top-0 h-svh overflow-hidden">
         {/* The second section, waiting in the depth behind the hero: the top of v1's Problem section. */}
         <motion.section
@@ -97,14 +97,9 @@ export function HeroIntoProblem() {
           aria-label="Problem"
           inert={phase !== "panel"}
           style={{ scale: panelScale, opacity: panelOpacity }}
-          className="v10-sheet absolute inset-[var(--v10-gap)] z-[1] will-change-transform motion-reduce:!transform-none"
+          className="absolute inset-0 z-[1] will-change-transform motion-reduce:!transform-none"
         >
-          <div aria-hidden className="v10-bg">
-            <div className="v10-light" data-light="b" />
-          </div>
-          <div className="relative z-10 h-full">
-            <ProblemTop />
-          </div>
+          <ProblemTop />
         </motion.section>
 
         {/* The hero: the film over the whole screen, only the headline and the two actions at its foot. */}
@@ -112,11 +107,8 @@ export function HeroIntoProblem() {
           id="top"
           inert={phase !== "hero"}
           style={{ scale: heroScale, opacity: heroOpacity }}
-          className="absolute inset-0 z-[2] overflow-hidden bg-[#040c1e] will-change-transform motion-reduce:!transform-none"
+          className="absolute inset-0 z-[2] overflow-hidden bg-[linear-gradient(160deg,#0a2a62_0%,#061536_100%)] will-change-transform motion-reduce:!transform-none"
         >
-          <div aria-hidden className="v10-bg">
-            <div className="v10-light" data-light="a" />
-          </div>
           <motion.div
             initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}

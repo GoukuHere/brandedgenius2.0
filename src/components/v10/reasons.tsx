@@ -3,15 +3,16 @@
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Heading } from "@/components/system/primitives";
+import { Container, Heading } from "@/components/system/primitives";
 import { REALITY } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 /*
   v10 Die Realität: v2's Problem chapter (the client: "please take also that section here, do it like this, I like
-  that style"), in place of v1's reasons list ("not really good, the other one is better"), in normal scrolling
-  ("not this scrolling by scrolling"). One screen: the Realität headline (v1's Problem headline is already right
-  above it), the six reasons one at a time with their photos dissolving into the panel's light, and a row of bars.
+  that style") in place of v1's reasons list ("not really good, the other one is better"), as a normal section of
+  v1's page in normal scrolling ("not this scrolling by scrolling"): the Realität headline (v1's Problem headline is
+  already right above it), the six reasons one at a time with a row of bars, and their photos filling the right of
+  the section and dissolving into the page towards the text. Phones: headline, photo in a frame, bars, reason.
 
   The reasons no longer step with the scroll. While the section is on screen each one stays for DWELL ms and its bar
   fills like a story, then the next follows. A bar is a button: picking one shows that reason and stops the advance
@@ -74,31 +75,27 @@ export function ReasonsSection() {
   );
 
   return (
-    <section ref={root} id="realitaet" aria-label={`${REALITY.title} ${REALITY.accent}`} className="relative h-[calc(100svh_-_2*var(--v10-gap))] min-h-[600px]">
-      {/* Desktop: the photos fill the right of the panel and dissolve into its light. */}
-      <div aria-hidden className="v10-photo-fade absolute inset-y-0 right-0 z-[2] hidden w-[58%] overflow-hidden md:block">
-        <ReasonPhotos active={active} sizes="58vw" />
+    <section ref={root} id="realitaet" aria-label={`${REALITY.title} ${REALITY.accent}`} className="relative overflow-x-clip py-16 md:flex md:min-h-[min(820px,100svh)] md:items-center md:py-24">
+      {/* Desktop: the photos fill the right of the section and dissolve into the page towards the text. */}
+      <div aria-hidden className="v10-photo-fade absolute inset-y-0 right-0 hidden w-[56%] overflow-hidden md:block">
+        <ReasonPhotos active={active} sizes="56vw" />
       </div>
 
-      <div className="relative z-10 mx-auto grid h-full max-w-[1360px] grid-cols-1 grid-rows-[auto_minmax(0,1fr)_auto] gap-5 px-5 pt-[88px] pb-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:grid-rows-1 md:items-center md:gap-16 md:px-12 md:pt-[96px] md:pb-[72px]">
-        <div>
-          <Heading title={REALITY.title} accent={REALITY.accent} className="text-[length:clamp(1.75rem,1.2rem+1.6vw,3rem)]" />
-          <div className="mt-8 hidden md:block" {...hold}>
+      <Container className="relative">
+        <div className="md:w-[44%] md:pr-10">
+          <Heading title={REALITY.title} accent={REALITY.accent} />
+
+          {/* Phones: the photo in a frame between the heading and the reason. */}
+          <div aria-hidden className="relative mt-8 aspect-[4/3] overflow-hidden rounded-panel shadow-[inset_0_0_0_1px_rgb(255_255_255/0.09)] md:hidden">
+            <ReasonPhotos active={active} sizes="92vw" />
+          </div>
+
+          <div className="mt-8" {...hold}>
             {bars}
             <ReasonText index={active} title={reason.title} text={reason.text} />
           </div>
         </div>
-
-        {/* Phones: the photo in a frame between the heading and the reason. */}
-        <div aria-hidden className="relative min-h-0 overflow-hidden rounded-[16px] shadow-[inset_0_0_0_1px_rgb(255_255_255/0.09)] md:hidden">
-          <ReasonPhotos active={active} sizes="92vw" />
-        </div>
-
-        <div className="md:hidden" {...hold}>
-          {bars}
-          <ReasonText index={active} title={reason.title} text={reason.text} compact />
-        </div>
-      </div>
+      </Container>
 
       {/* All six reasons for screen readers, in order; the changing view above is hidden from them. */}
       <ol className="sr-only">
@@ -175,7 +172,7 @@ function ReasonPhotos({ active, sizes }: { active: number; sizes: string }) {
           )}
         />
       ))}
-      <div className="absolute inset-0 bg-[linear-gradient(0deg,rgb(3_10_26/0.6)_0%,rgb(3_10_26/0)_45%),linear-gradient(0deg,rgb(0_75_160/0.24),rgb(0_75_160/0.24))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(0deg,rgb(6_21_54/0.55)_0%,rgb(6_21_54/0)_45%),linear-gradient(0deg,rgb(0_75_160/0.24),rgb(0_75_160/0.24))]" />
     </>
   );
 }

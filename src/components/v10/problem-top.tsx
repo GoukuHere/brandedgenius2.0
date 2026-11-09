@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
   with it, and the three facts under the paragraph as one plain line. v1's six problem cards on the broken circuit
   are left out (the developer: "he doesnt like this").
 
-  It is the panel the hero zooms into (hero.tsx), so it fills one screen and stands in the middle of it. It has no
-  entrance of its own: arriving out of the depth is its entrance.
+  It is what the hero zooms into (hero.tsx), so it fills one screen and stands in the middle of it, on the page's
+  background. It has no entrance of its own: arriving out of the depth is its entrance.
 */
 export function ProblemTop() {
   return (

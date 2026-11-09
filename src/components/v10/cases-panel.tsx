@@ -5,8 +5,8 @@ import { CASES, type CaseStudy } from "@/content/site";
 
 /*
   v10 Fallstudie card. The client found v1's cards "overloaded with a lot of text, this is not good", so a card now
-  holds only its story: the three results (the case's picture), the headline and the one paragraph, with the area
-  and kind at the foot. The quote, the list of what was built and the tools are left out; the content is unchanged.
+  holds only its three results and its headline. The paragraph, the quote, the list of what was built, the tools
+  and the area line are left out (the area is already in the row of tabs above); the words that remain are unchanged.
 
   Width: on the scroller (a size container), one card with the next peeking on phones and tablets, two side by side
   from 1280px: half the scroller less its padding (2 x 32px) and the gap (24px).
@@ -34,11 +34,6 @@ export const CaseCard = memo(function CaseCard({ item, index }: { item: CaseStud
           </ul>
 
           <h3 className="mt-7 text-[24px] leading-[1.15] font-medium tracking-[-0.02em] text-balance text-white sm:text-[27px]">{item.tagline}</h3>
-          <p className="mt-3 text-[16px] leading-[1.6] text-pretty text-white/75">{item.text}</p>
-
-          <p className="mt-auto pt-7 text-[14px] leading-[26px]">
-            <span className="font-medium text-white">{item.area}</span> <span className="text-white/55">{item.kind}</span>
-          </p>
         </div>
       </article>
     </li>
