@@ -2,21 +2,21 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Heading } from "@/components/system/primitives";
-import { PROBLEM, REALITY } from "@/content/site";
+import { REALITY } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 /*
-  v10 Problem: v2's Problem chapter (the client: "please take also that section here, do it like this, I like that
-  style"), in normal scrolling ("not this scrolling by scrolling"). One full-screen panel: the heading, the six
-  reasons from "Die Realität" one at a time with their photos dissolving into the panel's light, and a row of bars.
-  It replaces v1's problem cards and reasons list, which the client turned down.
+  v10 Die Realität: v2's Problem chapter (the client: "please take also that section here, do it like this, I like
+  that style"), in place of v1's reasons list ("not really good, the other one is better"), in normal scrolling
+  ("not this scrolling by scrolling"). One screen: the Realität headline (v1's Problem headline is already right
+  above it), the six reasons one at a time with their photos dissolving into the panel's light, and a row of bars.
 
-  The reasons no longer step with the scroll. While the panel is on screen each one stays for DWELL ms and its bar
-  fills like a story, then the next follows. A bar is a button: picking one shows that reason and stops the
-  advance (the visitor has taken over); hovering or focusing the reasons holds it. Reduced motion: no advance, the
-  bars still pick. Every reason is in the markup for screen readers as one list.
+  The reasons no longer step with the scroll. While the section is on screen each one stays for DWELL ms and its bar
+  fills like a story, then the next follows. A bar is a button: picking one shows that reason and stops the advance
+  (the visitor has taken over); hovering or focusing the reasons holds it. Reduced motion: no advance, the bars
+  still pick. Every reason is in the markup for screen readers as one list.
 */
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -25,7 +25,26 @@ const REASONS = REALITY.items;
 const COUNT = REASONS.length;
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 
-export function ProblemPanel({ live }: { live: boolean }) {
+export function ReasonsSection() {
+  const root = useRef<HTMLElement>(null);
+  // Live while most of the section is on screen and the tab is visible.
+  const [onScreen, setOnScreen] = useState(false);
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return undefined;
+    const io = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting), { threshold: 0.55 });
+    io.observe(el);
+    const onVisibility = () => setVisible(document.visibilityState === "visible");
+    onVisibility();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+  const live = onScreen && visible;
+
   const [active, setActive] = useState(0);
   const [run, setRun] = useState(0); // a new number restarts the running bar
   const [manual, setManual] = useState(false);
@@ -55,15 +74,15 @@ export function ProblemPanel({ live }: { live: boolean }) {
   );
 
   return (
-    <>
+    <section ref={root} id="realitaet" aria-label={`${REALITY.title} ${REALITY.accent}`} className="relative h-[calc(100svh_-_2*var(--v10-gap))] min-h-[600px]">
       {/* Desktop: the photos fill the right of the panel and dissolve into its light. */}
-      <div aria-hidden className="v10-photo-fade absolute inset-y-0 right-0 z-[2] hidden w-[58%] md:block">
+      <div aria-hidden className="v10-photo-fade absolute inset-y-0 right-0 z-[2] hidden w-[58%] overflow-hidden md:block">
         <ReasonPhotos active={active} sizes="58vw" />
       </div>
 
       <div className="relative z-10 mx-auto grid h-full max-w-[1360px] grid-cols-1 grid-rows-[auto_minmax(0,1fr)_auto] gap-5 px-5 pt-[88px] pb-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:grid-rows-1 md:items-center md:gap-16 md:px-12 md:pt-[96px] md:pb-[72px]">
         <div>
-          <Heading title={PROBLEM.title} accent={PROBLEM.accent} className="text-[length:clamp(1.75rem,1.2rem+1.6vw,3rem)]" />
+          <Heading title={REALITY.title} accent={REALITY.accent} className="text-[length:clamp(1.75rem,1.2rem+1.6vw,3rem)]" />
           <div className="mt-8 hidden md:block" {...hold}>
             {bars}
             <ReasonText index={active} title={reason.title} text={reason.text} />
@@ -89,7 +108,7 @@ export function ProblemPanel({ live }: { live: boolean }) {
           </li>
         ))}
       </ol>
-    </>
+    </section>
   );
 }
 

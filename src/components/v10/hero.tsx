@@ -5,23 +5,24 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { PrimaryLink, SecondaryLink } from "@/components/system/primitives";
 import { HERO, LINKS, MEDIA } from "@/content/site";
-import { ProblemPanel } from "./problem";
+import { ProblemTop } from "./problem-top";
 
 /*
-  v10 hero, after the client's first comment: "this effect I like, the zoom effect" (v6), "only that video ... full
-  screen, wide screen ... maybe the header down", and "only one time ... only the first hero section".
+  v10 hero, after the client's first comment on v6: "this effect I like, the zoom effect ... only that video ... like
+  full screen ... the bots, and then we're scrolling down, and it's moving to the second section ... only one time
+  ... only the first hero section ... full screen, wide screen, maybe one header, or maybe the header down".
 
-  The film fills the screen (on phones and portrait tablets it sits at the top, full width, so the robots are never
-  cropped away) with the headline at its foot. One stage is held while you scroll ZOOM of a screen: the hero flies
-  past (it grows and fades) and the Problem panel comes up out of the depth into its place. That is the page's only
-  zoom. Then, as everywhere on the page, the next sheet slides up over the panel while it sinks back and darkens.
+  The film fills the screen with nothing on it but the one headline, down at its foot, and the two main actions
+  beside it. On phones and portrait tablets the film sits at the top, full width (so the robots are never cropped
+  away), with the headline and the actions under it. One stage is held while you scroll ZOOM of a screen: the hero
+  flies past (it grows and fades) and the second section, the top of v1's Problem section, comes up out of the depth
+  into its place. That is the page's only zoom. Then, as everywhere on the page, the next sheet slides up over it.
 
   The film plays only while the hero can be seen. Reduced motion: no zoom and no film (the last frame stands), the
-  hero and the panel simply cross-fade.
+  hero and the Problem panel simply cross-fade.
 */
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-const LEAD = `${HERO.text.split(" für ")[0]}.`;
 
 /** The scroll, as a share of the screen height, over which the hero passes and the panel arrives. */
 const ZOOM = 0.8;
@@ -63,25 +64,17 @@ export function HeroIntoProblem() {
   }, []);
 
   const { scrollY } = useScroll();
-  // How far the zoom has run, and how far the next sheet has covered the panel after it.
+  // How far the zoom has run.
   const zoom = useTransform(() => clamp01((scrollY.get() - geo.current.top) / (ZOOM * geo.current.vh)));
-  const cover = useTransform(() => clamp01((scrollY.get() - geo.current.top - ZOOM * geo.current.vh) / geo.current.vh));
 
-  const heroScale = useTransform(() => 1 + 0.55 * smooth(zoom.get()));
   // The hero is gone before the panel is more than faint, so the two never sit on each other as a double image.
+  const heroScale = useTransform(() => 1 + 0.55 * smooth(zoom.get()));
   const heroOpacity = useTransform(() => 1 - clamp01((zoom.get() - 0.08) / 0.42));
-  const panelScale = useTransform(() => {
-    const arrive = smooth(clamp01((zoom.get() - 0.2) / 0.8));
-    return (0.72 + 0.28 * arrive) * (1 - 0.05 * cover.get());
-  });
+  const panelScale = useTransform(() => 0.72 + 0.28 * smooth(clamp01((zoom.get() - 0.2) / 0.8)));
   const panelOpacity = useTransform(() => clamp01((zoom.get() - 0.34) / 0.42));
-  const panelOrigin = useTransform(() => (cover.get() > 0 ? "50% 0%" : "50% 50%"));
-  const shade = useTransform(() => 0.6 * cover.get());
 
-  // The panel takes over (pointer, focus, its reasons' advance) once it is most of the way in, until it is covered.
-  const sync = () => setPhase(zoom.get() > 0.55 && cover.get() < 1 ? "panel" : "hero");
-  useMotionValueEvent(zoom, "change", sync);
-  useMotionValueEvent(cover, "change", sync);
+  // The panel takes over (pointer and focus) once it is most of the way in.
+  useMotionValueEvent(zoom, "change", (z) => setPhase(z > 0.55 ? "panel" : "hero"));
 
   // The film plays only while the hero can be seen.
   const playing = onScreen && phase === "hero" && !reduced;
@@ -98,23 +91,23 @@ export function HeroIntoProblem() {
   return (
     <div className="v10-hero relative z-[1]" style={{ height: `${200 + ZOOM * 100}svh` }}>
       <div ref={stage} className="sticky top-0 h-svh overflow-hidden">
-        {/* The Problem panel, waiting in the depth behind the hero. */}
+        {/* The second section, waiting in the depth behind the hero: the top of v1's Problem section. */}
         <motion.section
           id="problem"
           aria-label="Problem"
           inert={phase !== "panel"}
-          style={{ scale: panelScale, opacity: panelOpacity, transformOrigin: panelOrigin }}
+          style={{ scale: panelScale, opacity: panelOpacity }}
           className="v10-sheet absolute inset-[var(--v10-gap)] z-[1] will-change-transform motion-reduce:!transform-none"
         >
           <div aria-hidden className="v10-bg">
             <div className="v10-light" data-light="b" />
-            <div className="v10-grain" />
           </div>
-          <ProblemPanel live={phase === "panel" && onScreen} />
-          <motion.div aria-hidden style={{ opacity: shade }} className="v10-shade" />
+          <div className="relative z-10 h-full">
+            <ProblemTop />
+          </div>
         </motion.section>
 
-        {/* The hero: the film over the whole screen, the headline at its foot. */}
+        {/* The hero: the film over the whole screen, only the headline and the two actions at its foot. */}
         <motion.section
           id="top"
           inert={phase !== "hero"}
@@ -123,7 +116,6 @@ export function HeroIntoProblem() {
         >
           <div aria-hidden className="v10-bg">
             <div className="v10-light" data-light="a" />
-            <div className="v10-grain" />
           </div>
           <motion.div
             initial={{ opacity: 0, scale: 1.04 }}
@@ -145,50 +137,36 @@ export function HeroIntoProblem() {
             />
             <Image src="/media/hero-final.webp" alt="" fill sizes="100vw" className="hidden object-cover object-[50%_28%] motion-reduce:block" />
           </motion.div>
-          {/* Desktop: a navy ground rises behind the headline so it reads over the film. */}
+          {/* Desktop: a navy ground rises at the foot of the film so the headline reads. */}
           <div
             aria-hidden
-            className="absolute inset-0 z-[3] hidden bg-[linear-gradient(0deg,rgb(4_12_30/0.94)_0%,rgb(4_12_30/0.6)_26%,rgb(4_12_30/0)_52%),linear-gradient(90deg,rgb(4_12_30/0.35)_0%,rgb(4_12_30/0)_40%)] lg:block"
+            className="absolute inset-x-0 bottom-0 z-[3] hidden h-[46%] bg-[linear-gradient(0deg,rgb(4_12_30/0.92)_0%,rgb(4_12_30/0.55)_45%,rgb(4_12_30/0)_100%)] lg:block"
           />
 
-          <div className="relative z-10 mx-auto flex h-full w-full max-w-[1280px] flex-col px-5 pt-[calc(72px_+_min(75vw,40svh)_-_12px)] md:px-8 lg:justify-end lg:pt-0 lg:pb-12">
+          <div className="relative z-10 mx-auto flex h-full w-full max-w-[1280px] flex-col px-5 pt-[calc(72px_+_min(75vw,40svh)_+_8px)] md:px-8 lg:justify-end lg:pt-0 lg:pb-14">
             <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
-              <div className="max-w-[640px]">
-                {/* "KI-Automatisierung," is 7.8em wide; the display scale keeps it on one line down to a 360px phone. */}
-                <h1 className="t-display">
-                  <span className="-mb-[0.12em] block overflow-hidden pb-[0.12em]">
-                    <motion.span className="block whitespace-nowrap" {...line(0.25)}>
-                      {HERO.title}
-                    </motion.span>
-                  </span>
-                  <span className="-mb-[0.12em] block overflow-hidden pb-[0.2em]">
-                    <motion.span className="block" {...line(0.38)}>
-                      <span className="accent accent-sweep">{HERO.accent}</span>
-                    </motion.span>
-                  </span>
-                </h1>
-                <motion.p className="t-lead mt-4 max-w-[520px] lg:mt-5 [@media(max-height:700px)_and_(max-width:1023px)]:hidden" {...fade(0.6)}>
-                  {LEAD}
-                </motion.p>
-              </div>
-              <motion.div className="mt-6 flex flex-col gap-2.5 sm:flex-row lg:mt-0 lg:shrink-0 lg:gap-3" {...fade(0.75)}>
-                <PrimaryLink href={LINKS.analysis} size="lg" className="h-12 px-6 text-[15px] lg:h-14 lg:px-8 lg:text-[16px]">
+              {/* "KI-Automatisierung," is 7.8em wide; the display scale keeps it on one line down to a 360px phone. */}
+              <h1 className="t-display">
+                <span className="-mb-[0.12em] block overflow-hidden pb-[0.12em]">
+                  <motion.span className="block whitespace-nowrap" {...line(0.25)}>
+                    {HERO.title}
+                  </motion.span>
+                </span>
+                <span className="-mb-[0.12em] block overflow-hidden pb-[0.2em]">
+                  <motion.span className="block" {...line(0.38)}>
+                    <span className="accent accent-sweep">{HERO.accent}</span>
+                  </motion.span>
+                </span>
+              </h1>
+              <motion.div className="mt-7 flex flex-col gap-2.5 sm:flex-row lg:mt-0 lg:shrink-0 lg:gap-3 lg:pb-1.5" {...fade(0.7)}>
+                <PrimaryLink href={LINKS.analysis} size="lg">
                   {HERO.primary}
                 </PrimaryLink>
-                <SecondaryLink href={LINKS.booking} size="lg" className="h-12 px-6 text-[15px] lg:h-14 lg:px-8 lg:text-[16px]">
+                <SecondaryLink href={LINKS.booking} size="lg">
                   {HERO.secondary}
                 </SecondaryLink>
               </motion.div>
             </div>
-
-            <motion.p {...fade(1)} className="mt-10 hidden items-center gap-5 border-t border-white/10 pt-5 text-[15px] text-white/60 lg:flex">
-              {HERO.claim.map((word, i) => (
-                <span key={word} className="flex items-center gap-5">
-                  {i > 0 && <span aria-hidden className="h-3.5 w-px bg-white/20" />}
-                  {word}
-                </span>
-              ))}
-            </motion.p>
           </div>
         </motion.section>
       </div>
