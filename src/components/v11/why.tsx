@@ -8,10 +8,12 @@ import { useSectionProgress } from "@/components/system/use-section-progress";
 import { InView } from "@/components/ui/in-view";
 import { TextEffect } from "@/components/ui/text-effect";
 import { WHY } from "@/content/site";
-import { Icon3D, Tile } from "./bento";
+import { Tile } from "./bento";
+import { IconWell, useIconTurns } from "./icon-well";
+import type { IconName } from "./icons";
 
-/** v11: one icon per reason, in the order of WHY.reasons. */
-const REASON_ICONS = ["user-round-check", "megaphone", "bot", "handshake", "rocket", "presentation"];
+/** v11: one animated icon per reason, in the order of WHY.reasons. */
+const REASON_ICONS: IconName[] = ["user-check", "megaphone", "bot", "handshake", "rocket", "graduation-cap"];
 
 /*
   Warum Branded Genius, the page's "Über uns". The scroll expansion after 21st.dev's scroll-expansion hero, rebuilt
@@ -277,6 +279,7 @@ export function WhySection() {
     return g ? px(g.box.h) : "100%";
   });
   const veil = useTransform(() => VEIL * (1 - open.get()));
+  const { area: iconArea, well: iconWell, trigger: iconTrigger } = useIconTurns<HTMLUListElement>(WHY.reasons.length);
 
   return (
     <Section id="ueber-uns" className="why-section">
@@ -347,15 +350,16 @@ export function WhySection() {
         </InView>
 
         {/*
-          v11: the six reasons as a bento of tiles, each a large 3D icon and the title (the client: "a lot of text, this
-          should be a little bit less", and "maybe here some 3D icons"). Their sentences stay for screen readers.
+          v11: the six reasons as a bento of tiles, each an animated icon and the title (the client: "a lot of text,
+          this should be a little bit less"; the developer turned the rendered 3D icons down for animated ones). Their
+          sentences stay for screen readers.
         */}
         <InView variants={STAGGER} viewOptions={VIEW}>
-          <ul role="list" className="mt-12 grid grid-cols-2 gap-3 sm:gap-4 md:mt-14 lg:grid-cols-3">
+          <ul ref={iconArea} role="list" className="mt-12 grid grid-cols-2 gap-3 sm:gap-4 md:mt-14 lg:grid-cols-3">
             {WHY.reasons.map((reason, i) => (
               <motion.li key={reason.title} variants={RISE} transition={{ duration: 0.7, ease: EASE }}>
-                <Tile className="h-full min-h-[190px] sm:min-h-[220px]" layout="flex flex-col justify-between gap-8 p-5 sm:p-7">
-                  <Icon3D name={REASON_ICONS[i]} size={84} className="-mt-1 -ml-1 size-[60px] sm:size-[84px]" />
+                <Tile className="h-full min-h-[172px] sm:min-h-[200px]" layout="flex flex-col justify-between gap-8 p-5 sm:p-7" bind={iconTrigger(i)}>
+                  <IconWell ref={iconWell(i)} name={REASON_ICONS[i]} />
                   <div>
                     <h3 className="text-[17px] leading-snug font-medium tracking-[-0.01em] text-balance text-white sm:text-[20px]">{reason.title}</h3>
                     <p className="sr-only">{reason.text}</p>

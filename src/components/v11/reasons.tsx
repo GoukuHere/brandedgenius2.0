@@ -75,7 +75,7 @@ export function ReasonsSection() {
   );
 
   return (
-    <section ref={root} id="realitaet" aria-label={`${REALITY.title} ${REALITY.accent}`} className="relative overflow-x-clip py-16 md:flex md:min-h-[min(820px,100svh)] md:items-center md:py-24">
+    <section ref={root} id="realitaet" aria-label={`${REALITY.title} ${REALITY.accent}`} className="relative overflow-x-clip py-16 md:py-24">
       {/* Desktop: the photos fill the right of the section and dissolve into the page towards the text. */}
       <div aria-hidden className="v11-photo-fade absolute inset-y-0 right-0 hidden w-[56%] overflow-hidden md:block">
         <ReasonPhotos active={active} sizes="56vw" />

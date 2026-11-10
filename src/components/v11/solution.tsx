@@ -5,7 +5,9 @@ import { Fragment } from "react";
 import { Container, Heading, PrimaryLink, SecondaryLink, Section } from "@/components/system/primitives";
 import { Tilt } from "@/components/ui/tilt";
 import { LINKS, SOLUTION } from "@/content/site";
-import { Icon3D, Tile } from "./bento";
+import { Tile } from "./bento";
+import { IconWell, useIconTurns, type WellHandle } from "./icon-well";
+import type { IconName } from "./icons";
 
 /*
   v11 Lösung: v1's layout and spacing (the client: "keep that position and spaces"). A split: on the left the photo
@@ -39,18 +41,30 @@ function Joined({ items }: { items: readonly string[] }) {
 
 /*
   The three pillars, which the client found "not so good" in v1 (outlined numbers drawn by the scroll, hairlines
-  between): v11 makes them three bento tiles, each carried by a large 3D icon (a map for Plan, a network for
-  Systeme, people for Menschen) with its word and its items as small chips. They rise in once with the page's
-  entrance; nothing is tied to the scroll.
+  between): v11 makes them three bento tiles, each with an animated icon (a route for Plan, linked points for
+  Systeme, people for Menschen; the developer turned the rendered 3D icons down), its word and its items as small
+  chips. They rise in once with the page's entrance; nothing is tied to the scroll.
 */
-const PILLAR_ICONS = ["map", "network", "users"];
+const PILLAR_ICONS: IconName[] = ["route", "waypoints", "users"];
 
-function Pillar({ index, title, items }: { index: number; title: string; items: readonly string[] }) {
+function Pillar({
+  index,
+  title,
+  items,
+  well,
+  bind,
+}: {
+  index: number;
+  title: string;
+  items: readonly string[];
+  well: (handle: WellHandle | null) => void;
+  bind: ReturnType<ReturnType<typeof useIconTurns>["trigger"]>;
+}) {
   return (
     <li>
-      <Tile className="h-full" layout="flex flex-col justify-between gap-8 p-6 sm:p-8">
+      <Tile className="h-full" layout="flex flex-col justify-between gap-8 p-6 sm:p-8" bind={bind}>
         <div className="flex items-start justify-between gap-4">
-          <Icon3D name={PILLAR_ICONS[index]} size={88} className="-mt-1 -ml-1 size-[72px] sm:size-[88px]" />
+          <IconWell ref={well} name={PILLAR_ICONS[index]} />
           <span aria-hidden className="num text-[15px] text-sky">
             {pad(index)}
           </span>
@@ -71,6 +85,7 @@ function Pillar({ index, title, items }: { index: number; title: string; items: 
 }
 
 export function SolutionSection() {
+  const { area: iconArea, well: iconWell, trigger: iconTrigger } = useIconTurns<HTMLOListElement>(SOLUTION.pillars.length);
   return (
     <Section id="loesung">
       <Container>
@@ -124,9 +139,9 @@ export function SolutionSection() {
           </div>
         </div>
 
-        <ol role="list" data-reveal-group className="mt-16 grid gap-4 md:mt-24 md:grid-cols-3 md:gap-5 lg:mt-28">
+        <ol ref={iconArea} role="list" data-reveal-group className="mt-16 grid gap-4 md:mt-24 md:grid-cols-3 md:gap-5 lg:mt-28">
           {SOLUTION.pillars.map((pillar, i) => (
-            <Pillar key={pillar.title} index={i} title={pillar.title} items={pillar.items} />
+            <Pillar key={pillar.title} index={i} title={pillar.title} items={pillar.items} well={iconWell(i)} bind={iconTrigger(i)} />
           ))}
         </ol>
       </Container>

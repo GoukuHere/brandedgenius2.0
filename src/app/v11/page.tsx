@@ -6,6 +6,7 @@ import { PartnersSection } from "@/components/sections/partners";
 import { ProcessSection } from "@/components/sections/process";
 import { WorkshopSection } from "@/components/sections/workshop";
 import { RevealObserver } from "@/components/system/reveal-observer";
+import { SmoothScroll } from "@/components/system/smooth-scroll";
 import { V11Background } from "@/components/v11/background";
 import { CasesSection } from "@/components/v11/cases";
 import { CompareSection } from "@/components/v11/compare";
@@ -23,10 +24,11 @@ import "@/components/v11/v11.css";
 /*
   Version v11 (2026-11-10): v10 taken further at the developer's request ("v10 is not that good, avoid sections with
   too much text and use some cool layout for that, utilise 21st.dev, Magic UI"). Same base as v10: v1's page with the
-  client's changes from his two Loom videos, on v1's one fixed background in v2's light navy, normal scrolling, no
-  section sliding over another. What v11 adds: the text-heavy parts become bento layouts in which a real rendered
-  3D icon or one large figure carries each idea, with a short title instead of a paragraph. v1 and v10 stay as they
-  are. Kept out of search engines.
+  client's changes from his two Loom videos, on v1's one fixed background in v2's light navy, no section sliding over
+  another. What v11 adds: the text-heavy parts become bento layouts with animated icons; the Vorher/Nachher becomes
+  one drawing of the two ways; the Versprechen is v1's 3D card again, its figures counting up; the Use Cases are
+  v9's fan of glass layers. Second round (the developer's notes of 2026-11-10): v1's smooth scrolling and v1's
+  section rhythm. v1 and v10 stay as they are. Kept out of search engines.
 */
 export const metadata: Metadata = {
   title: "v11: Feedback Plus | Branded Genius",
@@ -61,6 +63,8 @@ export default function VersionElf() {
       </main>
       <Footer />
       <RevealObserver />
+      {/* v1's smooth scrolling (the developer: "add the smooth scroll on page we have on v1"). */}
+      <SmoothScroll />
     </div>
   );
 }

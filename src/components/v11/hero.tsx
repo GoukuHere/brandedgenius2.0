@@ -41,13 +41,28 @@ export function HeroIntoProblem() {
   useEffect(() => {
     const el = stage.current;
     if (!el) return undefined;
+    const facts = el.querySelector<HTMLElement>("#problem dl");
     const measure = () => {
       const slot = el.parentElement;
       geo.current = { top: slot ? slot.getBoundingClientRect().top + window.scrollY : 0, vh: el.offsetHeight || window.innerHeight };
+      /*
+        v1's rhythm after the zoom (the developer: "the spacing seems off between sections, v1 had good"): the panel
+        stands centred in the full-screen stage, so the half-screen under its facts would add to the gap before the
+        next section. The runway's foot is pulled up by exactly that excess, leaving v1's 96px (64px on phones) under
+        the facts before the next section's own padding. The stage still holds for the whole zoom (the runway keeps
+        its height); the next section just follows on closer. Measured in layout (offsets), not in the zoom's scale.
+      */
+      if (slot && facts) {
+        let bottom = facts.offsetHeight;
+        for (let node: HTMLElement | null = facts; node && node !== el; node = node.offsetParent as HTMLElement | null) bottom += node.offsetTop;
+        const keep = window.matchMedia("(min-width: 768px)").matches ? 96 : 64;
+        slot.style.setProperty("--v11-pull", `${Math.max(0, Math.round(el.offsetHeight - bottom - keep))}px`);
+      }
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
+    if (facts) ro.observe(facts);
     window.addEventListener("resize", measure);
     const io = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting));
     io.observe(el);
@@ -89,7 +104,7 @@ export function HeroIntoProblem() {
   const fade = (delay: number) => ({ initial: { opacity: 0, y: 18 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.9, delay, ease: EASE } });
 
   return (
-    <div className="relative" style={{ height: `${100 + ZOOM * 100}svh` }}>
+    <div className="relative" style={{ height: `${100 + ZOOM * 100}svh`, marginBottom: "calc(-1 * var(--v11-pull, 0px))" }}>
       <div ref={stage} className="sticky top-0 h-svh overflow-hidden">
         {/* The second section, waiting in the depth behind the hero: the top of v1's Problem section. */}
         <motion.section
@@ -99,7 +114,7 @@ export function HeroIntoProblem() {
           style={{ scale: panelScale, opacity: panelOpacity }}
           className="absolute inset-0 z-[1] will-change-transform motion-reduce:!transform-none"
         >
-          <ProblemTop />
+          <ProblemTop active={phase === "panel"} />
         </motion.section>
 
         {/* The hero: the film over the whole screen, only the headline and the two actions at its foot. */}
