@@ -1,36 +1,51 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useMotionValue, useMotionValueEvent, useSpring } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Container, Heading } from "@/components/system/primitives";
+import { useSectionProgress } from "@/components/system/use-section-progress";
 import { PROMISE } from "@/content/site";
 import { cn } from "@/lib/utils";
 import { PromiseCard } from "./promise-card";
 
 /*
-  v11 Unser Versprechen: v1's layout back (the developer: "we can utilize this from v1"): the 3D card with the
-  current figure on the left, the statement on the right, and under it v1's four ticks beside the current figure's
-  label. The four tiles of the first v11 are gone ("the text seems super big").
+  v11 Unser Versprechen: v1's section (the developer: "we can utilize this from v1", then "let it animate with
+  scrolling as it used to do in v1"): the 3D card with the current figure on the left, the statement on the right,
+  and under it v1's four ticks beside the current figure's label. Each figure counts up from zero on the card as it
+  arrives (v11).
 
-  No pinned scroll (the client: "not this scrolling by scrolling"): the section scrolls like any other. While it is
-  on screen the figures take turns on their own, DWELL ms each; each counts up from zero on the card as it arrives.
-  A tick is a button: picking one shows that figure and stops the turns (the visitor has taken over); hovering or
-  focusing the card or the ticks holds them. Reduced motion: no turns, the ticks still pick.
+  Desktop (lg, at least 720px tall), as in v1: a pinned scroll story. The section is a 320svh runway with a sticky
+  one-screen stage; the runway is cut into four equal steps, scroll-linked and reversible, and the card turns with
+  the scroll between them. A tick scrolls to its figure.
 
-  Phones: the card on top, full width, then the statement, the ticks and the label. Every figure is in the markup
-  for screen readers as one list; the card and the changing label are hidden from them.
+  Phones, tablets and short windows (where v1 did not pin and showed four small tiles, which the developer turned
+  down): the card on top, then the statement, the ticks and the label. While the section is on screen the figures
+  take turns on their own, DWELL ms each; a tick picks one and stops the turns, hovering or focusing holds them.
+  Reduced motion: no turns there, the ticks still pick.
+
+  Every figure is in the markup for screen readers as one list; the card and the changing label are hidden from them.
 */
 
 const FIGURES = PROMISE.figures;
 const COUNT = FIGURES.length;
 const DWELL = 4600;
 const EASE = [0.16, 1, 0.3, 1] as const;
+const PIN = "(min-width: 1024px) and (min-height: 720px)";
 
 // The title ends in a dash: a no-break space keeps it with "schafft", so no line ever starts with it.
 const TITLE = PROMISE.title.replace(/ –$/, " –");
 
+const stepAt = (progress: number) => Math.min(COUNT - 1, Math.max(0, Math.floor(progress * COUNT)));
+
 export function PromiseSection() {
-  const root = useRef<HTMLElement>(null);
+  const runway = useRef<HTMLElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  // 0 when the stage pins (section top at the screen top), 1 when it lets go (section bottom at the screen bottom).
+  const progress = useSectionProgress(runway, ["start start", "end end"]);
+  const smooth = useSpring(progress, { stiffness: 110, damping: 26, mass: 0.6, skipInitialAnimation: true });
+  const pinnedValue = useMotionValue(0);
+
+  const [pinned, setPinned] = useState(false);
   const [onScreen, setOnScreen] = useState(false);
   const [visible, setVisible] = useState(true);
   const [reduced, setReduced] = useState(false);
@@ -39,26 +54,39 @@ export function PromiseSection() {
   const [held, setHeld] = useState(false);
 
   useEffect(() => {
-    const el = root.current;
+    const el = stage.current;
     if (!el) return undefined;
     const io = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting), { threshold: 0.45 });
     io.observe(el);
     const onVisibility = () => setVisible(document.visibilityState === "visible");
     onVisibility();
     document.addEventListener("visibilitychange", onVisibility);
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onQuery = () => setReduced(query.matches);
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const pinQuery = window.matchMedia(PIN);
+    const onQuery = () => {
+      setReduced(motionQuery.matches);
+      setPinned(pinQuery.matches);
+      pinnedValue.set(pinQuery.matches ? 1 : 0);
+      if (pinQuery.matches) setStep(stepAt(smooth.get()));
+    };
     onQuery();
-    query.addEventListener("change", onQuery);
+    motionQuery.addEventListener("change", onQuery);
+    pinQuery.addEventListener("change", onQuery);
     return () => {
       io.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
-      query.removeEventListener("change", onQuery);
+      motionQuery.removeEventListener("change", onQuery);
+      pinQuery.removeEventListener("change", onQuery);
     };
-  }, []);
+  }, [pinnedValue, smooth]);
 
-  // The next figure after DWELL ms, while the section is on screen and nobody holds or has picked.
-  const turning = onScreen && visible && !held && !manual && !reduced;
+  // Pinned: the figure follows the scroll (v1's).
+  useMotionValueEvent(smooth, "change", (p) => {
+    if (pinnedValue.get()) setStep(stepAt(p));
+  });
+
+  // Not pinned: the next figure after DWELL ms, while the section is on screen and nobody holds or has picked.
+  const turning = !pinned && onScreen && visible && !held && !manual && !reduced;
   useEffect(() => {
     if (!turning) return undefined;
     const id = window.setTimeout(() => setStep((s) => (s + 1) % COUNT), DWELL);
@@ -66,40 +94,60 @@ export function PromiseSection() {
   }, [turning, step]);
 
   const pick = (i: number) => {
+    const el = runway.current;
+    if (pinned && el) {
+      // Scroll to the middle of that figure's step on the runway.
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const travel = el.offsetHeight - window.innerHeight;
+      window.scrollTo({ top: top + ((i + 0.5) / COUNT) * travel, behavior: reduced ? "auto" : "smooth" });
+      return;
+    }
     setManual(true);
     setStep(i);
   };
-  const hold = {
-    onPointerEnter: () => setHeld(true),
-    onPointerLeave: () => setHeld(false),
-    onFocus: () => setHeld(true),
-    onBlur: () => setHeld(false),
-  };
+  const hold = pinned
+    ? {}
+    : {
+        onPointerEnter: () => setHeld(true),
+        onPointerLeave: () => setHeld(false),
+        onFocus: () => setHeld(true),
+        onBlur: () => setHeld(false),
+      };
 
   return (
-    <section ref={root} id="mehrwert" className="relative py-16 md:py-24">
-      <Container className="grid items-center gap-y-10 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-x-[clamp(56px,6vw,112px)]">
-        <div aria-hidden data-reveal="up" className="mx-auto w-full max-w-[420px] lg:mx-0 lg:max-w-none" {...hold}>
-          <PromiseCard step={step} live={onScreen} />
-        </div>
-
-        <div className="min-w-0">
-          <Heading title={TITLE} accent={PROMISE.accent} className="max-w-[880px] text-[length:clamp(2.125rem,1.25rem+2.2vw,3.25rem)]" />
-
-          <div data-reveal="up" data-rd="2" className="mt-10 flex items-center gap-5 xl:mt-14" {...hold}>
-            <Ticks step={step} onPick={pick} />
-            <Label step={step} />
+    <section
+      ref={runway}
+      id="mehrwert"
+      className="relative py-16 md:py-24 lg:[@media(min-height:720px)]:h-[320svh] lg:[@media(min-height:720px)]:py-0"
+    >
+      {/* The stage: pinned for the length of the runway on desktop, its content centred below the fixed header. */}
+      <div
+        ref={stage}
+        className="lg:[@media(min-height:720px)]:sticky lg:[@media(min-height:720px)]:top-0 lg:[@media(min-height:720px)]:flex lg:[@media(min-height:720px)]:h-svh lg:[@media(min-height:720px)]:items-center lg:[@media(min-height:720px)]:pt-20"
+      >
+        <Container className="grid items-center gap-y-10 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-x-[clamp(56px,6vw,112px)]">
+          <div aria-hidden data-reveal="up" className="mx-auto w-full max-w-[420px] lg:mx-0 lg:max-w-none" {...hold}>
+            <PromiseCard step={step} live={onScreen} progress={smooth} scrollDriven={pinnedValue} />
           </div>
 
-          <ul role="list" className="sr-only">
-            {FIGURES.map((figure) => (
-              <li key={figure.value}>
-                {figure.value}: {figure.label}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Container>
+          <div className="min-w-0">
+            <Heading title={TITLE} accent={PROMISE.accent} className="max-w-[880px] text-[length:clamp(2.125rem,1.25rem+2.2vw,3.25rem)]" />
+
+            <div data-reveal="up" data-rd="2" className="mt-10 flex items-center gap-5 xl:mt-14" {...hold}>
+              <Ticks step={step} onPick={pick} />
+              <Label step={step} />
+            </div>
+
+            <ul role="list" className="sr-only">
+              {FIGURES.map((figure) => (
+                <li key={figure.value}>
+                  {figure.value}: {figure.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Container>
+      </div>
     </section>
   );
 }

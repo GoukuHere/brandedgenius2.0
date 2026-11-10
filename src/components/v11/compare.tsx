@@ -130,7 +130,8 @@ function smooth(points: Pt[]) {
 
 export function CompareSection() {
   return (
-    <Section id="unterschied">
+    // Where the Versprechen below pins (its stage centres the card in the screen), v1's smaller foot keeps v1's gap.
+    <Section id="unterschied" className="lg:[@media(min-height:720px)]:pb-12">
       <Container>
         <div className="max-w-[920px]">
           <Heading title={COMPARE.title} accent={COMPARE.accent} />

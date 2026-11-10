@@ -1,6 +1,6 @@
 "use client";
 
-import { animate, motion, useMotionValue, useTransform } from "motion/react";
+import { animate, motion, useMotionValue, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef, type CSSProperties } from "react";
 import { Tilt } from "@/components/ui/tilt";
 import { PROMISE } from "@/content/site";
@@ -14,10 +14,12 @@ import { CountUp, RiseLetters } from "./count";
 
   - Each figure counts up from zero when it arrives (both ends of "3–6" and "40–70 %"); "Nachhaltig", which has no
     number, rises in letter by letter.
-  - At each change the card swings 14 degrees to one side and back to face the reader (alternating sides), the move
-    v1 made on the scroll, here on its own time; the old figure slides out as the new one slides in (v1's).
+  - Where the section pins (`scrollDriven` is 1), the card turns with the scroll exactly as in v1: at every change of
+    figure it stands 14 degrees to one side (alternating sides) and for the middle half of each step it faces the
+    reader. Elsewhere it makes the same swing on its own time at each change. The old figure slides out as the new
+    one slides in (v1's).
   - The pointer tilts the card (Motion Primitives Tilt, mouse only).
-  Reduced motion: no swing and no tilt, the figures simply stand.
+  Reduced motion: no turn and no tilt, the figures simply stand.
 */
 
 const FIGURES = PROMISE.figures;
@@ -28,7 +30,23 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const VALUE_PX = 76;
 const TURN_Y = 14;
 const TURN_X = 4;
+/** Share of each step spent turning in from the last change of figure, and again turning out towards the next. */
+const TURN_SHARE = 0.25;
 const TILT_SPRING = { stiffness: 160, damping: 20, mass: 0.6 };
+
+const smoothstep = (t: number) => t * t * (3 - 2 * t);
+
+/** v1's turn at a runway progress, from -1 to 1 (0 while a figure faces the reader). */
+function turnAt(progress: number) {
+  const x = Math.min(1, Math.max(0, progress)) * STEPS;
+  const step = Math.min(STEPS - 1, Math.floor(x));
+  const t = x - step;
+  // The side the card stands at when this step begins; the next step begins at the other side.
+  const side = step % 2 === 0 ? -1 : 1;
+  if (t < TURN_SHARE) return side * (1 - smoothstep(t / TURN_SHARE));
+  if (t > 1 - TURN_SHARE) return -side * smoothstep((t - (1 - TURN_SHARE)) / TURN_SHARE);
+  return 0;
+}
 
 /* A 1px sky grid, pure CSS, fading out towards the card's middle. */
 const GRID: CSSProperties = {
@@ -42,24 +60,42 @@ const GRID: CSSProperties = {
 
 const hasNumber = (value: string) => /\d/.test(value);
 
-export function PromiseCard({ step, live }: { step: number; live: boolean }) {
+export function PromiseCard({
+  step,
+  live,
+  progress,
+  scrollDriven,
+}: {
+  step: number;
+  live: boolean;
+  /** The section's (smoothed) runway progress. */
+  progress: MotionValue<number>;
+  /** 1 where the section pins and the card turns with the scroll, 0 where it swings on its own. */
+  scrollDriven: MotionValue<number>;
+}) {
   const valuesRef = useRef<HTMLDivElement>(null);
-  const turn = useMotionValue(0);
-  const rotateY = useTransform(turn, (t) => TURN_Y * t);
-  const rotateX = useTransform(turn, (t) => TURN_X * Math.abs(t));
+  const swing = useMotionValue(0);
+  // Every source is read on every frame, so each stays subscribed whichever one drives the card.
+  const turn = useTransform(() => {
+    const scrolled = turnAt(progress.get());
+    const timed = swing.get();
+    return scrollDriven.get() ? scrolled : timed;
+  });
+  const rotateY = useTransform(() => TURN_Y * turn.get());
+  const rotateX = useTransform(() => TURN_X * Math.abs(turn.get()));
   const firstStep = useRef(true);
 
-  // The swing at each change of figure (not for the first one).
+  // The swing at each change of figure (not for the first one), where the scroll does not turn the card.
   useEffect(() => {
     if (firstStep.current) {
       firstStep.current = false;
       return undefined;
     }
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    if (scrollDriven.get() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
     const side = step % 2 === 0 ? -1 : 1;
-    const controls = animate(turn, [0, side, 0], { duration: 1.3, times: [0, 0.3, 1], ease: ["easeIn", EASE] });
+    const controls = animate(swing, [0, side, 0], { duration: 1.3, times: [0, 0.3, 1], ease: ["easeIn", EASE] });
     return () => controls.stop();
-  }, [step, turn]);
+  }, [step, swing, scrollDriven]);
 
   // Fit each value to the card's inner width (v1's): measured in em at its current size, so it scales exactly. Runs
   // once the brand font is in, and whenever the card changes size.

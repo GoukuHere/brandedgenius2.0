@@ -136,7 +136,42 @@ body:has(.v11) {
   transition-duration: 0.25s;
 }
 
-/* The shared glass panels, a step lighter on navy than on black; the header bar in navy. */
+/* ---------- Header ---------- */
+
+/*
+  The header bar as glass (the developer: "keep the CTA blue, but make the nav glass, not blue"): a clear,
+  white-tinted pane with a strong backdrop blur and a hairline, at the top of the page and once it scrolls; the
+  phone menu's panel the same. The blur also drains most of the colour from what lies behind (saturate 0.3): over
+  the blue page, a clear pane would otherwise read as a blue bar. The contact button keeps its blue: a navy-blue
+  fill with a sky rim, royal on hover.
+*/
+.v11 header .glass-blur,
+.v11 header .bg-page\/40 {
+  background-color: rgb(255 255 255 / 0.07);
+  -webkit-backdrop-filter: blur(22px) saturate(0.3);
+  backdrop-filter: blur(22px) saturate(0.3);
+}
+.v11 header .glass-blur::before {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    inset 0 0 0 1px rgb(255 255 255 / 0.12);
+}
+.v11 header .bg-\[\#161616\] {
+  background-color: rgb(255 255 255 / 0.08);
+  -webkit-backdrop-filter: blur(28px) saturate(0.3) brightness(0.8);
+  backdrop-filter: blur(28px) saturate(0.3) brightness(0.8);
+}
+.v11 header .specular-button[data-kind="secondary"] {
+  background-color: #0a2a62;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 0 0 1px rgb(105 191 248 / 0.42);
+}
+.v11 header .specular-button[data-kind="secondary"]:hover {
+  background-color: #0857bd;
+}
+
+/* The shared glass panels, a step lighter on navy than on black. */
 .v11 .glass {
   background-color: rgb(255 255 255 / 0.05);
 }
@@ -293,31 +328,21 @@ body:has(.v11) {
 /* ---------- Use Cases fan (cases.tsx) ---------- */
 
 /*
-  Six layers, each with its own 3D transform under one perspective (no shared 3D space, so the drawing order is the
-  z-index: a travelling layer never cuts through another). A layer's slot: --slot steps of (--dx, --dy, --dz) from
-  the front, all turned by --ry/--rx. The current one ([data-on]) leaves its slot for the front pose (--ax, --ay,
-  --az, turned less, towards the reader). Opaque navy, so the layers never show through each other.
+  A deck of six cards (cases.tsx sets each card's transform, opacity and stacking from the deck's position; the
+  geometry is there too). Each card has its own 3D transform under one perspective (no shared 3D space, so the
+  drawing order is the z-index: a travelling card never cuts through another). Opaque navy, so the cards never
+  show through each other; each strip above the card in front holds a whole number-and-name row.
 */
 .v11-fan {
   position: relative;
-  height: 520px;
+  height: 540px;
   perspective: 1500px;
 }
-/* Each back layer shows a strip of --dy above the one in front: enough for its whole number-and-name row. */
+/* Phones: tall enough for the longest case on a 360px phone (measured: 336px). */
 .v11-fan-layer {
   --w: min(300px, 80vw);
-  --h: 290px;
-  --base-y: 100px;
-  --dx: 6px;
-  --dy: -40px;
-  --dz: -36px;
-  --ry: 16deg;
-  --rx: 4deg;
-  --ax: -3%;
-  --ay: 10%;
-  --az: 60px;
-  --ary: 7deg;
-  --arx: 2deg;
+  --h: 340px;
+  --base-y: 72px;
   position: absolute;
   left: 50%;
   top: calc(50% + var(--base-y));
@@ -333,13 +358,9 @@ body:has(.v11) {
     inset 0 1px 0 rgb(255 255 255 / 0.1),
     inset 0 0 0 1px rgb(255 255 255 / 0.09),
     0 30px 60px -30px rgb(1 4 12 / 0.9);
-  opacity: calc(1 - var(--slot) * 0.08);
-  transform: translate(-50%, -50%) translate3d(calc(var(--slot) * var(--dx)), calc(var(--slot) * var(--dy)), calc(var(--slot) * var(--dz)))
-    rotateY(var(--ry)) rotateX(var(--rx));
-  transition:
-    transform 0.95s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.6s ease;
   backface-visibility: hidden;
+  /* Decorative: a card swiping away over the area list must never catch its clicks. */
+  pointer-events: none;
 }
 /* The current layer's light: a royal corner, a sky rim and a glow, faded in (opacity only). */
 .v11-fan-layer::before {
@@ -361,28 +382,12 @@ body:has(.v11) {
   position: relative;
   z-index: 1;
 }
-.v11-fan-layer[data-on] {
-  opacity: 1;
-  transform: translate(-50%, -50%) translate3d(var(--ax), var(--ay), var(--az)) rotateY(var(--ary)) rotateX(var(--arx));
-}
 .v11-fan-layer[data-on]::before {
   opacity: 1;
 }
-/* The headline and results: only on the current layer, after it has arrived. */
+/* The case (headline and results), on the card in front only (its opacity follows the deck, cases.tsx). */
 .v11-fan-detail {
   margin-top: 18px;
-  opacity: 0;
-  transform: translateY(8px);
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
-}
-.v11-fan-layer[data-on] .v11-fan-detail {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 0.6s ease 0.3s,
-    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
 }
 @media (min-width: 640px) {
   .v11-fan {
@@ -390,14 +395,8 @@ body:has(.v11) {
   }
   .v11-fan-layer {
     --w: 440px;
-    --h: 280px;
+    --h: 300px;
     --base-y: 90px;
-    --dx: 20px;
-    --dy: -46px;
-    --dz: -44px;
-    --ax: -8%;
-    --ay: 14%;
-    --az: 90px;
     padding: 15px 28px 24px;
   }
 }
@@ -409,17 +408,45 @@ body:has(.v11) {
     --w: 520px;
     --h: 290px;
     --base-y: 90px;
-    --dx: 30px;
-    --dy: -50px;
-    --dz: -48px;
-    --ry: 20deg;
-    --rx: 4deg;
-    --ax: -10%;
-    --ay: 15%;
-    --az: 110px;
-    --ary: 9deg;
-    --arx: 2deg;
     padding: 16px 32px 28px;
+  }
+}
+/* Shorter desktop windows: the whole deck a size smaller, so the held stage still fits under the header. */
+@media (min-width: 1024px) and (max-height: 780px) {
+  .v11-fan {
+    zoom: 0.84;
+  }
+}
+
+/*
+  The held stage (cases.tsx, PIN): where it fits, the deck's runway is REST + 5 + REST half-screen steps long and its
+  stage sticks for that length, the deck and the area list centred under the header. Elsewhere it is a plain block.
+*/
+.v11-cases-runway {
+  margin-top: 40px;
+}
+@media (min-width: 768px) {
+  .v11-cases-runway {
+    margin-top: 56px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (min-width: 1024px) and (min-height: 640px),
+  (prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 760px) {
+  .v11-cases {
+    padding-bottom: 0;
+  }
+  .v11-cases-runway {
+    height: 400svh;
+    margin-top: 0;
+  }
+  .v11-cases-stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: 100svh;
+    padding-top: 84px;
+    padding-bottom: 12px;
   }
 }
 
@@ -597,9 +624,7 @@ body:has(.v11) {
     animation: none;
     transform: scaleX(1);
   }
-  .v11-fan-layer,
-  .v11-fan-layer::before,
-  .v11-fan-detail {
+  .v11-fan-layer::before {
     transition: none;
   }
 }
