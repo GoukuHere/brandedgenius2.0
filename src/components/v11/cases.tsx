@@ -19,7 +19,7 @@ import { CountUp } from "./count";
   already seen have swiped away: up and to the left, turning and fading. So the deck is always in order, from the
   card being read to the last one, with no gaps.
 
-  Scrolling (desktop at least 640px tall, phones at least 760px tall): the section holds on a sticky stage while you
+  Scrolling (desktop and phones at least 640px tall; shorter phones get the deck a size smaller): the section holds on a sticky stage while you
   scroll REST + 5 + REST steps of half a screen; each card rests in front for a while, then swipes away and the next
   comes forward, all on the scroll and reversible. Picking an area scrolls to its card. Beside the deck (desktop) a
   quiet list of the six areas marks the current one; on phones the areas are buttons under the deck.
@@ -41,7 +41,7 @@ const UNITS = COUNT - 1 + 2 * REST;
 const EASE = [0.16, 1, 0.3, 1] as const;
 const PIN =
   "(prefers-reduced-motion: no-preference) and (min-width: 1024px) and (min-height: 640px), " +
-  "(prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 760px)";
+  "(prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 640px)";
 
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));

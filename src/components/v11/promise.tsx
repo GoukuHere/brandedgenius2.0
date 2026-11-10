@@ -14,13 +14,14 @@ import { PromiseCard } from "./promise-card";
   and under it v1's four ticks beside the current figure's label. Each figure counts up from zero on the card as it
   arrives (v11).
 
-  Desktop (lg, at least 720px tall), as in v1: a pinned scroll story. The section is a 320svh runway with a sticky
-  one-screen stage; the runway is cut into four equal steps, scroll-linked and reversible, and the card turns with
-  the scroll between them. A tick scrolls to its figure.
+  Desktop (lg, at least 720px tall) as in v1, and phones and tablets at least 640px tall (the developer: "it should
+  do the same thing on mobile too"): a pinned scroll story. The section is a 320svh runway with a sticky one-screen
+  stage; the runway is cut into four equal steps, scroll-linked and reversible, and the card turns with the scroll
+  between them. A tick scrolls to its figure. Phones stack the card, the statement and the ticks with the label on
+  the stage, sized to fit a 667px screen.
 
-  Phones, tablets and short windows (where v1 did not pin and showed four small tiles, which the developer turned
-  down): the card on top, then the statement, the ticks and the label. While the section is on screen the figures
-  take turns on their own, DWELL ms each; a tick picks one and stops the turns, hovering or focusing holds them.
+  Short windows (phones on their side, desktop windows under 720px): the figures take turns on their own while the
+  section is on screen, DWELL ms each; a tick picks one and stops the turns, hovering or focusing holds them.
   Reduced motion: no turns there, the ticks still pick.
 
   Every figure is in the markup for screen readers as one list; the card and the changing label are hidden from them.
@@ -30,7 +31,9 @@ const FIGURES = PROMISE.figures;
 const COUNT = FIGURES.length;
 const DWELL = 4600;
 const EASE = [0.16, 1, 0.3, 1] as const;
-const PIN = "(min-width: 1024px) and (min-height: 720px)";
+// Keep in step with v11.css (.v11-promise): desktop as in v1, and phones and tablets too (the developer: "it should do
+// the same thing on mobile too, scrolling").
+const PIN = "(min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 640px)";
 
 // The title ends in a dash: a no-break space keeps it with "schafft", so no line ever starts with it.
 const TITLE = PROMISE.title.replace(/ –$/, " –");
@@ -115,17 +118,10 @@ export function PromiseSection() {
       };
 
   return (
-    <section
-      ref={runway}
-      id="mehrwert"
-      className="relative py-16 md:py-24 lg:[@media(min-height:720px)]:h-[320svh] lg:[@media(min-height:720px)]:py-0"
-    >
-      {/* The stage: pinned for the length of the runway on desktop, its content centred below the fixed header. */}
-      <div
-        ref={stage}
-        className="lg:[@media(min-height:720px)]:sticky lg:[@media(min-height:720px)]:top-0 lg:[@media(min-height:720px)]:flex lg:[@media(min-height:720px)]:h-svh lg:[@media(min-height:720px)]:items-center lg:[@media(min-height:720px)]:pt-20"
-      >
-        <Container className="grid items-center gap-y-10 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-x-[clamp(56px,6vw,112px)]">
+    <section ref={runway} id="mehrwert" className="v11-promise relative py-16 md:py-24">
+      {/* The stage: pinned for the length of the runway (v11.css), its content centred below the fixed header. */}
+      <div ref={stage} className="v11-promise-stage">
+        <Container className="v11-promise-grid grid items-center gap-y-10 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-x-[clamp(56px,6vw,112px)]">
           <div aria-hidden data-reveal="up" className="mx-auto w-full max-w-[420px] lg:mx-0 lg:max-w-none" {...hold}>
             <PromiseCard step={step} live={onScreen} progress={smooth} scrollDriven={pinnedValue} />
           </div>
@@ -133,7 +129,7 @@ export function PromiseSection() {
           <div className="min-w-0">
             <Heading title={TITLE} accent={PROMISE.accent} className="max-w-[880px] text-[length:clamp(2.125rem,1.25rem+2.2vw,3.25rem)]" />
 
-            <div data-reveal="up" data-rd="2" className="mt-10 flex items-center gap-5 xl:mt-14" {...hold}>
+            <div data-reveal="up" data-rd="2" className="v11-promise-steps mt-10 flex items-center gap-5 xl:mt-14" {...hold}>
               <Ticks step={step} onPick={pick} />
               <Label step={step} />
             </div>
