@@ -24,6 +24,7 @@ export const VERSIONS = [
   { href: "/v8", label: "v8", name: "Kristall" },
   { href: "/v9", label: "v9", name: "Obsidian" },
   { href: "/v10", label: "v10", name: "Feedback" },
+  { href: "/v11", label: "v11", name: "Feedback Plus" },
 ] as const;
 
 export function VersionNav() {

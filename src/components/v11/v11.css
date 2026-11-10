@@ -1,0 +1,261 @@
+/*
+  v11 (2026-11-10): v10 taken further at the developer's request ("v10 is not that good, avoid sections with too much
+  text and use some cool layout for that, utilise 21st.dev, Magic UI"). The base is v10's: v1's page with the
+  client's changes, on v1's one fixed background in v2's light navy, normal scrolling, no section sliding over
+  another. On top: bento tiles (bento.tsx, Magic UI's MagicCard and BorderBeam) in which a rendered 3D icon or one
+  large figure carries each idea. Only /v11 imports this file.
+
+  The theme tokens are re-pointed to v2's navy inside .v11, so every v1 section used unchanged (Ablauf, Workshop,
+  Partner, Kontakt, header, footer) follows without a copy.
+*/
+
+.v11 {
+  --color-page: #040c1e;
+  --color-deep: #071737;
+  --color-panel: #0a1d44;
+  --color-panel-hi: #0f2754;
+  --color-silver: rgb(241 241 238 / 0.62);
+  position: relative;
+  isolation: isolate;
+  color: #f1f1ee;
+}
+
+/* The ground below the page (where the browser overscrolls). */
+body:has(.v11) {
+  background: #061536;
+}
+
+/* ---------- The one background ---------- */
+
+/*
+  v1's single fixed background (V11Background) in v2's colours: the "light navy blue" of v2's closing panel, which
+  the client pointed at ("this kind of light navy blue ... keep that in the full page"), with its royal light from
+  the top left and its sky light from the foot, v1's thin flowing lines and v2's grain. Fixed, so it never repaints.
+*/
+.v11-ground {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 90% at 85% 110%, rgb(105 191 248 / 0.3), rgb(105 191 248 / 0) 70%),
+    radial-gradient(80% 100% at 10% -10%, rgb(0 75 160 / 0.7), rgb(0 75 160 / 0) 70%),
+    linear-gradient(160deg, #0a2a62 0%, #061536 100%);
+}
+.v11-ground-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ---------- Surfaces ---------- */
+
+/* A bento tile: light navy glass, a hairline and a top light, a soft drop shadow (bento.tsx). */
+.v11-tile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgb(105 191 248 / 0.07), rgb(105 191 248 / 0) 60%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.025));
+  box-shadow: 0 30px 60px -36px rgb(1 4 12 / 0.95);
+}
+.v11-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  pointer-events: none;
+}
+/* The featured tile: a royal light from its corner. */
+.v11-tile-featured {
+  background:
+    radial-gradient(90% 90% at 100% 0%, rgb(26 111 224 / 0.35), rgb(26 111 224 / 0) 65%),
+    radial-gradient(80% 70% at 0% 100%, rgb(105 191 248 / 0.12), rgb(105 191 248 / 0) 60%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.03));
+}
+
+/* The shared glass panels, a step lighter on navy than on black; the header bar in navy. */
+.v11 .glass {
+  background-color: rgb(255 255 255 / 0.05);
+}
+.v11 .glass-blur {
+  background-color: rgb(4 12 30 / 0.8);
+}
+
+/* A panel with its own royal light: the service plates and the three pillars. Opaque, so a plate stacked over
+   another never lets it show through. */
+.v11-plate {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background:
+    radial-gradient(70% 90% at 100% 0%, rgb(0 75 160 / 0.5), rgb(0 75 160 / 0) 70%),
+    radial-gradient(60% 70% at 0% 100%, rgb(26 111 224 / 0.2), rgb(26 111 224 / 0) 70%),
+    linear-gradient(165deg, #0a2150 0%, #061331 100%);
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.9);
+}
+.v11-plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 1px rgb(255 255 255 / 0.07);
+  pointer-events: none;
+}
+
+/* The plate in front: a brighter rim (v1's glass-lit, on navy). */
+.v11-plate-lit::after {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    inset 0 0 0 1px rgb(105 191 248 / 0.3);
+}
+
+/*
+  The service drawings are made for a matte grey plate; screened over navy, the plate turns blue and the lines stay
+  bright. A drawing redraws every frame while it plays, so it gets its own layer on an opaque navy, and its frames
+  never repaint what lies under it.
+*/
+.v11-scene {
+  isolation: isolate;
+  background-color: #06142f;
+  will-change: transform;
+}
+.v11-scene svg {
+  mix-blend-mode: screen;
+}
+
+/* The testimonial arrows, beside the arc at its middle (the client: "better visible, not so in the bottom"). */
+.v11-step {
+  background-color: rgb(5 15 36 / 0.78);
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.5),
+    0 16px 32px -12px rgb(0 0 0 / 0.85);
+}
+.v11-step:hover {
+  background-color: #0857bd;
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.85),
+    0 18px 38px -12px rgb(26 116 224 / 0.7);
+}
+
+/*
+  The shared buttons in v2's colours: the main one royal with a sky rim and a passing light (as v2's), the second
+  one clear with a hairline. Their edge light (WebGL) is drawn for a cream button, so it is left out on the royal one.
+*/
+.v11 .specular-button[data-kind="primary"] {
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(100deg, #003a82 0%, #0857bd 52%, #1a74e0 100%);
+  background-size: 170% 100%;
+  background-position: 0% 0;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.26),
+    inset 0 0 0 1px rgb(105 191 248 / 0.38),
+    0 16px 36px -16px rgb(26 116 224 / 0.85);
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.4s ease,
+    background-position 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.v11 .specular-button[data-kind="primary"]:hover {
+  background-position: 100% 0;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.32),
+    inset 0 0 0 1px rgb(105 191 248 / 0.7),
+    0 20px 44px -14px rgb(105 191 248 / 0.6);
+}
+.v11 .specular-button[data-kind="primary"] .specular-button__light {
+  display: none;
+}
+.v11 .specular-button[data-kind="primary"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -70%;
+  z-index: 1;
+  width: 50%;
+  pointer-events: none;
+  background: linear-gradient(100deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.34), rgb(255 255 255 / 0));
+  transform: skewX(-18deg);
+}
+/* The light passes once on hover; it no longer runs on its own (the client: "too many animations"). */
+.v11 .specular-button[data-kind="primary"]:hover::before {
+  animation: v11-pass-once 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes v11-pass-once {
+  from {
+    left: -70%;
+  }
+  to {
+    left: 130%;
+  }
+}
+.v11 .specular-button[data-kind="primary"] .specular-button__label {
+  position: relative;
+  z-index: 2;
+}
+.v11 .specular-button[data-kind="secondary"] {
+  background-color: rgb(255 255 255 / 0.04);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
+}
+.v11 .specular-button[data-kind="secondary"]:hover {
+  background-color: rgb(105 191 248 / 0.1);
+}
+
+/* ---------- Hero ---------- */
+
+/* Below 1024px the film sits above the headline; its foot dissolves into the headline's ground. */
+@media (max-width: 1023px) {
+  .v11-film-phone {
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
+  }
+}
+
+/* The Problem photos fill the right of the panel and dissolve into its light towards the text (v2's). */
+.v11-photo-fade {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+}
+
+/* A story bar: fills over the reason's time on screen, then the next reason follows. */
+@keyframes v11-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.v11-bar-fill {
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.v11-bar-fill[data-state="done"] {
+  transform: scaleX(1);
+}
+.v11-bar-fill[data-state="running"] {
+  animation: v11-fill var(--v11-dwell, 5000ms) linear forwards;
+}
+.v11-bar-fill[data-state="running"][data-paused] {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v11 .specular-button[data-kind="primary"]::before {
+    display: none;
+  }
+  .v11-bar-fill[data-state="running"] {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
