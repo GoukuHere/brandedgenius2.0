@@ -19,7 +19,7 @@ import { CountUp } from "./count";
   already seen have swiped away: up and to the left, turning and fading. So the deck is always in order, from the
   card being read to the last one, with no gaps.
 
-  Scrolling (desktop and phones at least 640px tall; shorter phones get the deck a size smaller): the section holds on a sticky stage while you
+  Scrolling (desktop at least 640px tall, phones at least 600px, sized for Safari's own screen height): the section holds on a sticky stage while you
   scroll REST + 5 + REST steps of half a screen; each card rests in front for a while, then swipes away and the next
   comes forward, all on the scroll and reversible. Picking an area scrolls to its card. Beside the deck (desktop) a
   quiet list of the six areas marks the current one; on phones the areas are buttons under the deck.
@@ -41,7 +41,7 @@ const UNITS = COUNT - 1 + 2 * REST;
 const EASE = [0.16, 1, 0.3, 1] as const;
 const PIN =
   "(prefers-reduced-motion: no-preference) and (min-width: 1024px) and (min-height: 640px), " +
-  "(prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 640px)";
+  "(prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 600px)";
 
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -53,11 +53,45 @@ function staircase(k: number) {
   return i + smoothstep(clamp((k - i - 0.2) / 0.6, 0, 1));
 }
 
-/** The deck's geometry for a screen size (px and degrees). The card's size and padding are in v11.css. */
-type Geo = { w: number; h: number; dx: number; dy: number; dz: number; ry: number; rx: number; ax: number; ay: number; az: number; ary: number; arx: number };
-const PHONE: Geo = { w: 300, h: 340, dx: 6, dy: -40, dz: -36, ry: 16, rx: 4, ax: -9, ay: 32, az: 60, ary: 7, arx: 2 };
-const TABLET: Geo = { w: 440, h: 300, dx: 20, dy: -46, dz: -44, ry: 16, rx: 4, ax: -35, ay: 42, az: 90, ary: 7, arx: 2 };
-const DESK: Geo = { w: 520, h: 290, dx: 30, dy: -50, dz: -48, ry: 20, rx: 4, ax: -52, ay: 44, az: 110, ary: 9, arx: 2 };
+/*
+  The deck's geometry for a screen size (px and degrees): the card's size, the deck's height and where its slots
+  sit, so a held stage fits the screen. Explicit sizes only, never CSS zoom: iOS Safari zooms a box but not its text,
+  so a zoomed card spilled its words (the developer's iPhone: labels wrapping, results cut at the foot).
+  - fanH: the deck's height; top: where the front slot sits below the deck's middle.
+  - dx, dy, dz: one slot further back; ry, rx: how the slots are turned.
+  - ax, ay, az, ary, arx: the front card's pose.
+  Phones size for Safari's own screen height (about 660 to 750px with its bars): a compact card and slim strips.
+*/
+type Geo = {
+  w: number;
+  h: number;
+  fanH: number;
+  top: number;
+  dx: number;
+  dy: number;
+  dz: number;
+  ry: number;
+  rx: number;
+  ax: number;
+  ay: number;
+  az: number;
+  ary: number;
+  arx: number;
+};
+const DESK: Geo = { w: 520, h: 290, fanH: 600, top: 90, dx: 30, dy: -50, dz: -48, ry: 20, rx: 4, ax: -52, ay: 44, az: 110, ary: 9, arx: 2 };
+const DESK_SHORT: Geo = { w: 460, h: 272, fanH: 500, top: 76, dx: 26, dy: -40, dz: -42, ry: 18, rx: 4, ax: -46, ay: 36, az: 90, ary: 8, arx: 2 };
+const TABLET: Geo = { w: 440, h: 300, fanH: 560, top: 90, dx: 20, dy: -46, dz: -44, ry: 16, rx: 4, ax: -35, ay: 42, az: 90, ary: 7, arx: 2 };
+/* Phones: a compact card; under 660px of screen (an iPhone mini in Safari) the strips a little slimmer still. */
+const phoneGeo = (width: number, height: number): Geo => {
+  const w = Math.min(330, Math.round(width * 0.88));
+  const short = height < 660;
+  return { w, h: 272, fanH: short ? 400 : 420, top: 66, dx: 5, dy: short ? -24 : -28, dz: -30, ry: 14, rx: 4, ax: -8, ay: 22, az: 46, ary: 6, arx: 2 };
+};
+function geoFor(): Geo {
+  if (window.matchMedia("(min-width: 1024px)").matches) return window.matchMedia("(max-height: 780px)").matches ? DESK_SHORT : DESK;
+  if (window.matchMedia("(min-width: 640px)").matches) return TABLET;
+  return phoneGeo(window.innerWidth, window.innerHeight);
+}
 
 /**
  * A card's pose from its place in the deck: r = 0 is the front, r = 1, 2 ... the slots behind it, and below 0 the card
@@ -95,6 +129,7 @@ export function CasesSection() {
   const pinnedValue = useMotionValue(0);
   const timed = useMotionValue(0);
   const geo = useMotionValue<Geo>(DESK);
+  const [size, setSize] = useState<Geo>(DESK);
 
   // Where the deck stands: on the scroll where the section pins, else on its own time.
   const deck = useTransform(() => {
@@ -123,19 +158,21 @@ export function CasesSection() {
     onVisibility();
     document.addEventListener("visibilitychange", onVisibility);
     const pinQuery = window.matchMedia(PIN);
-    const desk = window.matchMedia("(min-width: 1024px)");
-    const tablet = window.matchMedia("(min-width: 640px)");
     const onQuery = () => {
       setPinned(pinQuery.matches);
       pinnedValue.set(pinQuery.matches ? 1 : 0);
-      geo.set(desk.matches ? DESK : tablet.matches ? TABLET : PHONE);
+      const g = geoFor();
+      geo.set(g);
+      setSize((current) => (current.w === g.w && current.h === g.h && current.fanH === g.fanH && current.top === g.top ? current : g));
     };
     onQuery();
-    for (const q of [pinQuery, desk, tablet]) q.addEventListener("change", onQuery);
+    pinQuery.addEventListener("change", onQuery);
+    window.addEventListener("resize", onQuery);
     return () => {
       io.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
-      for (const q of [pinQuery, desk, tablet]) q.removeEventListener("change", onQuery);
+      pinQuery.removeEventListener("change", onQuery);
+      window.removeEventListener("resize", onQuery);
     };
   }, [pinnedValue, geo]);
 
@@ -199,12 +236,12 @@ export function CasesSection() {
       <div ref={runway} className="v11-cases-runway">
         <div ref={stage} className="v11-cases-stage">
           <Container className="w-full">
-            <div className="grid gap-y-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:items-center lg:gap-x-12 xl:gap-x-16">
+            <div className="grid gap-y-7 sm:gap-y-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:items-center lg:gap-x-12 xl:gap-x-16">
               <div data-reveal="up" data-rd="2" className="hidden lg:block" {...hold}>
                 <AreaList {...timing} />
               </div>
               <div data-reveal="up" data-rd="2" {...hold}>
-                <Deck deck={deck} geo={geo} active={active} live={onScreen} />
+                <Deck deck={deck} geo={geo} size={size} active={active} live={onScreen} />
               </div>
               <div data-reveal="up" data-rd="3" className="lg:hidden" {...hold}>
                 <AreaGrid {...timing} />
@@ -298,7 +335,7 @@ function AreaGrid({ active, run, running, paused, onPick, onDone }: Timing) {
               aria-current={on ? "true" : undefined}
               aria-label={item.name}
               className={cn(
-                "flex min-h-11 w-full cursor-pointer items-center justify-center rounded-button px-2 text-[14px] leading-tight transition-colors duration-300",
+                "flex min-h-10 w-full cursor-pointer items-center justify-center rounded-button px-2 text-[14px] leading-tight transition-colors duration-300 sm:min-h-11",
                 on ? "bg-white/[0.08] text-white" : "bg-white/[0.03] text-white/55"
               )}
             >
@@ -313,7 +350,7 @@ function AreaGrid({ active, run, running, paused, onPick, onDone }: Timing) {
 }
 
 /** The deck (see above). Decorative for screen readers; the list after the section carries it. */
-function Deck({ deck, geo, active, live }: { deck: MotionValue<number>; geo: MotionValue<Geo>; active: number; live: boolean }) {
+function Deck({ deck, geo, size, active, live }: { deck: MotionValue<number>; geo: MotionValue<Geo>; size: Geo; active: number; live: boolean }) {
   // The pointer moves the point of view a little: the perspective origin follows it on a soft spring.
   const ox = useMotionValue(50);
   const oy = useMotionValue(42);
@@ -332,9 +369,9 @@ function Deck({ deck, geo, active, live }: { deck: MotionValue<number>; geo: Mot
   };
 
   return (
-    <motion.div aria-hidden onPointerMove={onMove} onPointerLeave={onLeave} style={{ perspectiveOrigin: origin }} className="v11-fan">
+    <motion.div aria-hidden onPointerMove={onMove} onPointerLeave={onLeave} style={{ perspectiveOrigin: origin, height: size.fanH }} className="v11-fan">
       {ITEMS.map((item, i) => (
-        <Card key={item.name} index={i} item={item} deck={deck} geo={geo} on={i === active} live={live} />
+        <Card key={item.name} index={i} item={item} deck={deck} geo={geo} size={size} on={i === active} live={live} />
       ))}
     </motion.div>
   );
@@ -345,6 +382,7 @@ function Card({
   item,
   deck,
   geo,
+  size,
   on,
   live,
 }: {
@@ -352,6 +390,7 @@ function Card({
   item: (typeof ITEMS)[number];
   deck: MotionValue<number>;
   geo: MotionValue<Geo>;
+  size: Geo;
   on: boolean;
   live: boolean;
 }) {
@@ -366,20 +405,26 @@ function Card({
   const detail = useTransform(() => clamp(1 - Math.abs(index - deck.get()) * 2.6, 0, 1));
 
   return (
-    <motion.div data-on={on || undefined} style={{ transform, opacity, zIndex }} className="v11-fan-layer">
-      <div className="flex items-baseline gap-3">
-        <span className="num text-[14px] text-sky">{pad(index)}</span>
-        <span className="text-[16px] leading-none font-medium tracking-[-0.005em] text-white">{item.name}</span>
+    <motion.div
+      data-on={on || undefined}
+      style={{ transform, opacity, zIndex, width: size.w, height: size.h, top: `calc(50% + ${size.top}px)` }}
+      className="v11-fan-layer"
+    >
+      {/* One line always: on phones the short area ("04 Backoffice"), from sm the case's full name. */}
+      <div className="flex items-baseline gap-2.5 whitespace-nowrap sm:gap-3">
+        <span className="num text-[13px] text-sky sm:text-[14px]">{pad(index)}</span>
+        <span className="text-[14px] leading-none font-medium tracking-[-0.005em] text-white sm:hidden">{item.area}</span>
+        <span className="hidden text-[16px] leading-none font-medium tracking-[-0.005em] text-white sm:inline">{item.name}</span>
       </div>
       <motion.div style={{ opacity: detail }} className="v11-fan-detail">
-        <p className="text-[19px] leading-[1.25] font-medium tracking-[-0.015em] text-balance text-white sm:text-[22px] lg:text-[24px]">{item.tagline}</p>
-        <ul role="list" className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-3 sm:gap-5">
+        <p className="text-[17px] leading-[1.25] font-medium tracking-[-0.015em] text-balance text-white sm:text-[22px] lg:text-[24px]">{item.tagline}</p>
+        <ul role="list" className="mt-3.5 grid gap-2.5 sm:mt-6 sm:grid-cols-3 sm:gap-5">
           {item.metrics.map((metric) => (
-            <li key={metric.label} className="grid grid-cols-[72px_minmax(0,1fr)] items-baseline gap-x-3 sm:block">
-              <p className="num text-[24px] leading-none text-white sm:text-[30px] lg:text-[36px]">
+            <li key={metric.label} className="grid grid-cols-[62px_minmax(0,1fr)] items-baseline gap-x-2.5 sm:block">
+              <p className="num text-[21px] leading-none text-white sm:text-[30px] lg:text-[36px]">
                 <CountUp value={metric.value} play={on && live} duration={1.3} delay={0.2} />
               </p>
-              <p className="text-[13px] leading-snug text-white/65 sm:mt-2">{metric.label}</p>
+              <p className="text-[12.5px] leading-[1.35] text-white/65 sm:mt-2 sm:text-[13px]">{metric.label}</p>
             </li>
           ))}
         </ul>

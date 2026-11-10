@@ -332,7 +332,7 @@ body:has(.v11) {
   scroll. Desktop as in v1 (at least 720px tall), and phones and tablets too (at least 640px tall; the developer:
   "it should do the same thing on mobile too"). Unlayered, so it wins over the section's Tailwind padding.
 */
-@media (min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 640px) {
+@media (min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px) {
   .v11-promise {
     height: 320svh;
     padding-top: 0;
@@ -348,7 +348,7 @@ body:has(.v11) {
   }
 }
 /* Phones and tablets on the stage: a flatter card and tighter steps, so card, statement, ticks and label fit 667px. */
-@media (max-width: 1023px) and (min-height: 640px) {
+@media (max-width: 1023px) and (min-height: 600px) {
   .v11-promise-grid {
     row-gap: 28px;
   }
@@ -375,23 +375,16 @@ body:has(.v11) {
   drawing order is the z-index: a travelling card never cuts through another). Opaque navy, so the cards never
   show through each other; each strip above the card in front holds a whole number-and-name row.
 */
+/* The deck's height and each card's size and place come from cases.tsx (one geometry per screen size). */
 .v11-fan {
   position: relative;
-  height: 540px;
   perspective: 1500px;
 }
-/* Phones: tall enough for the longest case on a 360px phone (measured: 336px). */
 .v11-fan-layer {
-  --w: min(300px, 80vw);
-  --h: 340px;
-  --base-y: 72px;
   position: absolute;
   left: 50%;
-  top: calc(50% + var(--base-y));
-  width: var(--w);
-  height: var(--h);
-  padding: 13px 22px 20px;
-  border-radius: 22px;
+  padding: 8px 18px 14px;
+  border-radius: 20px;
   overflow: hidden;
   background:
     radial-gradient(120% 80% at 0% 0%, rgb(105 191 248 / 0.07), rgb(105 191 248 / 0) 60%),
@@ -429,39 +422,20 @@ body:has(.v11) {
 }
 /* The case (headline and results), on the card in front only (its opacity follows the deck, cases.tsx). */
 .v11-fan-detail {
-  margin-top: 18px;
+  margin-top: 14px;
 }
 @media (min-width: 640px) {
-  .v11-fan {
-    height: 560px;
-  }
   .v11-fan-layer {
-    --w: 440px;
-    --h: 300px;
-    --base-y: 90px;
     padding: 15px 28px 24px;
+    border-radius: 22px;
+  }
+  .v11-fan-detail {
+    margin-top: 18px;
   }
 }
 @media (min-width: 1024px) {
-  .v11-fan {
-    height: 600px;
-  }
   .v11-fan-layer {
-    --w: 520px;
-    --h: 290px;
-    --base-y: 90px;
     padding: 16px 32px 28px;
-  }
-}
-/* Shorter desktop windows and shorter phones: the whole deck a size smaller, so the held stage still fits. */
-@media (min-width: 1024px) and (max-height: 780px) {
-  .v11-fan {
-    zoom: 0.84;
-  }
-}
-@media (max-width: 1023px) and (max-height: 759px) {
-  .v11-fan {
-    zoom: 0.76;
   }
 }
 
@@ -478,7 +452,7 @@ body:has(.v11) {
   }
 }
 @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) and (min-height: 640px),
-  (prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 640px) {
+  (prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 600px) {
   .v11-cases {
     padding-bottom: 0;
   }
@@ -494,6 +468,13 @@ body:has(.v11) {
     height: 100svh;
     padding-top: 84px;
     padding-bottom: 12px;
+  }
+}
+/* Phones: the header is 72px tall there, so the stage keeps just that clear (Safari leaves 600 to 750px of screen). */
+@media (prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 600px) {
+  .v11-cases-stage {
+    padding-top: 76px;
+    padding-bottom: 6px;
   }
 }
 

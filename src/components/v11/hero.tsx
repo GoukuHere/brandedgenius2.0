@@ -122,13 +122,18 @@ export function HeroIntoProblem() {
           id="top"
           inert={phase !== "hero"}
           style={{ scale: heroScale, opacity: heroOpacity }}
-          className="absolute inset-0 z-[2] overflow-hidden bg-[linear-gradient(160deg,#0a2a62_0%,#061536_100%)] will-change-transform motion-reduce:!transform-none"
+          className="absolute inset-0 z-[2] flex flex-col overflow-hidden bg-[linear-gradient(160deg,#0a2a62_0%,#061536_100%)] will-change-transform motion-reduce:!transform-none"
         >
+          {/*
+            Phones and tablets: the film fills the whole height between the header and the headline, so the screen has
+            no empty foot on a tall phone (the developer: "too much bottom blank space when the page loads on mobile").
+            Desktop: the film over the whole screen, as before.
+          */}
           <motion.div
             initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.6, delay: 0.1, ease: EASE }}
-            className="v11-film-phone absolute inset-x-0 top-[72px] z-[2] h-[min(75vw,40svh)] lg:inset-0 lg:h-auto"
+            className="v11-film-phone relative z-[2] mt-[72px] min-h-[96px] flex-1 lg:absolute lg:inset-0 lg:mt-0 lg:min-h-0"
           >
             <video
               ref={film}
@@ -150,7 +155,8 @@ export function HeroIntoProblem() {
             className="absolute inset-x-0 bottom-0 z-[3] hidden h-[46%] bg-[linear-gradient(0deg,rgb(4_12_30/0.92)_0%,rgb(4_12_30/0.55)_45%,rgb(4_12_30/0)_100%)] lg:block"
           />
 
-          <div className="relative z-10 mx-auto flex h-full w-full max-w-[1280px] flex-col px-5 pt-[calc(72px_+_min(75vw,40svh)_+_8px)] md:px-8 lg:justify-end lg:pt-0 lg:pb-14">
+          {/* The headline and the actions at the foot of the screen; on phones clear of the version pill below them. */}
+          <div className="relative z-10 mx-auto flex w-full max-w-[1280px] shrink-0 flex-col px-5 pt-2 pb-16 md:px-8 lg:h-full lg:justify-end lg:pt-0 lg:pb-14">
             <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
               {/* "KI-Automatisierung," is 7.8em wide; the display scale keeps it on one line down to a 360px phone. */}
               <h1 className="t-display">

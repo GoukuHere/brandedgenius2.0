@@ -33,7 +33,7 @@ const DWELL = 4600;
 const EASE = [0.16, 1, 0.3, 1] as const;
 // Keep in step with v11.css (.v11-promise): desktop as in v1, and phones and tablets too (the developer: "it should do
 // the same thing on mobile too, scrolling").
-const PIN = "(min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 640px)";
+const PIN = "(min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px)";
 
 // The title ends in a dash: a no-break space keeps it with "schafft", so no line ever starts with it.
 const TITLE = PROMISE.title.replace(/ –$/, " –");
