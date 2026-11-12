@@ -3,8 +3,7 @@
 import { motion, useMotionValueEvent, useScroll, useTransform } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { PrimaryLink, SecondaryLink } from "@/components/system/primitives";
-import { HERO, LINKS, MEDIA } from "@/content/site";
+import { HERO, MEDIA } from "@/content/site";
 import { ProblemTop } from "./problem-top";
 
 /*
@@ -17,6 +16,12 @@ import { ProblemTop } from "./problem-top";
   away), with the headline and the actions under it. One stage is held while you scroll ZOOM of a screen: the hero
   flies past (it grows and fades) and the second section, the top of v1's Problem section, comes up out of the depth
   into its place. That is the page's only zoom; from there the page simply scrolls on.
+
+  Round 4 (the client's Loom of 2026-11-12): "Just put that CTA here away ... This is too much" (both actions go; the
+  header keeps the one contact button), the headline "a little bit centralized", and "one level out that you can see
+  my hair". The film's source has only about 5% of its height above his hair, and the header bar covered the top
+  84px, so on desktop the film now starts under the bar (72px down, top-aligned) and its top edge fades into the
+  film's own edge navy. Phones already had the film below the header.
 
   The film plays only while the hero can be seen. Reduced motion: no zoom and no film (the last frame stands), the
   hero and the Problem panel simply cross-fade.
@@ -101,7 +106,6 @@ export function HeroIntoProblem() {
   }, [playing]);
 
   const line = (delay: number) => ({ initial: { y: "105%" }, animate: { y: "0%" }, transition: { duration: 1.1, delay, ease: EASE } });
-  const fade = (delay: number) => ({ initial: { opacity: 0, y: 18 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.9, delay, ease: EASE } });
 
   return (
     <div className="relative" style={{ height: `${100 + ZOOM * 100}svh`, marginBottom: "calc(-1 * var(--v11-pull, 0px))" }}>
@@ -122,7 +126,7 @@ export function HeroIntoProblem() {
           id="top"
           inert={phase !== "hero"}
           style={{ scale: heroScale, opacity: heroOpacity }}
-          className="absolute inset-0 z-[2] flex flex-col overflow-hidden bg-[linear-gradient(160deg,#0a2a62_0%,#061536_100%)] will-change-transform motion-reduce:!transform-none"
+          className="absolute inset-0 z-[2] flex flex-col overflow-hidden bg-[linear-gradient(160deg,#0a2a62_0%,#061536_100%)] will-change-transform motion-reduce:!transform-none lg:bg-[#080d1b] lg:bg-none"
         >
           {/*
             Phones and tablets: the film fills the whole height between the header and the headline, so the screen has
@@ -133,11 +137,11 @@ export function HeroIntoProblem() {
             initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.6, delay: 0.1, ease: EASE }}
-            className="v11-film-phone relative z-[2] mt-[72px] min-h-[96px] flex-1 lg:absolute lg:inset-0 lg:mt-0 lg:min-h-0"
+            className="v11-film-phone relative z-[2] mt-[72px] min-h-[96px] flex-1 lg:absolute lg:inset-x-0 lg:top-[72px] lg:bottom-0 lg:mt-0 lg:min-h-0 lg:[mask-image:linear-gradient(to_bottom,transparent_0,#000_28px)]"
           >
             <video
               ref={film}
-              className="absolute inset-0 h-full w-full object-cover object-[50%_28%] motion-reduce:hidden"
+              className="absolute inset-0 h-full w-full object-cover object-[50%_28%] motion-reduce:hidden lg:object-[50%_0%]"
               src={MEDIA.heroVideo}
               poster={MEDIA.heroPoster}
               autoPlay
@@ -147,7 +151,7 @@ export function HeroIntoProblem() {
               preload="auto"
               aria-label="Roman Tränkle, Gründer von Branded Genius, mit zwei KI-Robotern"
             />
-            <Image src="/media/hero-final.webp" alt="" fill sizes="100vw" className="hidden object-cover object-[50%_28%] motion-reduce:block" />
+            <Image src="/media/hero-final.webp" alt="" fill sizes="100vw" className="hidden object-cover object-[50%_28%] motion-reduce:block lg:object-[50%_0%]" />
           </motion.div>
           {/* Desktop: a navy ground rises at the foot of the film so the headline reads. */}
           <div
@@ -155,31 +159,21 @@ export function HeroIntoProblem() {
             className="absolute inset-x-0 bottom-0 z-[3] hidden h-[46%] bg-[linear-gradient(0deg,rgb(4_12_30/0.92)_0%,rgb(4_12_30/0.55)_45%,rgb(4_12_30/0)_100%)] lg:block"
           />
 
-          {/* The headline and the actions at the foot of the screen; on phones clear of the version pill below them. */}
+          {/* The headline, centred at the foot of the screen; on phones clear of the version pill below it. */}
           <div className="relative z-10 mx-auto flex w-full max-w-[1280px] shrink-0 flex-col px-5 pt-2 pb-16 md:px-8 lg:h-full lg:justify-end lg:pt-0 lg:pb-14">
-            <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
-              {/* "KI-Automatisierung," is 7.8em wide; the display scale keeps it on one line down to a 360px phone. */}
-              <h1 className="t-display">
-                <span className="-mb-[0.12em] block overflow-hidden pb-[0.12em]">
-                  <motion.span className="block whitespace-nowrap" {...line(0.25)}>
-                    {HERO.title}
-                  </motion.span>
-                </span>
-                <span className="-mb-[0.12em] block overflow-hidden pb-[0.2em]">
-                  <motion.span className="block" {...line(0.38)}>
-                    <span className="accent accent-sweep">{HERO.accent}</span>
-                  </motion.span>
-                </span>
-              </h1>
-              <motion.div className="mt-7 flex flex-col gap-2.5 sm:flex-row lg:mt-0 lg:shrink-0 lg:gap-3 lg:pb-1.5" {...fade(0.7)}>
-                <PrimaryLink href={LINKS.analysis} size="lg">
-                  {HERO.primary}
-                </PrimaryLink>
-                <SecondaryLink href={LINKS.booking} size="lg">
-                  {HERO.secondary}
-                </SecondaryLink>
-              </motion.div>
-            </div>
+            {/* "KI-Automatisierung," is 7.8em wide; the display scale keeps it on one line down to a 360px phone. */}
+            <h1 className="t-display text-center">
+              <span className="-mb-[0.12em] block overflow-hidden pb-[0.12em]">
+                <motion.span className="block whitespace-nowrap" {...line(0.25)}>
+                  {HERO.title}
+                </motion.span>
+              </span>
+              <span className="-mb-[0.12em] block overflow-hidden pb-[0.2em]">
+                <motion.span className="block" {...line(0.38)}>
+                  <span className="accent accent-sweep">{HERO.accent}</span>
+                </motion.span>
+              </span>
+            </h1>
           </div>
         </motion.section>
       </div>

@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Footer } from "@/components/layout/footer";
+import { Footer } from "@/components/v11/footer";
 import { Header } from "@/components/layout/header";
 import { CtaSection } from "@/components/sections/cta";
-import { PartnersSection } from "@/components/sections/partners";
-import { ProcessSection } from "@/components/sections/process";
-import { WorkshopSection } from "@/components/sections/workshop";
+import { PartnersSection } from "@/components/v11/partners";
+import { ProcessSection } from "@/components/v11/process";
+import { WorkshopSection } from "@/components/v11/workshop";
 import { RevealObserver } from "@/components/system/reveal-observer";
 import { SmoothScroll } from "@/components/system/smooth-scroll";
 import { V11Background } from "@/components/v11/background";

@@ -9,11 +9,53 @@ import { InView } from "@/components/ui/in-view";
 import { TextEffect } from "@/components/ui/text-effect";
 import { WHY } from "@/content/site";
 import { Tile } from "./bento";
+import { Clip } from "./clip";
 import { IconWell, useIconTurns } from "./icon-well";
 import type { IconName } from "./icons";
 
-/** v11: one animated icon per reason, in the order of WHY.reasons. */
-const REASON_ICONS: IconName[] = ["user-check", "megaphone", "bot", "handshake", "rocket", "graduation-cap"];
+/*
+  v11 round 4 (the client's Loom of 2026-11-12, video 2 at 0:20 to 0:36, scrolling up to these tiles): "here again
+  icons, here again icons ... It should be a good mix-up with picture, icons, video clip, text ... every section a
+  little bit different and unique". The six reasons are now a bento of mixed sizes and media, each medium chosen for
+  what the reason says:
+  - Persönliche Experten-Positionierung: Roman himself (his own photo), the tall tile.
+  - KI-Automatisierung mit realem Business-Use: a short silent clip of real work at a laptop (Pexels 30712136), wide.
+  - Schnelle Pilotprojekte: the one animated icon left (the rocket).
+  - Beratung & Umsetzung aus einer Hand: words only, its sentence on show.
+  - Marketing & Vertriebs-Erfahrung: Roman in a client meeting (his own photo).
+  - Team-Workshops inklusive: Roman leading a team session (his own photo).
+  Desktop: four columns, the Roman tile two rows tall, the clip two columns wide. Phones: two columns in reading order.
+*/
+type ReasonMedia =
+  | { kind: "photo"; src: string; position?: string }
+  | { kind: "clip"; src: string; poster: string }
+  | { kind: "icon"; icon: IconName }
+  | { kind: "text" };
+const REASON_MEDIA: Record<string, ReasonMedia> = {
+  "Persönliche Experten-Positionierung": { kind: "photo", src: "/media/photos/roman-standing.webp", position: "50% 20%" },
+  "Marketing & Vertriebs-Erfahrung": { kind: "photo", src: "/media/photos/roman-consult.webp", position: "50% 35%" },
+  "KI-Automatisierung mit realem Business-Use": { kind: "clip", src: "/media/v11/clips/arbeit.mp4", poster: "/media/v11/clips/arbeit-poster.webp" },
+  "Beratung & Umsetzung aus einer Hand": { kind: "text" },
+  "Schnelle Pilotprojekte": { kind: "icon", icon: "rocket" },
+  "Team-Workshops inklusive": { kind: "photo", src: "/media/photos/roman-meeting.webp", position: "50% 30%" },
+};
+/* Reading order on phones, and each tile's place in the desktop grid (four columns, two rows). */
+const REASON_ORDER = [
+  "Persönliche Experten-Positionierung",
+  "Schnelle Pilotprojekte",
+  "Beratung & Umsetzung aus einer Hand",
+  "KI-Automatisierung mit realem Business-Use",
+  "Marketing & Vertriebs-Erfahrung",
+  "Team-Workshops inklusive",
+];
+const REASON_PLACE: Record<string, string> = {
+  "Persönliche Experten-Positionierung": "row-span-2 min-h-[340px] lg:col-start-1 lg:row-start-1 lg:min-h-0",
+  "KI-Automatisierung mit realem Business-Use": "col-span-2 aspect-[16/9] lg:col-start-2 lg:col-end-4 lg:row-start-1 lg:aspect-auto",
+  "Schnelle Pilotprojekte": "min-h-[164px] lg:col-start-4 lg:row-start-1",
+  "Beratung & Umsetzung aus einer Hand": "min-h-[164px] lg:col-start-2 lg:row-start-2",
+  "Marketing & Vertriebs-Erfahrung": "aspect-[4/5] lg:col-start-3 lg:row-start-2 lg:aspect-auto",
+  "Team-Workshops inklusive": "aspect-[4/5] lg:col-start-4 lg:row-start-2 lg:aspect-auto",
+};
 
 /*
   Warum Branded Genius, the page's "Über uns". The scroll expansion after 21st.dev's scroll-expansion hero, rebuilt
@@ -279,7 +321,8 @@ export function WhySection() {
     return g ? px(g.box.h) : "100%";
   });
   const veil = useTransform(() => VEIL * (1 - open.get()));
-  const { area: iconArea, well: iconWell, trigger: iconTrigger } = useIconTurns<HTMLUListElement>(WHY.reasons.length);
+  const { area: iconArea, well: iconWell, trigger: iconTrigger } = useIconTurns<HTMLUListElement>(1);
+  const reasons = REASON_ORDER.map((title) => WHY.reasons.find((r) => r.title === title)).filter((r): r is (typeof WHY.reasons)[number] => Boolean(r));
 
   return (
     <Section id="ueber-uns" className="why-section">
@@ -349,27 +392,57 @@ export function WhySection() {
           <p className="t-lead max-w-[640px]">{WHY.text}</p>
         </InView>
 
-        {/*
-          v11: the six reasons as a bento of tiles, each an animated icon and the title (the client: "a lot of text,
-          this should be a little bit less"; the developer turned the rendered 3D icons down for animated ones). Their
-          sentences stay for screen readers.
-        */}
         <InView variants={STAGGER} viewOptions={VIEW}>
-          <ul ref={iconArea} role="list" className="mt-12 grid grid-cols-2 gap-3 sm:gap-4 md:mt-14 lg:grid-cols-3">
-            {WHY.reasons.map((reason, i) => (
-              <motion.li key={reason.title} variants={RISE} transition={{ duration: 0.7, ease: EASE }}>
-                <Tile className="h-full min-h-[172px] sm:min-h-[200px]" layout="flex flex-col justify-between gap-8 p-5 sm:p-7" bind={iconTrigger(i)}>
-                  <IconWell ref={iconWell(i)} name={REASON_ICONS[i]} />
-                  <div>
-                    <h3 className="text-[17px] leading-snug font-medium tracking-[-0.01em] text-balance text-white sm:text-[20px]">{reason.title}</h3>
-                    <p className="sr-only">{reason.text}</p>
-                  </div>
-                </Tile>
-              </motion.li>
-            ))}
+          <ul
+            ref={iconArea}
+            role="list"
+            className="mt-12 grid grid-cols-2 gap-3 sm:gap-4 md:mt-14 lg:grid-cols-4 lg:grid-rows-[repeat(2,minmax(232px,auto))]"
+          >
+            {reasons.map((reason) => {
+              const media = REASON_MEDIA[reason.title] ?? { kind: "text" };
+              return (
+                <motion.li key={reason.title} variants={RISE} transition={{ duration: 0.7, ease: EASE }} className={REASON_PLACE[reason.title]}>
+                  {media.kind === "icon" ? (
+                    <Tile className="h-full" layout="flex h-full flex-col justify-between gap-8 p-5 sm:p-7" bind={iconTrigger(0)}>
+                      <IconWell ref={iconWell(0)} name={media.icon} />
+                      <div>
+                        <h3 className="text-[17px] leading-snug font-medium tracking-[-0.01em] text-balance text-white sm:text-[20px]">{reason.title}</h3>
+                        <p className="sr-only">{reason.text}</p>
+                      </div>
+                    </Tile>
+                  ) : media.kind === "text" ? (
+                    <Tile className="h-full" layout="flex h-full flex-col justify-end p-5 sm:p-7">
+                      <h3 className="text-[19px] leading-[1.2] font-medium tracking-[-0.015em] text-balance text-white sm:text-[24px]">{reason.title}</h3>
+                      <p className="mt-3 text-[14px] leading-normal text-white/70 sm:text-[15px]">{reason.text}</p>
+                    </Tile>
+                  ) : (
+                    <Tile className="h-full" layout="relative h-full overflow-hidden rounded-[24px]">
+                      {media.kind === "photo" ? (
+                        <Image
+                          src={media.src}
+                          alt=""
+                          fill
+                          sizes="(min-width: 1024px) 25vw, 50vw"
+                          className="object-cover"
+                          style={{ objectPosition: media.position ?? "50% 50%" }}
+                        />
+                      ) : (
+                        <Clip src={media.src} poster={media.poster} />
+                      )}
+                      <span aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgb(6_18_44/0)_38%,rgb(6_18_44/0.88)_100%)]" />
+                      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                        <h3 className="text-[16px] leading-snug font-medium tracking-[-0.01em] text-balance text-white sm:text-[19px]">{reason.title}</h3>
+                        <p className="sr-only">{reason.text}</p>
+                      </div>
+                    </Tile>
+                  )}
+                </motion.li>
+              );
+            })}
           </ul>
         </InView>
       </Container>
     </Section>
   );
 }
+

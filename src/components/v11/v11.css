@@ -424,6 +424,30 @@ body:has(.v11) {
 .v11-fan-detail {
   margin-top: 14px;
 }
+/* Round 4: each card's photo under a navy grade (dark top for the label, open middle, dark foot for the case). The
+   card is a column, so the case sits at the foot and the photo shows between. */
+.v11-fan-layer {
+  display: flex;
+  flex-direction: column;
+}
+.v11-fan-layer > .v11-fan-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+.v11-fan-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(7 22 52 / 0.9) 0%, rgb(7 22 52 / 0.45) 20%, rgb(7 22 52 / 0.38) 34%, rgb(7 22 52 / 0.86) 58%, rgb(7 22 52 / 0.97) 80%),
+    linear-gradient(0deg, rgb(0 75 160 / 0.18), rgb(0 75 160 / 0.18));
+}
+.v11-fan-layer > .v11-fan-detail {
+  margin-top: auto;
+}
 @media (min-width: 640px) {
   .v11-fan-layer {
     padding: 15px 28px 24px;
@@ -654,5 +678,41 @@ body:has(.v11) {
   }
   .v11-fan-layer::before {
     transition: none;
+  }
+}
+
+/* ---------- Die Realität on the scroll (reasons.tsx, PIN) ---------- */
+
+/*
+  Round 4 (the client: "step by step before it's going to the next section"): v2's held chapter. A runway with a
+  one-screen sticky stage; the six reasons step with the scroll (about 40svh each). Same screens as the Versprechen.
+*/
+@media (min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px) {
+  .v11-reasons {
+    height: 340svh;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .v11-reasons-stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: 100svh;
+    padding-top: 72px;
+  }
+}
+/* Phones on the stage: a flatter photo and tighter gaps, so heading, photo, bars and reason fit a 667px screen. */
+@media (max-width: 767px) and (min-height: 600px) {
+  .v11-reasons-frame {
+    aspect-ratio: 16 / 9;
+    margin-top: 20px;
+  }
+  .v11-reasons-steps {
+    margin-top: 16px;
+  }
+  /* Room for the longest reason (two-line title, two-line text), so the stage never re-centres between reasons. */
+  .v11-reasons-steps > div:last-child {
+    min-height: 176px;
   }
 }

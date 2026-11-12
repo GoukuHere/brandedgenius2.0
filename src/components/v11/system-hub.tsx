@@ -48,7 +48,14 @@ import {
   group. No pulses. Reduced motion and no script: everything drawn and in place.
 
   v11: the client liked the hub ("looks nice") but found the row of four qualities under it "not really fitting", so
-  the qualities now sit inside the hub, under its claim.
+  the qualities sat inside the hub, under its claim.
+
+  Round 4 (the client's Loom of 2026-11-12, 2:01 to 2:59): the heading block had "left-handed, and then nothing ...
+  something is missing"; the hub should be "only the icon, this favicon without the name and the subtext ... This
+  is too much ... put it somewhere ... make it like similar the other one before"; and the outer cards came "too
+  late". So the hub is v1's again, now only the bG mark in a square panel; the four qualities moved up beside the
+  heading, filling its empty right side; and the circuit draws as the stage comes in, complete before the hub
+  reaches the middle of the screen.
 */
 
 type Group = (typeof SYSTEM.nodes)[number];
@@ -102,8 +109,8 @@ export function SystemSection() {
   const reduced = useReducedMotionPref();
   const tabVisible = useTabVisible();
 
-  // Entrance: drawn while the stage rises from 62% of the screen until its centre passes 52%.
-  const progress = useSectionProgress(diagram, ["start 62%", "center 52%"]);
+  // Entrance: drawn while the stage rises from 88% of the screen until its top reaches 30% (round 4: "too late").
+  const progress = useSectionProgress(diagram, ["start 88%", "start 30%"]);
   const smooth = useSpring(progress, SCROLL_SPRING);
   // 1 on lg with motion allowed (set after mount); everywhere else the end state.
   const live = useMotionValue(0);
@@ -181,14 +188,17 @@ export function SystemSection() {
   return (
     <Section id="system">
       <Container>
-        <div>
-          <Heading title={SYSTEM.title} accent={SYSTEM.accent} className="max-w-[880px]" />
-          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[620px]">
-            {SYSTEM.text}
-          </p>
-          <div data-reveal="up" data-rd="3" className="mt-9">
-            <PrimaryLink href={LINKS.analysis}>{SYSTEM.cta}</PrimaryLink>
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:items-end lg:gap-x-16 xl:gap-x-24">
+          <div>
+            <Heading title={SYSTEM.title} accent={SYSTEM.accent} className="max-w-[880px]" />
+            <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[620px]">
+              {SYSTEM.text}
+            </p>
+            <div data-reveal="up" data-rd="3" className="mt-9">
+              <PrimaryLink href={LINKS.analysis}>{SYSTEM.cta}</PrimaryLink>
+            </div>
           </div>
+          <Qualities />
         </div>
 
         <Reveal className="mt-16 md:mt-24">
@@ -225,33 +235,34 @@ export function SystemSection() {
   );
 }
 
-/** The hub: the section's lit glass panel. A column in the middle of the stage on lg, the head of the list below. */
+/** The hub: the section's lit glass panel holding only the bG mark. A square in the middle of the stage on lg, the head of the list below. */
 function Hub() {
   return (
-    <div className="relative z-10 pl-10 lg:col-start-2 lg:row-start-1 lg:self-center lg:pl-0">
+    <div className="relative z-10 pl-10 lg:col-start-2 lg:row-start-1 lg:self-center lg:justify-self-center lg:pl-0">
       <PhoneNode dot={52.5} first />
-      <div data-hub className="glass glass-lit rounded-panel p-6 lg:px-7 lg:py-10 lg:text-center">
+      <div data-hub className="glass glass-lit grid h-[104px] w-[150px] place-items-center rounded-panel lg:size-[208px]">
         <BorderBeam colorFrom={SKY} colorTo={ROYAL} duration={12} size={160} />
         {/* eslint-disable-next-line @next/next/no-img-element -- a small static vector mark; next/image adds nothing */}
-        <img src="/brand/mark.svg" alt="" width={89} height={56} className="block h-14 w-auto lg:mx-auto" />
-        <p className="mt-5 text-[18px] leading-tight font-medium tracking-[-0.01em] text-white">Branded Genius</p>
-        <p className="mt-2 text-[14px] leading-normal text-balance text-silver">{SYSTEM.claim}</p>
-        {/* The four qualities belong to the system itself, so they sit in the hub (v1 had them as a row below). */}
-        <ul role="list" className="mt-6 grid gap-3 border-t border-white/10 pt-5 text-left sm:grid-cols-2 lg:grid-cols-1">
-          {SYSTEM.qualities.map((quality) => (
-            <li key={quality.title} className="flex items-start gap-3">
-              <span aria-hidden className="flex h-5 shrink-0 items-center">
-                <span className="size-1.5 rounded-full bg-sky" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[14px] leading-5 font-medium text-white">{quality.title}</span>
-                <span className="block text-[13px] leading-[1.45] text-silver">{quality.text}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
+        <img src="/brand/mark.svg" alt="Branded Genius" width={89} height={56} className="block h-12 w-auto lg:h-[72px]" />
       </div>
     </div>
+  );
+}
+
+/* The four qualities, beside the heading on lg (two by two), under it on phones and tablets. Each hangs from a short
+   trace, as v1 drew them under the hub. */
+function Qualities() {
+  return (
+    <ul role="list" data-reveal="up" data-rd="3" className="mt-12 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:mt-0 lg:gap-y-10">
+      {SYSTEM.qualities.map((quality) => (
+        <li key={quality.title} className="relative pt-5">
+          <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,rgb(105_191_248/0.55),rgb(105_191_248/0.08))]" />
+          <span aria-hidden className="absolute top-[-2.5px] left-0 size-1.5 rounded-full bg-sky" />
+          <h3 className="text-[17px] leading-snug font-medium text-white">{quality.title}</h3>
+          <p className="mt-1 text-[14px] leading-normal text-silver">{quality.text}</p>
+        </li>
+      ))}
+    </ul>
   );
 }
 

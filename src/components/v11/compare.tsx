@@ -133,9 +133,10 @@ export function CompareSection() {
     // Where the Versprechen below pins (its stage centres the card in the screen), v1's smaller foot keeps v1's gap.
     <Section id="unterschied" className="lg:[@media(min-height:720px)]:pb-12">
       <Container>
-        <div className="max-w-[920px]">
-          <Heading title={COMPARE.title} accent={COMPARE.accent} />
-          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[600px]">
+        {/* Round 4 ("not every time left, left, left, the header"): centred from md up, above the two ways. */}
+        <div className="max-w-[920px] md:mx-auto md:text-center">
+          <Heading title={COMPARE.title} accent={COMPARE.accent} className="text-balance" />
+          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[600px] md:mx-auto">
             {COMPARE.text}
           </p>
         </div>
@@ -144,7 +145,7 @@ export function CompareSection() {
           <div className="hidden lg:block">
             <Ways layout={DESK} />
           </div>
-          <div className="max-w-[440px] lg:hidden">
+          <div className="max-w-[440px] md:mx-auto lg:hidden">
             <Ways layout={PHONE} />
           </div>
         </div>

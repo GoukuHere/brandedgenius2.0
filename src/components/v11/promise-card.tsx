@@ -1,10 +1,11 @@
 "use client";
 
 import { animate, motion, useMotionValue, useTransform, type MotionValue } from "motion/react";
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef } from "react";
 import { Tilt } from "@/components/ui/tilt";
 import { PROMISE } from "@/content/site";
 import { CountUp, RiseLetters } from "./count";
+import { PromiseArt } from "./promise-art";
 
 /*
   v11 Versprechen card: v1's 3D card (sections/promise-card.tsx), which the developer pointed back to ("we can
@@ -20,6 +21,11 @@ import { CountUp, RiseLetters } from "./count";
     one slides in (v1's).
   - The pointer tilts the card (Motion Primitives Tilt, mouse only).
   Reduced motion: no turn and no tilt, the figures simply stand.
+
+  Round 4 (the client: "we need an other effect. This is too less"): the faint grid in the lower half is replaced by a
+  line drawing per figure (promise-art.tsx). Where the section pins, a figure's drawing draws over the first 70% of
+  its own step, scroll-linked and reversible; elsewhere it draws over 1.9s each time its figure arrives. Reduced
+  motion: every drawing stands complete.
 */
 
 const FIGURES = PROMISE.figures;
@@ -48,15 +54,9 @@ function turnAt(progress: number) {
   return 0;
 }
 
-/* A 1px sky grid, pure CSS, fading out towards the card's middle. */
-const GRID: CSSProperties = {
-  backgroundImage:
-    "linear-gradient(to right, rgb(105 191 248 / 0.13) 1px, transparent 1px), linear-gradient(to bottom, rgb(105 191 248 / 0.13) 1px, transparent 1px)",
-  backgroundSize: "28px 28px",
-  backgroundPosition: "center top",
-  maskImage: "linear-gradient(to bottom, transparent 0%, #000 62%)",
-  WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 62%)",
-};
+/** Share of a figure's step over which its drawing completes, where the scroll drives it. */
+const DRAW_SHARE = 0.7;
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
 const hasNumber = (value: string) => /\d/.test(value);
 
@@ -84,6 +84,23 @@ export function PromiseCard({
   const rotateY = useTransform(() => TURN_Y * turn.get());
   const rotateX = useTransform(() => TURN_X * Math.abs(turn.get()));
   const firstStep = useRef(true);
+
+  // The drawings: driven by the scroll where the section pins, otherwise by `timed` (0 to 1) from each arrival.
+  const timed = useMotionValue(0);
+  const stepValue = useMotionValue(step);
+  const still = useMotionValue(0);
+  useEffect(() => {
+    stepValue.set(step);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      still.set(1);
+      return undefined;
+    }
+    still.set(0);
+    if (scrollDriven.get() || !live) return undefined;
+    timed.set(0);
+    const controls = animate(timed, 1, { duration: 1.9, delay: 0.25, ease: EASE });
+    return () => controls.stop();
+  }, [step, live, timed, stepValue, still, scrollDriven]);
 
   // The swing at each change of figure (not for the first one), where the scroll does not turn the card.
   useEffect(() => {
@@ -131,16 +148,15 @@ export function PromiseCard({
       <motion.div style={{ rotateX, rotateY }} className="will-change-transform motion-reduce:transform-none!">
         <Tilt rotationFactor={8} springOptions={TILT_SPRING} className="motion-reduce:transform-none! [@media(hover:none)]:transform-none!">
           <div className="v11-promise-card relative aspect-[4/3] w-full overflow-hidden rounded-[24px] lg:aspect-[380/480] lg:w-[clamp(300px,24vw,380px)]">
-            <motion.div
-              className="absolute inset-x-0 bottom-0 h-1/2"
-              style={GRID}
-              initial={false}
-              animate={{ opacity: 0.45 + (0.55 * step) / (STEPS - 1) }}
-              transition={{ duration: 0.8, ease: EASE }}
-            />
+            {/* The current figure's drawing in the lower half; the others wait, faded. */}
+            <div className="absolute inset-x-0 bottom-0 grid h-[60%] px-7 pt-6 pb-7 sm:px-9 sm:pb-9">
+              {FIGURES.map((figure, i) => (
+                <ArtLayer key={figure.value} index={i} on={i === step} progress={progress} scrollDriven={scrollDriven} timed={timed} stepValue={stepValue} still={still} />
+              ))}
+            </div>
 
             {/* All four values share one cell; the current one stands, the others wait above or below, faded. */}
-            <div ref={valuesRef} className="absolute inset-x-0 top-0 grid h-1/2 items-end px-7 pb-1 sm:px-9">
+            <div ref={valuesRef} className="absolute inset-x-0 top-0 grid h-[40%] items-end px-7 pb-1 sm:px-9">
               {FIGURES.map((figure, i) => {
                 const on = i === step;
                 return (
@@ -168,5 +184,41 @@ export function PromiseCard({
         </Tilt>
       </motion.div>
     </div>
+  );
+}
+
+function ArtLayer({
+  index,
+  on,
+  progress,
+  scrollDriven,
+  timed,
+  stepValue,
+  still,
+}: {
+  index: number;
+  on: boolean;
+  progress: MotionValue<number>;
+  scrollDriven: MotionValue<number>;
+  timed: MotionValue<number>;
+  stepValue: MotionValue<number>;
+  still: MotionValue<number>;
+}) {
+  const draw = useTransform(() => {
+    const scrolled = clamp01((progress.get() * STEPS - index) / DRAW_SHARE);
+    const current = stepValue.get();
+    const arrived = index < current ? 1 : index > current ? 0 : timed.get();
+    if (still.get()) return 1;
+    return scrollDriven.get() ? scrolled : arrived;
+  });
+  return (
+    <motion.div
+      className="col-start-1 row-start-1 min-h-0"
+      initial={false}
+      animate={{ opacity: on ? 1 : 0 }}
+      transition={{ duration: on ? 0.5 : 0.25, delay: on ? 0.1 : 0, ease: EASE }}
+    >
+      <PromiseArt index={index} draw={draw} />
+    </motion.div>
   );
 }

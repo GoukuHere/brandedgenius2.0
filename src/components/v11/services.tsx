@@ -3,12 +3,12 @@
 import { motion, useMotionValue, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
 import { createRef, useCallback, useEffect, useRef, useState, useSyncExternalStore, type FocusEvent, type ReactNode, type RefObject } from "react";
 import { useMounted } from "@/components/concepts/shared";
-import { isSceneId, SCENE_ASPECT, ServiceAnimation, type SceneId } from "@/components/sections/service-scenes";
 import { Container, Heading, Section, TextLink } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { MagicCard } from "@/components/ui/magic-card";
 import { LINKS, SERVICES } from "@/content/site";
 import { cn } from "@/lib/utils";
+import { isSceneId, SceneBox, ServiceAnimation, type SceneId } from "./scenes";
 
 /*
   v11 Leistungen: v1's stacked plates, exactly as v1 builds them (the developer: "liked this but with cards scrolling
@@ -32,14 +32,20 @@ import { cn } from "@/lib/utils";
 
   Every visual state that depends on the window (stacking, fine pointer) is read after hydration, so the server
   HTML and the first browser render always match.
+
+  2026-11-13: the drawings are v11's own (./scenes: a real interface per service, a taller composition below lg so
+  its words stay legible on a phone); v1 keeps the shared fine-line ones. On phones the sticky tops step 12px from
+  92px (the header ends at 76px), so the plates, now a little taller, still fit a 667px Safari window. The heading is
+  centred from md up, and its accent always starts the second line.
 */
 
 type Service = (typeof SERVICES.items)[number] & { id: SceneId };
 const ITEMS = SERVICES.items.filter((s): s is Service => isSceneId(s.id));
 
-/** Sticky tops in px, 20px apart, below the fixed header. */
+/** Sticky tops in px below the fixed header: 20px apart, and 12px apart from 92px on phones (below sm). */
 const TOPS = [112, 132, 152, 172];
-const topOf = (i: number) => TOPS[Math.min(i, TOPS.length - 1)];
+const PHONE_TOPS = [92, 104, 116, 128];
+const PHONE = "(max-width: 639px)";
 
 /** Must match the `[@media(min-height:600px)]:` classes below. */
 const STACKED = "(min-height: 600px)";
@@ -75,6 +81,7 @@ function keepCompounds(text: string): ReactNode {
 function Plate({
   service,
   index,
+  tops,
   spacer,
   next,
   front,
@@ -85,6 +92,7 @@ function Plate({
 }: {
   service: Service;
   index: number;
+  tops: number[];
   /** The gap in front of this plate. Its bottom edge is where the plate sits in the flow, sticky or not. */
   spacer: RefObject<HTMLDivElement | null>;
   /** The next plate's gap, whose bottom edge is where that plate sits: it measures how far it has covered this one. */
@@ -96,10 +104,11 @@ function Plate({
   stack: MotionValue<number>;
   onCover: (index: number, covered: boolean) => void;
 }) {
+  const topOf = (i: number) => tops[Math.min(i, tops.length - 1)];
   const top = topOf(index);
 
-  // 0 while the next plate is a screen away, 1 once it rests 20px below this one's top. Measured on the next gap,
-  // which never sticks, so the numbers stay true while the plates themselves are stuck.
+  // 0 while the next plate is a screen away, 1 once it rests a step (20px, 12px on phones) below this one's top.
+  // Measured on the next gap, which never sticks, so the numbers stay true while the plates themselves are stuck.
   const arriving = useSectionProgress(next ?? spacer, ["end end", `end ${topOf(index + 1)}px`]);
   const cover = useTransform(() => (next ? arriving.get() : 0));
   const scale = useTransform(() => 1 - 0.03 * cover.get() * stack.get());
@@ -153,17 +162,14 @@ function Plate({
           )}
           <div className={cn("relative", lit && "pointer-events-none")}>
             {/*
-              On phones the drawing runs to the plate's edges. On short stacked desktop windows its width (and so, by its
-              aspect ratio, its height) is capped so the whole plate fits under the header: the screen less 440px tall.
+              On phones the drawing runs to the plate's edges. On stacked desktop windows its height is capped so the whole
+              plate fits under the header: the screen less 440px tall (the box's own classes, scenes/index.tsx).
             */}
             <div className="v11-scene -mx-5 overflow-hidden sm:mx-0 sm:rounded-[14px]">
               {mounted ? (
-                <ServiceAnimation id={service.id} playing={front} className="lg:[@media(min-height:600px)]:max-w-[calc((100svh_-_440px)_*_2.6667)]" />
+                <ServiceAnimation id={service.id} playing={front} />
               ) : (
-                <div
-                  className="mx-auto w-full lg:[@media(min-height:600px)]:max-w-[calc((100svh_-_440px)_*_2.6667)]"
-                  style={{ aspectRatio: SCENE_ASPECT }}
-                />
+                <SceneBox id={service.id} />
               )}
             </div>
             <div className="mt-6 grid gap-4 sm:mt-8 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-10 lg:mt-9 lg:gap-14">
@@ -196,6 +202,7 @@ function Plate({
 export function ServicesSection() {
   const stacked = useMedia(STACKED);
   const magic = useMedia(FINE_POINTER);
+  const phone = useMedia(PHONE);
   const stack = useMotionValue(0);
   const [spacers] = useState(() => ITEMS.map(() => createRef<HTMLDivElement>()));
   const [covered, setCovered] = useState(() => ITEMS.map(() => false));
@@ -215,9 +222,11 @@ export function ServicesSection() {
   return (
     <Section id="leistungen">
       <Container>
-        <div className="max-w-[820px]">
-          <Heading title={SERVICES.title} accent={SERVICES.accent} />
-          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[620px]">
+        {/* Centred from md up. The accent always starts line 2: an empty block before it breaks the line (Heading is
+            shared, so the break is made here). */}
+        <div className="max-w-[820px] md:mx-auto md:text-center">
+          <Heading title={SERVICES.title} accent={SERVICES.accent} className="[&_.accent]:before:block [&_.accent]:before:content-['']" />
+          <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[640px] md:mx-auto">
             {SERVICES.text}
           </p>
           <div data-reveal="up" data-rd="3" className="mt-5">
@@ -233,6 +242,7 @@ export function ServicesSection() {
               key={service.id}
               service={service}
               index={i}
+              tops={phone ? PHONE_TOPS : TOPS}
               spacer={spacers[i]}
               next={spacers[i + 1]}
               front={i === front}

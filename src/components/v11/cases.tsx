@@ -6,6 +6,7 @@ import { Container, Heading, Section } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { CASES } from "@/content/site";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { CountUp } from "./count";
 
 /*
@@ -78,9 +79,9 @@ type Geo = {
   ary: number;
   arx: number;
 };
-const DESK: Geo = { w: 520, h: 290, fanH: 600, top: 90, dx: 30, dy: -50, dz: -48, ry: 20, rx: 4, ax: -52, ay: 44, az: 110, ary: 9, arx: 2 };
+const DESK: Geo = { w: 520, h: 340, fanH: 640, top: 90, dx: 30, dy: -50, dz: -48, ry: 20, rx: 4, ax: -52, ay: 44, az: 110, ary: 9, arx: 2 };
 const DESK_SHORT: Geo = { w: 460, h: 272, fanH: 500, top: 76, dx: 26, dy: -40, dz: -42, ry: 18, rx: 4, ax: -46, ay: 36, az: 90, ary: 8, arx: 2 };
-const TABLET: Geo = { w: 440, h: 300, fanH: 560, top: 90, dx: 20, dy: -46, dz: -44, ry: 16, rx: 4, ax: -35, ay: 42, az: 90, ary: 7, arx: 2 };
+const TABLET: Geo = { w: 440, h: 340, fanH: 600, top: 90, dx: 20, dy: -46, dz: -44, ry: 16, rx: 4, ax: -35, ay: 42, az: 90, ary: 7, arx: 2 };
 /* Phones: a compact card; under 660px of screen (an iPhone mini in Safari) the strips a little slimmer still. */
 const phoneGeo = (width: number, height: number): Geo => {
   const w = Math.min(330, Math.round(width * 0.88));
@@ -91,6 +92,48 @@ function geoFor(): Geo {
   if (window.matchMedia("(min-width: 1024px)").matches) return window.matchMedia("(max-height: 780px)").matches ? DESK_SHORT : DESK;
   if (window.matchMedia("(min-width: 640px)").matches) return TABLET;
   return phoneGeo(window.innerWidth, window.innerHeight);
+}
+
+/*
+  Round 4 (the client's Loom of 2026-11-12, 3:43): "I like the style ... but the content, we need a better content
+  here ... add also pictures inside ... this stats maybe ... with an animation, with a picture". Each card now carries
+  a photo of its area (real Pexels photos, /media/v11/cases) under a navy grade: dark at the top for the card's label
+  (so the strips behind still read), open in the middle, dark again at the foot for the headline and the results,
+  which now sit at the card's foot. Each result counts up as before and draws a thin bar as it does: up by its figure
+  for a gain, down by it for a cut (the cut part stays as a faint outline). Cards on desktop and tablets grew 50px
+  for the photo; phones keep their Safari-fitted size, and their results keep the count without bars.
+*/
+const PHOTOS: Record<string, { src: string; position?: string }> = {
+  Marketing: { src: "/media/v11/cases/marketing.webp", position: "78% 50%" },
+  Vertrieb: { src: "/media/v11/cases/vertrieb.webp" },
+  Kundenservice: { src: "/media/v11/cases/kundenservice.webp" },
+  Backoffice: { src: "/media/v11/cases/backoffice.webp" },
+  Telefonie: { src: "/media/v11/cases/telefonie.webp" },
+  CRM: { src: "/media/v11/cases/crm.webp", position: "50% 40%" },
+};
+
+/** A result's figure as a share (0 to 1) and whether it is a cut ("−62%") or a gain ("+43%"). */
+function figure(value: string) {
+  const amount = Math.min(100, parseInt(value.replace(/[^0-9]/g, ""), 10) || 0) / 100;
+  return { amount, cut: /^[−-]/.test(value.trim()) };
+}
+
+function ResultBar({ value, play }: { value: string; play: boolean }) {
+  const { amount, cut } = figure(value);
+  // A gain grows from nothing to its share; a cut starts full and falls by its share.
+  const from = cut ? 1 : 0;
+  const to = cut ? 1 - amount : amount;
+  return (
+    <span aria-hidden className="relative mt-3 hidden h-[3px] overflow-hidden rounded-full bg-white/12 sm:block">
+      {cut && <span className="absolute inset-0 rounded-full border border-dashed border-white/25" />}
+      <motion.span
+        className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-sky"
+        initial={false}
+        animate={{ scaleX: play ? to : from }}
+        transition={{ duration: play ? 1.3 : 0.3, delay: play ? 0.2 : 0, ease: [0.16, 1, 0.3, 1] }}
+      />
+    </span>
+  );
 }
 
 /**
@@ -410,6 +453,18 @@ function Card({
       style={{ transform, opacity, zIndex, width: size.w, height: size.h, top: `calc(50% + ${size.top}px)` }}
       className="v11-fan-layer"
     >
+      {PHOTOS[item.area] && (
+        <span aria-hidden className="v11-fan-photo">
+          <Image
+            src={PHOTOS[item.area].src}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 520px, (min-width: 640px) 440px, 90vw"
+            className="object-cover"
+            style={{ objectPosition: PHOTOS[item.area].position ?? "50% 50%" }}
+          />
+        </span>
+      )}
       {/* One line always: on phones the short area ("04 Backoffice"), from sm the case's full name. */}
       <div className="flex items-baseline gap-2.5 whitespace-nowrap sm:gap-3">
         <span className="num text-[13px] text-sky sm:text-[14px]">{pad(index)}</span>
@@ -424,7 +479,8 @@ function Card({
               <p className="num text-[21px] leading-none text-white sm:text-[30px] lg:text-[36px]">
                 <CountUp value={metric.value} play={on && live} duration={1.3} delay={0.2} />
               </p>
-              <p className="text-[12.5px] leading-[1.35] text-white/65 sm:mt-2 sm:text-[13px]">{metric.label}</p>
+              <ResultBar value={metric.value} play={on && live} />
+              <p className="text-[12.5px] leading-[1.35] text-white/70 sm:mt-2.5 sm:text-[13px]">{metric.label}</p>
             </li>
           ))}
         </ul>
