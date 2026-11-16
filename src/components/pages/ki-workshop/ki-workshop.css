@@ -1,0 +1,1096 @@
+/*
+  /ki-workshop (2026-11-16). Everything here is scoped with a kw- prefix. The page sits on the site's one navy ground
+  (SiteShell); no section paints its own background, at most a soft local glow. Motion is transform, opacity and SVG
+  stroke offsets only; every entrance is gated on scripting and on motion being allowed, so without either the page
+  simply stands complete (the global reduced-motion rule also cuts every transition to an instant change).
+*/
+
+.v11 {
+  --kw-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --kw-sky: #69bff8;
+}
+
+/* A heading whose blue phrase starts its own line; fit-content keeps the gradient as wide as the words. */
+.kw-break .accent {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+}
+.kw-center .accent {
+  margin-inline: auto;
+}
+
+/* A soft local light behind a section's main object. */
+.kw-glow {
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgb(105 191 248 / 0.16), rgb(105 191 248 / 0) 100%);
+}
+.kw-glow-royal {
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgb(26 111 224 / 0.28), rgb(26 111 224 / 0) 100%);
+}
+
+/* ---------- 1 Hero ---------- */
+
+.kw-hero-frame {
+  border-radius: 22px;
+}
+@media (min-width: 1024px) {
+  .kw-hero-frame {
+    border-radius: 28px;
+  }
+}
+/* The photo sinks into the navy at its foot, so the floating tag reads on it. */
+.kw-hero-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(4 12 30 / 0) 55%, rgb(4 12 30 / 0.5) 100%);
+}
+.kw-hero-tag {
+  position: absolute;
+  z-index: 2;
+  border-radius: 16px;
+  padding: 12px 14px;
+  background-color: rgb(6 19 48 / 0.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    inset 0 0 0 1px rgb(255 255 255 / 0.12),
+    0 24px 48px -24px rgb(1 4 12 / 0.9);
+}
+@media (min-width: 640px) {
+  .kw-hero-tag {
+    border-radius: 18px;
+    padding: 16px 18px;
+  }
+}
+
+/* ---------- 2 Herausforderungen: four tiles that turn over ---------- */
+
+.kw-flip {
+  perspective: 1600px;
+  height: 232px;
+}
+@media (min-width: 640px) {
+  .kw-flip {
+    height: 300px;
+  }
+}
+@media (min-width: 1024px) {
+  .kw-flip {
+    height: 340px;
+  }
+}
+.kw-flip-card {
+  position: relative;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+.kw-flip[data-turned] .kw-flip-card {
+  transform: rotateY(180deg);
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  /* The turn lifts the tile a little towards the reader at its middle, as a card turned by hand. */
+  .kw-flip[data-turned] .kw-flip-card {
+    animation: kw-turn 1200ms cubic-bezier(0.3, 0.75, 0.2, 1) both;
+  }
+}
+@keyframes kw-turn {
+  0% {
+    transform: rotateY(0deg) translateZ(0);
+  }
+  50% {
+    transform: rotateY(96deg) translateZ(56px);
+  }
+  100% {
+    transform: rotateY(180deg) translateZ(0);
+  }
+}
+.kw-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  border-radius: 22px;
+  padding: 22px 22px 24px;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+@media (min-width: 1024px) {
+  .kw-face {
+    border-radius: 26px;
+    padding: 28px 28px 30px;
+  }
+}
+/* Opaque faces: matte navy in front, a royal light and a sky rim on the back. */
+.kw-face-front {
+  background:
+    radial-gradient(90% 70% at 0% 0%, rgb(105 191 248 / 0.09), rgb(105 191 248 / 0) 60%),
+    linear-gradient(165deg, #0b2250 0%, #071839 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 1px rgb(255 255 255 / 0.08),
+    0 30px 60px -32px rgb(1 4 12 / 0.95);
+}
+.kw-face-back {
+  transform: rotateY(180deg);
+  background:
+    radial-gradient(90% 90% at 100% 0%, rgb(26 111 224 / 0.55), rgb(26 111 224 / 0) 65%),
+    radial-gradient(80% 70% at 0% 100%, rgb(105 191 248 / 0.16), rgb(105 191 248 / 0) 60%),
+    linear-gradient(165deg, #0c2a5e 0%, #081c44 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    inset 0 0 0 1px rgb(105 191 248 / 0.34),
+    0 30px 60px -30px rgb(1 4 12 / 0.95);
+}
+.kw-flip-num {
+  font-size: 76px;
+  font-weight: 300;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  font-variant-numeric: lining-nums tabular-nums;
+  background: linear-gradient(100deg, #f1f1ee 0%, #dcecff 38%, #69bff8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-bottom: 0.08em;
+}
+@media (min-width: 1024px) {
+  .kw-flip-num {
+    font-size: 112px;
+  }
+}
+.kw-flip-title {
+  font-size: 24px;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  color: #f1f1ee;
+  text-wrap: balance;
+}
+@media (min-width: 1024px) {
+  .kw-flip-title {
+    font-size: 28px;
+  }
+}
+.kw-flip-mini {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 500;
+  color: rgb(241 241 238 / 0.92);
+}
+.kw-flip-text {
+  font-size: 18px;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+  color: rgb(241 241 238 / 0.9);
+  text-wrap: pretty;
+}
+@media (min-width: 1024px) {
+  .kw-flip-text {
+    font-size: 20px;
+  }
+}
+
+/* ---------- 3 Ergebnisse: the course ring ---------- */
+
+.kw-ring-node {
+  fill: #0a1f48;
+  stroke: rgb(241 241 238 / 0.38);
+  stroke-width: 1.5;
+  transition:
+    fill 0.45s ease,
+    stroke 0.45s ease;
+}
+.kw-ring-node[data-on] {
+  fill: var(--kw-sky);
+  stroke: var(--kw-sky);
+}
+.kw-ring-halo {
+  fill: none;
+  stroke: var(--kw-sky);
+  stroke-width: 1.25;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .kw-ring-halo[data-on] {
+    animation: kw-halo 900ms var(--kw-ease) both;
+  }
+}
+@keyframes kw-halo {
+  0% {
+    opacity: 0.9;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 3.2;
+  }
+}
+/* The count in the middle: a new number rises in. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .kw-count {
+    animation: kw-count-in 520ms var(--kw-ease) both;
+  }
+}
+@keyframes kw-count-in {
+  from {
+    opacity: 0;
+    translate: 0 0.25em;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.kw-ring-done {
+  opacity: 0;
+  translate: 0 6px;
+  transition:
+    opacity 0.6s ease,
+    translate 0.6s var(--kw-ease);
+}
+.kw-ring-done[data-on] {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.kw-result {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 46px;
+  border-top: 1px solid rgb(255 255 255 / 0.07);
+  color: rgb(241 241 238 / 0.42);
+  transition: color 0.5s ease;
+}
+.kw-result:last-child {
+  border-bottom: 1px solid rgb(255 255 255 / 0.07);
+}
+@media (min-width: 1024px) {
+  .kw-result {
+    min-height: 66px;
+    gap: 20px;
+  }
+}
+.kw-result[data-on] {
+  color: #f1f1ee;
+}
+.kw-result-check {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgb(241 241 238 / 0.22);
+  transition:
+    box-shadow 0.45s ease,
+    background-color 0.45s ease;
+}
+.kw-result[data-on] .kw-result-check {
+  background-color: rgb(105 191 248 / 0.14);
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.8),
+    0 0 18px -4px rgb(105 191 248 / 0.6);
+}
+.kw-result-check path {
+  fill: none;
+  stroke: var(--kw-sky);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.5s ease 0.1s;
+}
+.kw-result[data-on] .kw-result-check path {
+  stroke-dashoffset: 0;
+}
+
+/* ---------- 4 Themen: the module picker ---------- */
+
+.kw-module {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  border-radius: 22px;
+  padding: 20px 20px 18px;
+  text-align: left;
+  cursor: pointer;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.055), rgb(255 255 255 / 0.02));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 0 0 0 1px rgb(255 255 255 / 0.08),
+    0 24px 48px -32px rgb(1 4 12 / 0.9);
+  transition:
+    background-color 0.35s ease,
+    box-shadow 0.35s ease,
+    scale 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+@media (min-width: 1024px) {
+  .kw-module {
+    padding: 24px 24px 20px;
+  }
+}
+.kw-module:hover {
+  background-color: rgb(255 255 255 / 0.03);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 1px rgb(255 255 255 / 0.16),
+    0 24px 48px -32px rgb(1 4 12 / 0.9);
+}
+.kw-module:active {
+  scale: 0.985;
+}
+.kw-module:focus-visible {
+  outline: 2px solid var(--kw-sky);
+  outline-offset: 3px;
+}
+/* Chosen: a royal light from the corner and a sky rim, as a lit key. */
+.kw-module[aria-pressed="true"] {
+  background:
+    radial-gradient(90% 90% at 100% 0%, rgb(26 111 224 / 0.42), rgb(26 111 224 / 0) 65%),
+    radial-gradient(80% 70% at 0% 100%, rgb(105 191 248 / 0.12), rgb(105 191 248 / 0) 60%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.03));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    inset 0 0 0 1px rgb(105 191 248 / 0.55),
+    0 24px 52px -26px rgb(26 116 224 / 0.55);
+}
+.kw-module-toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  color: rgb(241 241 238 / 0.75);
+  box-shadow: inset 0 0 0 1px rgb(241 241 238 / 0.25);
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+}
+.kw-module-toggle svg {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  transition:
+    opacity 0.25s ease,
+    scale 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    rotate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.kw-module-toggle .kw-icon-on {
+  opacity: 0;
+  scale: 0.4;
+}
+.kw-module[aria-pressed="true"] .kw-module-toggle {
+  color: #041027;
+  background-color: var(--kw-sky);
+  box-shadow: 0 0 22px -4px rgb(105 191 248 / 0.8);
+}
+.kw-module[aria-pressed="true"] .kw-module-toggle .kw-icon-off {
+  opacity: 0;
+  rotate: 90deg;
+  scale: 0.4;
+}
+.kw-module[aria-pressed="true"] .kw-module-toggle .kw-icon-on {
+  opacity: 1;
+  scale: 1;
+}
+.kw-module-pick {
+  transition: color 0.3s ease;
+}
+.kw-module[aria-pressed="true"] .kw-module-pick {
+  color: var(--kw-sky);
+}
+.kw-module[aria-pressed="true"] .kw-module-num {
+  color: var(--kw-sky);
+}
+
+/* The tray that collects the chosen modules. */
+.kw-tray {
+  border-radius: 26px;
+  padding: 24px 20px 20px;
+  background:
+    radial-gradient(90% 60% at 100% 0%, rgb(0 75 160 / 0.45), rgb(0 75 160 / 0) 70%),
+    linear-gradient(165deg, #0a2150 0%, #061331 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 0 0 1px rgb(255 255 255 / 0.09),
+    0 30px 60px -30px rgb(1 4 12 / 0.95);
+}
+@media (min-width: 1024px) {
+  .kw-tray {
+    padding: 30px 28px 28px;
+  }
+}
+.kw-tray-seg {
+  height: 4px;
+  flex: 1 1 0;
+  border-radius: 999px;
+  background-color: rgb(241 241 238 / 0.12);
+  transition:
+    background-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.kw-tray-seg[data-on] {
+  background-color: var(--kw-sky);
+  box-shadow: 0 0 12px -2px rgb(105 191 248 / 0.7);
+}
+.kw-chip {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 10px;
+  border-radius: 999px;
+  padding: 9px 10px 9px 16px;
+  font-size: 14px;
+  line-height: 1.25;
+  text-align: left;
+  color: #f1f1ee;
+  cursor: pointer;
+  background-color: rgb(105 191 248 / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.38);
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.kw-chip:hover {
+  background-color: rgb(105 191 248 / 0.18);
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.7);
+}
+.kw-chip svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: rgb(241 241 238 / 0.7);
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .kw-chip {
+    animation: kw-chip-in 420ms var(--kw-ease) both;
+  }
+}
+@keyframes kw-chip-in {
+  from {
+    opacity: 0;
+    scale: 0.86;
+    translate: 0 6px;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
+}
+/* A long button label may wrap inside the tray (phones). */
+.kw-wrap-button.specular-button {
+  height: auto;
+  min-height: 52px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.3;
+}
+
+/* ---------- 5 Bereiche: the org chart ---------- */
+
+.kw-org-line {
+  fill: none;
+  stroke: rgb(105 191 248 / 0.3);
+  stroke-width: 1;
+}
+.kw-org-on {
+  fill: none;
+  stroke: var(--kw-sky);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 5px rgb(105 191 248 / 0.65));
+}
+.kw-org-dot {
+  fill: var(--kw-sky);
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .kw-org-line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1300ms var(--kw-ease) calc(var(--d, 0) * 110ms + 150ms);
+  }
+  .kw-org[data-drawn] .kw-org-line {
+    stroke-dashoffset: 0;
+  }
+  .kw-org-on {
+    stroke-dasharray: 1;
+    animation: kw-draw 700ms var(--kw-ease) var(--on-delay, 0ms) both;
+  }
+  .kw-org-dot {
+    animation: kw-fade 400ms ease calc(var(--on-delay, 0ms) + 450ms) both;
+  }
+  .kw-org:not([data-drawn]) .kw-org-on,
+  .kw-org:not([data-drawn]) .kw-org-dot {
+    visibility: hidden;
+  }
+}
+@keyframes kw-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes kw-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.kw-org-root {
+  position: relative;
+  border-radius: 24px;
+  background:
+    radial-gradient(90% 90% at 100% 0%, rgb(26 111 224 / 0.38), rgb(26 111 224 / 0) 65%),
+    radial-gradient(80% 70% at 0% 100%, rgb(105 191 248 / 0.1), rgb(105 191 248 / 0) 60%),
+    linear-gradient(165deg, #0b2554 0%, #071a40 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    inset 0 0 0 1px rgb(105 191 248 / 0.3),
+    0 30px 60px -30px rgb(1 4 12 / 0.95);
+}
+.kw-org-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: 16px;
+  padding: 0 16px;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 500;
+  color: rgb(241 241 238 / 0.72);
+  cursor: pointer;
+  background-color: #08193d;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.kw-org-node:hover {
+  color: #f1f1ee;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 1px rgb(255 255 255 / 0.2);
+}
+.kw-org-node[aria-selected="true"] {
+  color: #f1f1ee;
+  background-color: #0c2a60;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    inset 0 0 0 1px rgb(105 191 248 / 0.75),
+    0 0 30px -8px rgb(105 191 248 / 0.55);
+}
+.kw-org-node:focus-visible {
+  outline: 2px solid var(--kw-sky);
+  outline-offset: 3px;
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .kw-swap {
+    animation: kw-swap-in 480ms var(--kw-ease) both;
+  }
+}
+@keyframes kw-swap-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* ---------- 6 Formate: the Venn diagram ---------- */
+
+.kw-venn-ring {
+  fill: none;
+  stroke: rgb(105 191 248 / 0.55);
+  stroke-width: 1.25;
+}
+.kw-venn-ring-outer {
+  stroke: rgb(105 191 248 / 0.4);
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .kw-venn-ring {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1600ms var(--kw-ease) var(--d, 0ms);
+  }
+  .kw-venn[data-drawn] .kw-venn-ring {
+    stroke-dashoffset: 0;
+  }
+  .kw-venn-label {
+    opacity: 0;
+    transition: opacity 600ms ease var(--d, 0ms);
+  }
+  .kw-venn[data-drawn] .kw-venn-label {
+    opacity: 1;
+  }
+  .kw-venn-region {
+    transition: fill-opacity 450ms ease;
+  }
+  .kw-venn-edge {
+    stroke-dasharray: 1;
+    animation: kw-draw 800ms var(--kw-ease) both;
+  }
+}
+/* One fill for every region (a sky-to-royal light); only its strength changes, so a region fades both ways. */
+.kw-venn-region {
+  fill: url(#kw-venn-fill);
+  fill-opacity: 0.16;
+  cursor: pointer;
+}
+.kw-venn-region:hover {
+  fill-opacity: 0.4;
+}
+.kw-venn-region[data-on] {
+  fill-opacity: 1;
+}
+.kw-venn-edge {
+  fill: none;
+  stroke: var(--kw-sky);
+  stroke-width: 1.75;
+  filter: drop-shadow(0 0 6px rgb(105 191 248 / 0.6));
+  pointer-events: none;
+}
+.kw-venn-label {
+  position: absolute;
+  translate: -50% -50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border-radius: 12px;
+  padding: 6px 10px;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.kw-venn-label:focus-visible {
+  outline: 2px solid var(--kw-sky);
+  outline-offset: 2px;
+}
+.kw-venn-title {
+  font-size: 15px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: rgb(241 241 238 / 0.72);
+  transition: color 0.3s ease;
+}
+.kw-venn-sub {
+  font-size: 12.5px;
+  line-height: 1.2;
+  color: rgb(105 191 248 / 0.7);
+  transition: color 0.3s ease;
+}
+@media (min-width: 1024px) {
+  .kw-venn-title {
+    font-size: 16px;
+  }
+  .kw-venn-sub {
+    font-size: 13px;
+  }
+}
+.kw-venn-label:hover .kw-venn-title,
+.kw-venn-label[aria-selected="true"] .kw-venn-title {
+  color: #f1f1ee;
+}
+.kw-venn-label[aria-selected="true"] .kw-venn-sub {
+  color: var(--kw-sky);
+}
+/* The geometry per screen: the tall drawing below 640px, the wide one above. */
+.kw-venn-box {
+  position: relative;
+  margin-inline: auto;
+  aspect-ratio: 340 / 500;
+  width: 100%;
+  max-width: 400px;
+}
+.kw-venn-box .kw-venn-label {
+  left: var(--tx);
+  top: var(--ty);
+}
+@media (min-width: 640px) {
+  .kw-venn-box {
+    aspect-ratio: 720 / 500;
+    max-width: 760px;
+  }
+  .kw-venn-box .kw-venn-label {
+    left: var(--wx);
+    top: var(--wy);
+  }
+}
+/* The formats' panels share one place; only the chosen one shows. */
+.kw-stack {
+  display: grid;
+}
+.kw-stack > * {
+  grid-area: 1 / 1;
+}
+.kw-panel {
+  transition:
+    opacity 0.45s ease,
+    visibility 0s linear 0.45s;
+}
+.kw-panel:not([data-on]) {
+  opacity: 0;
+  visibility: hidden;
+}
+.kw-panel[data-on] {
+  transition:
+    opacity 0.45s ease,
+    visibility 0s;
+}
+
+/* ---------- 7 Ablauf: the plan ---------- */
+
+.kw-gantt {
+  position: relative;
+}
+.kw-gantt-bar {
+  position: absolute;
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0b4fa8 0%, #1a74e0 55%, #69bff8 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 0 0 1px rgb(105 191 248 / 0.5),
+    0 10px 30px -10px rgb(26 116 224 / 0.75);
+  transition: filter 0.3s ease;
+}
+.kw-gantt-link {
+  position: absolute;
+  display: block;
+  width: 1px;
+  background: linear-gradient(180deg, rgb(105 191 248 / 0.9), rgb(105 191 248 / 0.35));
+}
+.kw-gantt-row:hover .kw-gantt-bar {
+  filter: brightness(1.18);
+}
+/* Phones and tablets: the time runs down; each step's bar sits in its own lane and reaches into the next step. */
+@media (max-width: 1023px) {
+  .kw-gantt-lanes {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 50px;
+    background-image: repeating-linear-gradient(90deg, rgb(255 255 255 / 0.08) 0 1px, transparent 1px 10px);
+    background-position: 3.5px 0;
+    background-size: 41px 100%;
+    background-repeat: no-repeat;
+  }
+  .kw-gantt-row {
+    position: relative;
+    padding: 0 0 30px 62px;
+  }
+  .kw-gantt-row:last-child {
+    padding-bottom: 0;
+  }
+  .kw-gantt-track {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .kw-gantt-bar {
+    left: calc(var(--i) * 10px + 1px);
+    top: 2px;
+    width: 6px;
+    height: calc(100% + 22px);
+    background: linear-gradient(180deg, #0b4fa8 0%, #1a74e0 55%, #69bff8 100%);
+    transform-origin: 50% 0;
+  }
+  .kw-gantt-row:last-child .kw-gantt-bar {
+    height: calc(100% - 4px);
+  }
+  .kw-gantt-link,
+  .kw-gantt-mile {
+    display: none;
+  }
+}
+@media (min-width: 1024px) {
+  .kw-gantt-lanes {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--label) + 48px);
+    right: 0;
+    background-image: linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px);
+    background-size: calc(100% / 12) 100%;
+    box-shadow: inset -1px 0 0 rgb(255 255 255 / 0.06);
+  }
+  .kw-gantt {
+    --label: 400px;
+    --row: 112px;
+    --bar: 40px;
+  }
+  .kw-gantt-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--label) 1fr;
+    column-gap: 48px;
+    align-items: center;
+    height: var(--row);
+    border-top: 1px solid rgb(255 255 255 / 0.07);
+  }
+  .kw-gantt-row:last-child {
+    border-bottom: 1px solid rgb(255 255 255 / 0.07);
+  }
+  .kw-gantt-track {
+    position: relative;
+    height: 100%;
+  }
+  .kw-gantt-bar {
+    top: calc(50% - var(--bar) / 2);
+    height: var(--bar);
+    left: calc(var(--from) * 1%);
+    width: calc((var(--to) - var(--from)) * 1%);
+    border-radius: 12px;
+    transform-origin: 0 50%;
+  }
+  /* From the step before's bar down into this one, just inside this bar's start. */
+  .kw-gantt-link {
+    left: calc(var(--from) * 1% + 20px);
+    top: calc(var(--bar) / 2 - var(--row) / 2);
+    height: calc(var(--row) - var(--bar));
+    transform-origin: 50% 0;
+  }
+  /* The plan's end: a milestone at the end of the last bar. */
+  .kw-gantt-mile {
+    position: absolute;
+    right: -7px;
+    top: calc(50% - 7px);
+    width: 14px;
+    height: 14px;
+    rotate: 45deg;
+    border-radius: 3px;
+    background: #dcecff;
+    box-shadow: 0 0 18px rgb(105 191 248 / 0.9);
+  }
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .kw-gantt:not([data-on]) .kw-gantt-bar {
+    scale: 0 1;
+  }
+  .kw-gantt:not([data-on]) .kw-gantt-link {
+    scale: 1 0;
+  }
+  .kw-gantt:not([data-on]) .kw-gantt-mile {
+    opacity: 0;
+  }
+  .kw-gantt[data-on] .kw-gantt-bar {
+    animation: kw-grow-x 1000ms var(--kw-ease) calc(var(--i) * 280ms + 120ms) both;
+  }
+  .kw-gantt[data-on] .kw-gantt-link {
+    animation: kw-grow-y 360ms ease-out calc(var(--i) * 280ms) both;
+  }
+  .kw-gantt[data-on] .kw-gantt-mile {
+    animation: kw-fade 500ms ease 1500ms both;
+  }
+  @media (max-width: 1023px) {
+    .kw-gantt:not([data-on]) .kw-gantt-bar {
+      scale: 1 0;
+    }
+    .kw-gantt[data-on] .kw-gantt-bar {
+      animation-name: kw-grow-y;
+    }
+  }
+}
+@keyframes kw-grow-x {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+@keyframes kw-grow-y {
+  from {
+    scale: 1 0;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+/* ---------- 8 Trainer: competencies around the portrait ---------- */
+
+.kw-stage {
+  position: relative;
+  margin-inline: auto;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 335 / 470;
+}
+@media (min-width: 1024px) {
+  .kw-stage {
+    max-width: 592px;
+    aspect-ratio: 592 / 660;
+  }
+}
+.kw-skill {
+  position: absolute;
+  left: var(--px);
+  top: var(--py);
+  z-index: 2;
+  translate: -50% -50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  border-radius: 999px;
+  padding: 8px 13px 8px 11px;
+  font-size: 13px;
+  line-height: 1.2;
+  color: #f1f1ee;
+  background-color: rgb(7 22 54 / 0.72);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  backdrop-filter: blur(12px) saturate(1.2);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 0 0 1px rgb(105 191 248 / 0.3),
+    0 16px 32px -16px rgb(1 4 12 / 0.9);
+}
+.kw-skill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--kw-sky);
+  box-shadow: 0 0 10px rgb(105 191 248 / 0.9);
+}
+@media (min-width: 1024px) {
+  .kw-skill {
+    left: var(--x);
+    top: var(--y);
+    gap: 10px;
+    padding: 10px 17px 10px 14px;
+    font-size: 15px;
+  }
+}
+.kw-web {
+  fill: none;
+  stroke: rgb(105 191 248 / 0.32);
+  stroke-width: 1;
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .kw-stage:not([data-on]) .kw-skill {
+    opacity: 0;
+  }
+  .kw-stage[data-on] .kw-skill {
+    animation: kw-skill-in 900ms var(--kw-ease) calc(var(--n) * 90ms + 250ms) both;
+  }
+  .kw-web {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .kw-stage[data-on] .kw-web {
+    transition: stroke-dashoffset 1600ms var(--kw-ease) 700ms;
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes kw-skill-in {
+  from {
+    opacity: 0;
+    translate: calc(-50% + var(--dx)) calc(-50% + var(--dy));
+    scale: 0.82;
+  }
+  to {
+    opacity: 1;
+    translate: -50% -50%;
+    scale: 1;
+  }
+}
+
+/* ---------- 10 FAQ ---------- */
+
+.kw-faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 520ms var(--kw-ease),
+    visibility 0s linear 520ms;
+}
+.kw-faq-panel[data-on] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows 520ms var(--kw-ease),
+    visibility 0s;
+}
+.kw-faq-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgb(241 241 238 / 0.2);
+  transition:
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
+}
+.kw-faq-icon::before,
+.kw-faq-icon::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: #f1f1ee;
+  transition:
+    rotate 0.4s var(--kw-ease),
+    background-color 0.3s ease;
+}
+.kw-faq-icon::after {
+  rotate: 90deg;
+}
+.kw-faq-q:hover .kw-faq-icon {
+  box-shadow: inset 0 0 0 1px rgb(241 241 238 / 0.45);
+}
+.kw-faq-q[aria-expanded="true"] .kw-faq-icon {
+  background-color: rgb(105 191 248 / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.7);
+}
+.kw-faq-q[aria-expanded="true"] .kw-faq-icon::before,
+.kw-faq-q[aria-expanded="true"] .kw-faq-icon::after {
+  background: var(--kw-sky);
+}
+.kw-faq-q[aria-expanded="true"] .kw-faq-icon::after {
+  rotate: 0deg;
+}

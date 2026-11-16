@@ -6,7 +6,7 @@ import { useMounted } from "@/components/concepts/shared";
 import { Container, Heading, Section, TextLink } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { MagicCard } from "@/components/ui/magic-card";
-import { LINKS, SERVICES } from "@/content/site";
+import { SERVICES } from "@/content/site";
 import { cn } from "@/lib/utils";
 import { isSceneId, SceneBox, ServiceAnimation, type SceneId } from "./scenes";
 
@@ -41,6 +41,8 @@ import { isSceneId, SceneBox, ServiceAnimation, type SceneId } from "./scenes";
 
 type Service = (typeof SERVICES.items)[number] & { id: SceneId };
 const ITEMS = SERVICES.items.filter((s): s is Service => isSceneId(s.id));
+/* 2026-11-16: the site has a Leistungen page; each plate's link opens that service's live demo there. */
+const SERVICE_ANCHOR: Record<string, string> = { agents: "ki-agenten", chat: "chatbots", calls: "callbots", marketing: "marketing" };
 
 /** Sticky tops in px below the fixed header: 20px apart, and 12px apart from 92px on phones (below sm). */
 const TOPS = [112, 132, 152, 172];
@@ -185,7 +187,7 @@ function Plate({
               </h3>
               <div data-reveal="up" data-rd="2">
                 <p className="t-body text-white/80">{service.text}</p>
-                <TextLink href={LINKS.contact} className="pointer-events-auto mt-3 min-h-11">
+                <TextLink href={`/leistungen#${SERVICE_ANCHOR[service.id]}`} className="pointer-events-auto mt-3 min-h-11">
                   {service.cta}
                 </TextLink>
               </div>
@@ -230,7 +232,7 @@ export function ServicesSection() {
             {SERVICES.text}
           </p>
           <div data-reveal="up" data-rd="3" className="mt-5">
-            <TextLink href={LINKS.contact} className="min-h-11">
+            <TextLink href="/leistungen" className="min-h-11">
               {SERVICES.cta}
             </TextLink>
           </div>

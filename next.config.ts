@@ -14,12 +14,13 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  // The versions are v1 (the homepage) to v7. The layout concepts first lived at /konzept-1 to /konzept-6; those
-  // addresses (and /v1) keep working.
+  // 2026-11-16: v11 became the only version (the homepage). Every earlier version address, and the old layout-concept
+  // addresses, lead to it, so no link the client saved breaks. The versions themselves live on in the git tag
+  // versions-archive-2026-11-16.
   async redirects() {
     return [
-      { source: "/v1", destination: "/", permanent: false },
-      ...[1, 2, 3, 4, 5, 6].map((n) => ({ source: `/konzept-${n}`, destination: `/v${n + 1}`, permanent: false })),
+      ...Array.from({ length: 11 }, (_, i) => ({ source: `/v${i + 1}`, destination: "/", permanent: false })),
+      ...[1, 2, 3, 4, 5, 6].map((n) => ({ source: `/konzept-${n}`, destination: "/", permanent: false })),
     ];
   },
 };

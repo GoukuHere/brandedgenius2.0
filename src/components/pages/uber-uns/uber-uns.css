@@ -1,0 +1,283 @@
+/*
+  Über uns (src/app/uber-uns). Only what Tailwind cannot say: the hero's line entrance and the mark's light, the
+  seal's turning rings, the dial's held stage. Every loop here runs only while its box is on screen (OnScreen sets
+  data-live) and stands still for reduced motion.
+*/
+
+/* ---------- Hero: the manifesto ---------- */
+
+.uu-manifesto {
+  font-size: clamp(2.5rem, 1.2rem + 4.1vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+/* Each line in a mask a little taller than the line, so descenders and the accent's own padding are never cut. */
+.uu-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.uu-line-accent {
+  padding-bottom: 0.22em;
+}
+.uu-line > span {
+  display: block;
+}
+
+/* The bG mark, huge and faint, behind the headline: a mask of the mark over a soft sky tint. */
+.uu-mark {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  z-index: -1;
+  width: min(1520px, 118vw);
+  aspect-ratio: 721 / 454;
+  translate: -50% -50%;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(170deg, rgb(105 191 248 / 0.085) 0%, rgb(105 191 248 / 0.04) 55%, rgb(105 191 248 / 0.02) 100%);
+  -webkit-mask: url("/media/pages/uber-uns/mark-mask.svg") center / 100% 100% no-repeat;
+  mask: url("/media/pages/uber-uns/mark-mask.svg") center / 100% 100% no-repeat;
+}
+/* The light: one soft band, slanted, crossing the mark every twelve seconds and resting between. */
+.uu-mark-sweep {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 28%;
+  background: linear-gradient(
+    90deg,
+    rgb(220 236 255 / 0) 0%,
+    rgb(220 236 255 / 0.16) 38%,
+    rgb(255 255 255 / 0.34) 50%,
+    rgb(220 236 255 / 0.16) 62%,
+    rgb(220 236 255 / 0) 100%
+  );
+  transform: translate3d(-120%, 0, 0) skewX(-18deg);
+  opacity: 0;
+}
+@keyframes uu-sweep {
+  0% {
+    transform: translate3d(-120%, 0, 0) skewX(-18deg);
+    opacity: 1;
+  }
+  34% {
+    transform: translate3d(380%, 0, 0) skewX(-18deg);
+    opacity: 1;
+  }
+  34.1%,
+  100% {
+    transform: translate3d(380%, 0, 0) skewX(-18deg);
+    opacity: 0;
+  }
+}
+@keyframes uu-line-in {
+  from {
+    translate: 0 108%;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+@keyframes uu-rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .uu-line > span {
+    animation: uu-line-in 1.15s var(--ease-out-expo) both;
+  }
+  .uu-rise {
+    animation: uu-rise 1s var(--ease-out-expo) both;
+  }
+  .uu-mark-sweep {
+    will-change: transform;
+    animation: uu-sweep 12s cubic-bezier(0.45, 0, 0.3, 1) 1.4s infinite both;
+    animation-play-state: paused;
+  }
+  .uu-hero[data-live] .uu-mark-sweep {
+    animation-play-state: running;
+  }
+}
+/* The deck: on wider screens the two paragraphs sit side by side with a hairline between them. */
+@media (min-width: 768px) {
+  .uu-deck > p + p {
+    box-shadow: inset 1px 0 0 rgb(255 255 255 / 0.1);
+  }
+}
+/* Phones: the mark sits behind the headline, a touch stronger, since the text covers more of it. */
+@media (max-width: 767px) {
+  .uu-mark {
+    top: 27%;
+    width: 140vw;
+    background: linear-gradient(170deg, rgb(105 191 248 / 0.11) 0%, rgb(105 191 248 / 0.06) 55%, rgb(105 191 248 / 0.03) 100%);
+  }
+}
+
+.uu-who-heading {
+  font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3rem);
+}
+
+/* ---------- Founder: the quote in the heading style ---------- */
+
+.uu-quote {
+  font-size: clamp(1.625rem, 1.1rem + 1.55vw, 2.625rem);
+  line-height: 1.2;
+  letter-spacing: -0.022em;
+  text-wrap: pretty;
+}
+
+/* ---------- Expertise: large type rows and the floating frame ---------- */
+
+/* "Vertriebsautomatisierung" is one word: 24px keeps it inside a 360px phone. */
+.uu-ex-title {
+  font-size: clamp(1.5rem, 1.05rem + 1.6vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.028em;
+  font-weight: 500;
+  text-wrap: balance;
+}
+/* The frame: an opaque navy plate with a royal light from its corner (opaque, so on phones the rows pass under it). */
+.uu-ex-frame {
+  position: relative;
+  border-radius: 22px;
+  padding: 10px 10px 16px;
+  background:
+    radial-gradient(90% 70% at 100% 0%, rgb(26 111 224 / 0.3), rgb(26 111 224 / 0) 65%),
+    linear-gradient(165deg, #0b2252 0%, #071636 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 0 0 1px rgb(255 255 255 / 0.08),
+    0 40px 80px -40px rgb(1 4 12 / 0.95);
+}
+/* Phones: the frame docks under the header while the rows pass beneath it, inside this section only. */
+@media (max-width: 767px) {
+  .uu-ex-dock {
+    position: sticky;
+    top: 84px;
+    margin-bottom: 8px;
+  }
+}
+
+/* ---------- Vertrauen: the seal's turning rings ---------- */
+
+.uu-seal-ring {
+  transform-origin: 50% 50%;
+  font-family: var(--font-sans);
+}
+@keyframes uu-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes uu-turn-back {
+  to {
+    rotate: -360deg;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .uu-seal-ring {
+    will-change: transform;
+    animation: uu-turn 160s linear infinite;
+    animation-play-state: paused;
+  }
+  .uu-seal-ring-b {
+    animation-name: uu-turn-back;
+    animation-duration: 210s;
+  }
+  .uu-seal[data-live] .uu-seal-ring {
+    animation-play-state: running;
+  }
+}
+
+/* ---------- So arbeiten wir: the dial and its held stage ---------- */
+
+/* The dial: as large as the stage allows, square. Its step names sit just outside the ring. */
+.uu-dial {
+  width: min(560px, 100%, calc(100svh - 190px));
+  aspect-ratio: 1;
+}
+/* The heading on the stage: sized so "Von der Herausforderung zur" holds one line in its half (measured). */
+.uu-proc-heading {
+  font-size: clamp(2.2rem, -0.05rem + 3.5vw, 2.75rem);
+}
+@media (max-width: 1023px) {
+  .uu-dial {
+    width: min(340px, 100%, calc(100svh - 300px));
+  }
+  .uu-proc-heading {
+    font-size: clamp(1.5625rem, 1.2rem + 1.5vw, 2.25rem);
+    text-align: center;
+    margin-inline: auto;
+  }
+  .uu-proc-text {
+    margin-inline: auto;
+    text-align: center;
+  }
+}
+
+/* Tablets: a larger dial, with the step names around it as on desktop. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .uu-dial {
+    width: min(480px, 100%, calc(100svh - 330px));
+  }
+}
+
+/*
+  Held where it fits (the homepage's screens: desktop at least 720px tall, phones and tablets at least 600px), as the
+  homepage's held stages: a 300svh runway with a sticky one-screen stage, the content centred under the header.
+  Unlayered, so it wins over the section's Tailwind padding.
+*/
+@media (prefers-reduced-motion: no-preference) and (min-width: 1024px) and (min-height: 720px),
+  (prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 600px) {
+  .uu-proc {
+    height: 300svh;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .uu-proc-stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: 100svh;
+    padding-top: 84px;
+    padding-bottom: 16px;
+  }
+}
+/* Desktop: the held stage centres the dial in the screen, which already leaves its own space above it, so the
+   section before it ends without its bottom padding (as the homepage does before its held stages). */
+@media (prefers-reduced-motion: no-preference) and (min-width: 1024px) and (min-height: 720px) {
+  .v11 #vertrauen {
+    padding-bottom: 0;
+  }
+}
+/* Phones on the stage: the header is 76px there; the line under the heading only where there is room for it. */
+@media (prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 600px) {
+  .uu-proc-stage {
+    padding-top: 80px;
+    padding-bottom: 8px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 600px) and (max-height: 799px) {
+  .uu-proc-text {
+    display: none;
+  }
+}
+
+/* ---------- The close ---------- */
+
+.uu-rule-centre[data-reveal="rule"] {
+  transform-origin: 50% 50%;
+}

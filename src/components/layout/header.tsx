@@ -1,6 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PrimaryLink, SecondaryLink } from "@/components/system/primitives";
 import { HEADER, LINKS, NAV } from "@/content/site";
@@ -18,47 +20,26 @@ const EASE = [0.16, 1, 0.3, 1] as const;
   it: the button's 12px plus its 8px inset. A pill bar around a 12px button would pinch the gap at the corner.
   v5: as in the developer's reference, the header's button is the dark second style, so the cream main button
   leads in the content; the phone menu keeps the cream one.
-  v6 (2026-11-07): the link of the section being read lights up (white, with a small sky dot that slides from link
-  to link). A section counts while it holds the line at 35% of the screen height; between linked sections (Ablauf,
-  Impact, ...) no link is lit. The phone menu marks the same link.
+  v6 (2026-11-07): the current link lights up (white, with a small sky dot that slides from link to link).
+  2026-11-16: the site has pages now, so the links lead to them (Next links, no reload) and the lit link is the page
+  being read. The phone menu marks the same link.
 */
 
-/** Which linked section holds the reading line (35% down the screen), if any. */
-function useCurrentSection() {
-  const [current, setCurrent] = useState<string | null>(null);
-  useEffect(() => {
-    const targets = NAV.map((item) => ({ href: item.href, el: document.querySelector<HTMLElement>(item.href) }));
-    let frame = 0;
-    const measure = () => {
-      frame = 0;
-      const line = window.innerHeight * 0.35;
-      const hit = targets.find(({ el }) => {
-        if (!el) return false;
-        const rect = el.getBoundingClientRect();
-        return rect.top <= line && rect.bottom > line;
-      });
-      setCurrent(hit ? hit.href : null);
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(measure);
-    };
-    measure();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, []);
-  return current;
+/**
+ * The page being read (2026-11-16: the nav links to the site's pages, no longer to sections of one page). The sky dot
+ * sits under that page's link; a deeper address (a later case-study page, say) lights its parent.
+ */
+function useCurrentPage() {
+  const path = usePathname() ?? "/";
+  const hit = NAV.find((item) => (item.href === "/" ? path === "/" : path === item.href || path.startsWith(`${item.href}/`)));
+  return hit ? hit.href : null;
 }
 
 export function Header() {
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const current = useCurrentSection();
+  const current = useCurrentPage();
 
   useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 24));
 
@@ -88,9 +69,9 @@ export function Header() {
           scrolled || open ? "glass glass-blur h-[60px] border-transparent" : "h-16 border-white/[0.06] bg-page/40 md:h-[68px]"
         )}
       >
-        <a href="#top" aria-label="Branded Genius, zum Seitenanfang" className="block h-8 shrink-0 md:h-9">
+        <Link href="/" aria-label="Branded Genius, zur Startseite" className="block h-8 shrink-0 md:h-9">
           <BrandLogo className="h-full" />
-        </a>
+        </Link>
 
         <nav aria-label="Hauptnavigation" className="hidden xl:block">
           <ul className="flex items-center gap-0.5">
@@ -98,7 +79,7 @@ export function Header() {
               const on = current === item.href;
               return (
                 <li key={item.href}>
-                  <a
+                  <Link
                     href={item.href}
                     aria-current={on ? "true" : undefined}
                     className={cn(
@@ -115,7 +96,7 @@ export function Header() {
                         className="absolute inset-x-0 bottom-[3px] mx-auto size-1 rounded-full bg-sky"
                       />
                     )}
-                  </a>
+                  </Link>
                 </li>
               );
             })}
@@ -157,7 +138,7 @@ export function Header() {
             <ul className="space-y-1">
               {NAV.map((item) => (
                 <li key={item.href}>
-                  <a
+                  <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
                     aria-current={current === item.href ? "true" : undefined}
@@ -165,7 +146,7 @@ export function Header() {
                   >
                     {item.label}
                     {current === item.href && <span aria-hidden className="size-1.5 rounded-full bg-sky" />}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

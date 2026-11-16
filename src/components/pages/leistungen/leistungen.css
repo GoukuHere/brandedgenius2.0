@@ -1,0 +1,1941 @@
+/*
+  /leistungen (2026-11-16): the page's own styles beyond Tailwind, imported by src/app/leistungen/page.tsx only.
+  Every class starts with ls-. Colours as everywhere on the site: the navy ground, off-white ink #f1f1ee, Sky #69bff8
+  for what is active or moving, Royal #004ba0 and ice #dcecff; no other hues. Only transform, opacity and a few
+  colour transitions animate; every loop pauses off screen or stops with reduced motion.
+*/
+
+/* ---------- Shared ---------- */
+
+/* A use case as a small quiet pill. */
+.ls-use {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  line-height: 1.3;
+  color: rgb(241 241 238 / 0.8);
+  background: rgb(255 255 255 / 0.04);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+}
+
+/* The service headings are long: a step below the h2 size. */
+.ls-service-title {
+  font-size: clamp(1.75rem, 1.2rem + 1.4vw, 2.5rem);
+  line-height: 1.1;
+}
+
+/* The demos' own button (shared.tsx): 40px, 12px corners. */
+.ls-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  color: #f1f1ee;
+  background: rgb(255 255 255 / 0.04);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.17);
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ls-btn:hover {
+  background-color: rgb(105 191 248 / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.45);
+}
+.ls-btn:active {
+  transform: scale(0.97);
+}
+.ls-btn:disabled {
+  cursor: default;
+}
+.ls-btn:disabled:active {
+  transform: none;
+}
+.ls-btn-primary {
+  color: #fff;
+  background: linear-gradient(100deg, #003a82 0%, #0857bd 52%, #1a74e0 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.24),
+    inset 0 0 0 1px rgb(105 191 248 / 0.42),
+    0 12px 28px -14px rgb(26 116 224 / 0.85);
+}
+.ls-btn-primary:hover {
+  background: linear-gradient(100deg, #0646a0 0%, #0c62d2 52%, #2a82ea 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    inset 0 0 0 1px rgb(105 191 248 / 0.75),
+    0 14px 32px -12px rgb(105 191 248 / 0.55);
+}
+
+/* A two-way switch (WhatsApp / Telegram, Inbound / Outbound). */
+.ls-switch {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.045);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+}
+.ls-switch-option {
+  height: 32px;
+  padding: 0 15px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(241 241 238 / 0.62);
+  cursor: pointer;
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.ls-switch-option:hover {
+  color: #fff;
+}
+.ls-switch-option[aria-checked="true"] {
+  color: #fff;
+  background: rgb(105 191 248 / 0.16);
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.55);
+}
+
+.ls-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: rgb(241 241 238 / 0.8);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  cursor: pointer;
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.ls-icon-btn:hover {
+  color: #fff;
+  background: rgb(105 191 248 / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.45);
+}
+
+/* A status light: quiet at rest, breathing while something runs. */
+.ls-status-dot {
+  position: relative;
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #69bff8;
+  box-shadow: 0 0 0 3px rgb(105 191 248 / 0.16);
+}
+.ls-status-dot::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 1px rgb(105 191 248 / 0.7);
+  opacity: 0;
+}
+:is([data-phase="running"], [data-phase="playing"]) .ls-status-dot::after,
+.ls-status-dot-live::after {
+  animation: ls-ping 1.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes ls-ping {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+@keyframes ls-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ls-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ls-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ls-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+@keyframes ls-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Hero ---------- */
+
+.ls-hero-title {
+  font-size: clamp(1.6875rem, 0.9rem + 2.9vw, 3.75rem);
+  line-height: 1.06;
+}
+.ls-hero-lead {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgb(241 241 238 / 0.74);
+  text-wrap: pretty;
+}
+@media (min-width: 640px) {
+  .ls-hero-lead {
+    font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);
+    line-height: 1.6;
+  }
+}
+
+/*
+  The engine. Phones: a compact still layout (core in the middle, two pills above, two below). From md: the orbit,
+  sized from the stage's own width (container units): --rx and --ry are the radii of the ring the pills ride.
+*/
+.ls-engine {
+  --core: 60px;
+  --rx: 150px;
+  --ry: 64px;
+  position: relative;
+  height: 176px;
+  margin-top: 26px;
+}
+/* Tablets: the same still layout, wider, with his sub-lines. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .ls-engine {
+    --core: 84px;
+    --rx: 250px;
+    --ry: 98px;
+    max-width: 640px;
+    height: 236px;
+    margin: 38px auto 0;
+  }
+}
+/* From lg: the orbit, sized from the stage's own width (container units). */
+@media (min-width: 1024px) {
+  .ls-engine {
+    --core: 128px;
+    --rx: min(470px, calc(50cqw - 158px));
+    --ry: max(118px, calc(var(--rx) * 0.3));
+    --T: 84s;
+    container-type: inline-size;
+    height: clamp(372px, 20vw + 90px, 412px);
+    margin-top: 22px;
+  }
+}
+
+.ls-rings {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* The rings: ellipses on the orbit's plane, fainter towards the back (the top). */
+.ls-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--rx) * 2 * var(--s, 1));
+  height: calc(var(--ry) * 2 * var(--s, 1));
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1px solid rgb(105 191 248 / 0.45);
+  -webkit-mask-image: linear-gradient(180deg, rgb(0 0 0 / 0.25) 0%, #000 64%);
+  mask-image: linear-gradient(180deg, rgb(0 0 0 / 0.25) 0%, #000 64%);
+}
+.ls-ring-plane {
+  border: 0;
+  background: radial-gradient(closest-side, rgb(26 111 224 / 0.2), rgb(26 111 224 / 0.07) 62%, rgb(26 111 224 / 0));
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.ls-ring-1 {
+  --s: 0.56;
+  border-color: rgb(105 191 248 / 0.3);
+}
+.ls-ring-3 {
+  --s: 1.36;
+  border-color: rgb(105 191 248 / 0.22);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
+}
+
+.ls-core-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: calc(var(--rx) * 1.4);
+  height: calc(var(--ry) * 2.3);
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(105 191 248 / 0.3), rgb(26 111 224 / 0.14) 55%, rgb(26 111 224 / 0));
+  pointer-events: none;
+}
+
+.ls-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: var(--core);
+  height: var(--core);
+  translate: -50% -50%;
+  border-radius: calc(var(--core) * 0.27);
+  background:
+    radial-gradient(130% 100% at 30% 0%, rgb(105 191 248 / 0.26), rgb(105 191 248 / 0) 58%),
+    linear-gradient(160deg, #10306a 0%, #081b42 62%, #061533 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    inset 0 0 0 1px rgb(105 191 248 / 0.42),
+    0 24px 60px -24px rgb(0 0 0 / 0.9),
+    0 0 70px -6px rgb(105 191 248 / 0.4);
+}
+/* The glass sheen across its upper half. */
+.ls-core::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.13), rgb(255 255 255 / 0) 46%);
+  pointer-events: none;
+}
+.ls-core-mark {
+  position: relative;
+  width: 60%;
+  height: auto;
+  filter: drop-shadow(0 0 12px rgb(105 191 248 / 0.35));
+}
+.ls-core-ripple {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow:
+    0 0 0 1px rgb(105 191 248 / 0.95),
+    0 0 34px rgb(105 191 248 / 0.55);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The light from a satellite: a short streak with a bright head (its head is the transform origin), and a faint
+   line between the two while it travels. Placed by the script (hero.tsx). */
+.ls-beam {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  width: 120px;
+  height: 3px;
+  margin: -1.5px 0 0 -120px;
+  border-radius: 3px;
+  transform-origin: 100% 50%;
+  background: linear-gradient(90deg, rgb(105 191 248 / 0), rgb(105 191 248 / 0.75) 58%, #f4faff);
+  box-shadow:
+    0 0 14px rgb(105 191 248 / 0.8),
+    0 0 4px rgb(234 246 255 / 0.9);
+  opacity: 0;
+  pointer-events: none;
+}
+.ls-spoke {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  height: 1px;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, rgb(105 191 248 / 0.6), rgb(105 191 248 / 0.22));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ls-orbits {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The pills: navy glass, fully round, the icon bare in sky. */
+.ls-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 20px 11px 16px;
+  border-radius: 999px;
+  white-space: nowrap;
+  text-decoration: none;
+  color: #f1f1ee;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.03)),
+    rgb(9 28 66 / 0.94);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.15),
+    inset 0 0 0 1px rgb(105 191 248 / 0.3),
+    0 18px 38px -18px rgb(0 0 0 / 0.95);
+  transition: box-shadow 0.3s ease;
+}
+.ls-pill:hover,
+.ls-pill:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    inset 0 0 0 1px rgb(105 191 248 / 0.8),
+    0 18px 42px -16px rgb(105 191 248 / 0.5);
+}
+.ls-pill-lit {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.95),
+    0 0 26px -4px rgb(105 191 248 / 0.65);
+  opacity: 0;
+  pointer-events: none;
+}
+.ls-pill-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: #69bff8;
+}
+.ls-pill-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.ls-pill-name {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+.ls-pill-sub {
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 1.25;
+  color: rgb(241 241 238 / 0.62);
+}
+
+/* Phones and tablets: still, around the core: two pills above it, two below. */
+@media (max-width: 1023px) {
+  .ls-orbit {
+    position: absolute;
+  }
+  .ls-orbit:nth-child(1) {
+    left: 0;
+    top: 0;
+  }
+  .ls-orbit:nth-child(2) {
+    right: 0;
+    top: 0;
+  }
+  .ls-orbit:nth-child(3) {
+    left: 0;
+    bottom: 0;
+  }
+  .ls-orbit:nth-child(4) {
+    right: 0;
+    bottom: 0;
+  }
+}
+/* Phones: compact pills, names on his own two lines, no sub-line. */
+@media (max-width: 639px) {
+  .ls-pill {
+    gap: 8px;
+    padding: 8px 13px 8px 11px;
+  }
+  .ls-pill-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .ls-pill-name {
+    font-size: 13px;
+    line-height: 1.22;
+  }
+  .ls-pill-line {
+    display: block;
+  }
+  .ls-pill-sub {
+    display: none;
+  }
+}
+
+/* From lg: the orbit. At rest (and with reduced motion) each pill stands at its own angle --a. */
+@media (min-width: 1024px) {
+  .ls-orbit {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    translate: calc(var(--rx) * cos(var(--a))) 0;
+  }
+  .ls-orbit-y {
+    width: max-content;
+    translate: 0 calc(var(--ry) * sin(var(--a)));
+  }
+  .ls-orbit-d {
+    width: max-content;
+    translate: -50% -50%;
+    scale: calc(0.93 + 0.07 * sin(var(--a)));
+    opacity: calc(0.87 + 0.13 * sin(var(--a)));
+  }
+}
+
+/*
+  The orbit itself: x and y each run an eased loop (the ease of a sine), a quarter turn apart, which traces the
+  ellipse; the depth loop (size and light) runs with y, so a pill is largest and brightest at the front. Each pill's
+  delays start it at its own angle. Paused while a pill is hovered or focused, and while the engine is off screen.
+*/
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .ls-orbit {
+    animation: ls-orbit-x var(--T) cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: calc(var(--T) * var(--px) * -1);
+  }
+  .ls-orbit-y {
+    animation: ls-orbit-y var(--T) cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: calc(var(--T) * var(--py) * -1);
+  }
+  .ls-orbit-d {
+    animation: ls-orbit-depth var(--T) cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    animation-delay: calc(var(--T) * var(--py) * -1);
+  }
+  .ls-engine[data-off] :is(.ls-orbit, .ls-orbit-y, .ls-orbit-d),
+  .ls-engine:has(.ls-pill:hover, .ls-pill:focus-visible) :is(.ls-orbit, .ls-orbit-y, .ls-orbit-d) {
+    animation-play-state: paused;
+  }
+  .ls-core-glow {
+    animation: ls-breathe 7s ease-in-out infinite;
+  }
+  .ls-engine[data-off] .ls-core-glow {
+    animation-play-state: paused;
+  }
+}
+@keyframes ls-orbit-x {
+  0%,
+  100% {
+    translate: var(--rx) 0;
+  }
+  50% {
+    translate: calc(var(--rx) * -1) 0;
+  }
+}
+@keyframes ls-orbit-y {
+  0%,
+  100% {
+    translate: 0 var(--ry);
+  }
+  50% {
+    translate: 0 calc(var(--ry) * -1);
+  }
+}
+@keyframes ls-orbit-depth {
+  0%,
+  100% {
+    scale: 1;
+    opacity: 1;
+  }
+  50% {
+    scale: 0.86;
+    opacity: 0.74;
+  }
+}
+@keyframes ls-breathe {
+  0%,
+  100% {
+    opacity: 0.78;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Potenzial ---------- */
+
+/* The statement: very large, centred (the two statements of the page share this size). */
+.ls-statement,
+.ls-closing-title {
+  font-size: clamp(2.25rem, 1rem + 4.2vw, 4.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+.ls-statement {
+  font-weight: 500;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+/*
+  The words light with the scroll: --p (0 to 1) is written by the script; word --i lights over its share of --u.
+  The blue phrase keeps a dim layer under its gradient and fills from left to right last. Without script or with
+  reduced motion it all stands lit.
+*/
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .ls-lit-word {
+    opacity: calc(0.16 + 0.84 * clamp(0, var(--p, 0) * var(--u) - var(--i), 1));
+  }
+  .ls-lit-accent {
+    --fill: clamp(0, calc((var(--p, 0) * var(--u) - var(--i)) / 2), 1);
+    background-image:
+      linear-gradient(100deg, #f1f1ee 0%, #dcecff 15.2%, #69bff8 40%, rgb(105 191 248 / 0) 50%),
+      linear-gradient(rgb(241 241 238 / 0.16), rgb(241 241 238 / 0.16));
+    background-size:
+      250% 100%,
+      100% 100%;
+    background-repeat: no-repeat;
+    background-position:
+      calc((1 - var(--fill)) * 100%) 0,
+      0 0;
+  }
+}
+
+.ls-benefit-rule {
+  background: linear-gradient(90deg, rgb(241 241 238 / 0.18), rgb(241 241 238 / 0.14) 70%, rgb(241 241 238 / 0.04));
+}
+/* Phones: each benefit has its own line. */
+.ls-benefits > li::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: rgb(241 241 238 / 0.12);
+}
+@media (min-width: 768px) {
+  .ls-benefits > li::before {
+    content: none;
+  }
+}
+.ls-benefit-mark {
+  position: absolute;
+  left: 0;
+  top: -0.5px;
+  width: 36px;
+  height: 2px;
+  border-radius: 2px;
+  background: #69bff8;
+  box-shadow: 0 0 12px rgb(105 191 248 / 0.6);
+}
+/* One after another, slower than the site's default group step. */
+.ls-benefits > :nth-child(2) {
+  --n: 2.8;
+}
+.ls-benefits > :nth-child(3) {
+  --n: 5.6;
+}
+.ls-benefits > :nth-child(4) {
+  --n: 8.4;
+}
+
+/* ---------- KI-Agenten: the console ---------- */
+
+.ls-console {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(90% 60% at 100% 0%, rgb(26 111 224 / 0.24), rgb(26 111 224 / 0) 60%),
+    linear-gradient(180deg, #0c2252 0%, #081a3f 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 0 0 1px rgb(255 255 255 / 0.09),
+    0 40px 80px -40px rgb(0 0 0 / 0.95);
+}
+.ls-console-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 14px 14px 14px 22px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.07);
+}
+.ls-console[data-phase="running"] .ls-console-button svg {
+  animation: ls-spin 0.9s linear infinite;
+}
+.ls-console[data-phase="running"] .ls-console-button {
+  opacity: 0.85;
+}
+
+.ls-steps {
+  margin: 0;
+  padding: 10px 12px;
+  list-style: none;
+}
+.ls-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 16px;
+  padding: 12px 12px;
+  border-radius: 14px;
+  transition:
+    background-color 0.35s ease,
+    box-shadow 0.35s ease,
+    opacity 0.35s ease;
+}
+.ls-console[data-phase="running"] .ls-step[data-state="pending"] {
+  opacity: 0.5;
+}
+.ls-step[data-state="active"] {
+  background: rgb(105 191 248 / 0.07);
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.3);
+}
+.ls-step-dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: #06142f;
+  background: #0b2050;
+  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.2);
+  transition:
+    background-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.ls-step[data-state="active"] .ls-step-dot {
+  box-shadow:
+    inset 0 0 0 1.5px rgb(105 191 248 / 0.35),
+    0 0 18px -2px rgb(105 191 248 / 0.6);
+}
+/* The working step's dot: a sky arc turning. */
+.ls-step[data-state="active"] .ls-step-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid transparent;
+  border-top-color: #69bff8;
+  border-right-color: #69bff8;
+  animation: ls-spin 0.8s linear infinite;
+}
+.ls-step[data-state="done"] .ls-step-dot {
+  background: #69bff8;
+  box-shadow: 0 0 16px -4px rgb(105 191 248 / 0.8);
+}
+/* The line from one step's dot down to the next one's (his progress line, drawn step by step). */
+.ls-step-link {
+  position: absolute;
+  left: 25px;
+  top: 40px;
+  bottom: -12px;
+  width: 2px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.09);
+  overflow: hidden;
+}
+.ls-step-link > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(180deg, #69bff8, rgb(105 191 248 / 0.6));
+  transform: scaleY(var(--link, 0));
+  transform-origin: 50% 0;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ls-step-state {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 86px;
+  min-height: 28px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.ls-step[data-state="done"] .ls-step-state {
+  animation: ls-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.ls-working {
+  display: inline-flex;
+  gap: 4px;
+}
+.ls-working > span {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: #69bff8;
+  animation: ls-dot 0.9s ease-in-out infinite;
+}
+.ls-working > span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.ls-working > span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.ls-score {
+  display: block;
+  width: min(220px, 100%);
+  height: 4px;
+  margin-top: 9px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.08);
+}
+.ls-score-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #0857bd, #69bff8);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ls-step:is([data-state="active"], [data-state="done"]) .ls-score-fill {
+  transform: scaleX(var(--score));
+}
+.ls-console-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin: 0;
+  padding: 14px 22px 16px;
+  list-style: none;
+  font-size: 13px;
+  color: rgb(241 241 238 / 0.62);
+  border-top: 1px solid rgb(255 255 255 / 0.07);
+}
+.ls-console-foot > li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ls-console-foot > li::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgb(105 191 248 / 0.85);
+}
+@media (max-width: 639px) {
+  .ls-console-head {
+    padding: 12px 12px 12px 16px;
+  }
+  .ls-steps {
+    padding: 8px 6px;
+  }
+  .ls-step {
+    gap: 12px;
+    padding: 11px 10px;
+  }
+  .ls-step-link {
+    left: 23px;
+  }
+  .ls-step-state {
+    min-width: 0;
+    font-size: 13px;
+    gap: 4px;
+  }
+  .ls-console-foot {
+    padding: 13px 16px 14px;
+  }
+}
+
+/* ---------- Chatbots: the phone ---------- */
+
+.ls-phone {
+  position: relative;
+  width: min(330px, 100%);
+  height: 628px;
+  padding: 9px;
+  border-radius: 52px;
+  background: linear-gradient(160deg, #1d2d50 0%, #070f22 42%, #0d1b3a 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.14),
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    0 50px 90px -40px rgb(0 0 0 / 0.95),
+    0 0 0 1px rgb(0 0 0 / 0.45);
+}
+/* A soft light behind the phone. */
+.ls-phone::before {
+  content: "";
+  position: absolute;
+  inset: 12% -40%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(26 111 224 / 0.3), rgb(26 111 224 / 0));
+  pointer-events: none;
+}
+.ls-phone-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 43px;
+  background: #06142f;
+}
+.ls-phone-island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  z-index: 3;
+  width: 90px;
+  height: 26px;
+  translate: -50% 0;
+  border-radius: 999px;
+  background: #01040b;
+}
+.ls-chat-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 50px 14px 12px;
+  background: rgb(10 31 74 / 0.97);
+  border-bottom: 1px solid rgb(255 255 255 / 0.06);
+}
+.ls-chat-avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #10306a, #081b42);
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.35);
+}
+.ls-chat-avatar img {
+  width: 25px;
+  height: auto;
+}
+[data-channel="telegram"] .ls-chat-head {
+  background: rgb(14 42 96 / 0.97);
+}
+[data-channel="telegram"] .ls-chat-avatar {
+  border-radius: 999px;
+}
+
+.ls-chat-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background-color: #071a3c;
+  background-image: radial-gradient(rgb(105 191 248 / 0.075) 1px, transparent 1.5px);
+  background-size: 18px 18px;
+}
+[data-channel="telegram"] .ls-chat-body {
+  background-color: #082052;
+  background-image:
+    radial-gradient(120% 60% at 100% 0%, rgb(26 111 224 / 0.3), rgb(26 111 224 / 0) 60%),
+    radial-gradient(90% 50% at 0% 100%, rgb(105 191 248 / 0.12), rgb(105 191 248 / 0) 60%);
+  background-size: auto;
+}
+/* Newest at the foot; older rows leave over the top edge, which fades. */
+.ls-chat-list {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 7px;
+  padding: 14px 12px 16px;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 40px);
+  mask-image: linear-gradient(180deg, transparent 0, #000 40px);
+}
+.ls-msg {
+  display: flex;
+  flex-shrink: 0;
+  animation: ls-rise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.ls-msg-bot {
+  justify-content: flex-start;
+}
+.ls-msg-user {
+  justify-content: flex-end;
+}
+.ls-bubble {
+  position: relative;
+  max-width: 86%;
+  padding: 8px 11px;
+  border-radius: 15px;
+  font-size: 14px;
+  line-height: 1.42;
+  color: #f1f1ee;
+}
+.ls-bubble-bot {
+  background: #11295a;
+  border-top-left-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+}
+.ls-bubble-user {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 6px;
+  background: #0a4aa0;
+  border-top-right-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.25);
+}
+[data-channel="telegram"] .ls-bubble-bot {
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 4px;
+  background: #142f62;
+}
+[data-channel="telegram"] .ls-bubble-user {
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 4px;
+  background: #1257b0;
+}
+.ls-read {
+  flex-shrink: 0;
+  margin-bottom: 1px;
+  color: #69bff8;
+}
+.ls-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 13px;
+}
+.ls-typing > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(241 241 238 / 0.85);
+  animation: ls-dot 1s ease-in-out infinite;
+}
+.ls-typing > span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+.ls-typing > span:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+/* WhatsApp: the quick replies as buttons under the bot's message, in sky. */
+.ls-replies {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 5px;
+  width: 86%;
+  animation: ls-rise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.ls-reply {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #69bff8;
+  background: #11295a;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.ls-reply:hover {
+  background: #173470;
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.45);
+}
+/* Telegram: an inline keyboard across the chat, white on clear glass. */
+.ls-replies-tg {
+  width: 100%;
+}
+.ls-replies-tg .ls-reply {
+  height: 38px;
+  border-radius: 10px;
+  color: #f1f1ee;
+  background: rgb(255 255 255 / 0.1);
+}
+.ls-replies-tg .ls-reply:hover {
+  background: rgb(255 255 255 / 0.16);
+}
+.ls-replies-tg .ls-reply svg {
+  color: #69bff8;
+}
+
+.ls-card {
+  border-radius: 15px;
+  background: #11295a;
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.32);
+}
+.ls-expert {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  max-width: 90%;
+  padding: 10px 13px 10px 10px;
+  text-decoration: none;
+  transition: box-shadow 0.25s ease;
+}
+.ls-expert:hover {
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.8),
+    0 0 22px -6px rgb(105 191 248 / 0.6);
+}
+.ls-expert-mark {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: #0a1d44;
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.3);
+}
+.ls-expert-mark img {
+  width: 23px;
+  height: auto;
+}
+.ls-slots {
+  width: 90%;
+  padding: 10px;
+}
+.ls-slot {
+  height: 36px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: #f1f1ee;
+  background: rgb(255 255 255 / 0.06);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.3s ease;
+}
+.ls-slot:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.6);
+}
+.ls-slot-day {
+  flex: 1;
+  min-width: 0;
+}
+.ls-slot[aria-checked="true"],
+.ls-slot[data-on] {
+  color: #fff;
+  background: rgb(105 191 248 / 0.2);
+  box-shadow: inset 0 0 0 1px #69bff8;
+}
+.ls-slot:disabled {
+  cursor: default;
+}
+.ls-slots[data-picked] .ls-slot:not([data-on], [aria-checked="true"]) {
+  opacity: 0.4;
+}
+.ls-booked {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px 9px 9px;
+}
+.ls-booked-check {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  color: #06142f;
+  background: #69bff8;
+  box-shadow: 0 0 18px -4px rgb(105 191 248 / 0.8);
+}
+.ls-system {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 94%;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: center;
+  color: rgb(241 241 238 / 0.85);
+  background: rgb(4 12 30 / 0.62);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+
+/* ---------- Callbots: the voice engine ---------- */
+
+.ls-voice {
+  overflow: hidden;
+  border-radius: 26px;
+  background:
+    radial-gradient(80% 60% at 0% 0%, rgb(26 111 224 / 0.22), rgb(26 111 224 / 0) 60%),
+    linear-gradient(180deg, #0c2252 0%, #081a3f 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 0 0 1px rgb(255 255 255 / 0.09),
+    0 40px 80px -40px rgb(0 0 0 / 0.95);
+}
+.ls-voice-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 18px 22px;
+}
+.ls-voice-screen {
+  margin: 0 14px;
+  padding: 22px 20px 18px;
+  border-radius: 18px;
+  background: #050f26;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.06),
+    inset 0 12px 30px -12px rgb(0 0 0 / 0.85);
+}
+.ls-wave {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3px;
+  height: 92px;
+}
+.ls-wave > span {
+  flex: 1;
+  max-width: 6px;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #dcecff 0%, #69bff8 42%, #1a6fe0 100%);
+  transform: scaleY(calc(var(--h) * 0.14));
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ls-wave[data-on] > span {
+  animation: ls-wave var(--d) ease-in-out var(--o) infinite alternate;
+}
+.ls-voice[data-phase="paused"] .ls-wave > span {
+  animation-play-state: paused;
+}
+@keyframes ls-wave {
+  0% {
+    transform: scaleY(calc(var(--h) * 0.16));
+  }
+  35% {
+    transform: scaleY(calc(var(--h) * 0.88));
+  }
+  65% {
+    transform: scaleY(calc(var(--h) * 0.42));
+  }
+  100% {
+    transform: scaleY(var(--h));
+  }
+}
+.ls-transcript {
+  min-height: 3em;
+}
+.ls-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.16em;
+  background: #69bff8;
+  animation: ls-blink 1s steps(1) infinite;
+}
+.ls-voice-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px 0;
+}
+.ls-voice-topics {
+  padding: 20px 22px 24px;
+}
+.ls-topic {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 14px 0 11px;
+  border-radius: 999px;
+  font-size: 14px;
+  color: rgb(241 241 238 / 0.55);
+  background: rgb(255 255 255 / 0.03);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  transition:
+    color 0.45s ease,
+    background-color 0.45s ease,
+    box-shadow 0.45s ease;
+}
+.ls-topic-check {
+  width: 14px;
+  height: 14px;
+  color: #69bff8;
+  opacity: 0.25;
+  transform: scale(0.75);
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ls-topic-on {
+  color: #fff;
+  background: rgb(105 191 248 / 0.12);
+  box-shadow:
+    inset 0 0 0 1px rgb(105 191 248 / 0.6),
+    0 0 22px -8px rgb(105 191 248 / 0.7);
+}
+.ls-topic-on .ls-topic-check {
+  opacity: 1;
+  transform: none;
+}
+@media (max-width: 639px) {
+  .ls-voice-head {
+    padding: 16px 16px 14px;
+  }
+  .ls-voice-screen {
+    margin: 0 10px;
+    padding: 18px 14px 16px;
+  }
+  .ls-wave {
+    height: 72px;
+    gap: 2px;
+  }
+  .ls-voice-controls {
+    padding: 16px 16px 0;
+  }
+  .ls-voice-topics {
+    padding: 18px 16px 20px;
+  }
+}
+
+/* ---------- Marketing: the pipeline track ---------- */
+
+.ls-track {
+  padding: 16px 22px 30px;
+  border-radius: 26px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.045), rgb(255 255 255 / 0.015));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 0 0 0 1px rgb(255 255 255 / 0.07);
+}
+.ls-track-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.07);
+}
+.ls-track-stage {
+  display: inline-block;
+  animation: ls-fade 0.5s ease both;
+}
+.ls-track-fill {
+  transition: stroke-dashoffset 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.ls-stations {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Phones: a snake of two by four (the order runs right, down, back left, down ...). */
+.ls-station[data-i="0"] {
+  grid-area: 1 / 1;
+}
+.ls-station[data-i="1"] {
+  grid-area: 1 / 2;
+}
+.ls-station[data-i="2"] {
+  grid-area: 2 / 2;
+}
+.ls-station[data-i="3"] {
+  grid-area: 2 / 1;
+}
+.ls-station[data-i="4"] {
+  grid-area: 3 / 1;
+}
+.ls-station[data-i="5"] {
+  grid-area: 3 / 2;
+}
+.ls-station[data-i="6"] {
+  grid-area: 4 / 2;
+}
+.ls-station[data-i="7"] {
+  grid-area: 4 / 1;
+}
+/* Tablets: four by two. */
+@media (min-width: 768px) {
+  .ls-stations {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 40px 16px;
+  }
+  .ls-station[data-i="0"] {
+    grid-area: 1 / 1;
+  }
+  .ls-station[data-i="1"] {
+    grid-area: 1 / 2;
+  }
+  .ls-station[data-i="2"] {
+    grid-area: 1 / 3;
+  }
+  .ls-station[data-i="3"] {
+    grid-area: 1 / 4;
+  }
+  .ls-station[data-i="4"] {
+    grid-area: 2 / 4;
+  }
+  .ls-station[data-i="5"] {
+    grid-area: 2 / 3;
+  }
+  .ls-station[data-i="6"] {
+    grid-area: 2 / 2;
+  }
+  .ls-station[data-i="7"] {
+    grid-area: 2 / 1;
+  }
+}
+/* Large screens: one row of eight. */
+@media (min-width: 1024px) {
+  .ls-stations {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 0 10px;
+  }
+  .ls-station[data-i] {
+    grid-row: 1;
+  }
+  .ls-station[data-i="0"] {
+    grid-column: 1;
+  }
+  .ls-station[data-i="1"] {
+    grid-column: 2;
+  }
+  .ls-station[data-i="2"] {
+    grid-column: 3;
+  }
+  .ls-station[data-i="3"] {
+    grid-column: 4;
+  }
+  .ls-station[data-i="4"] {
+    grid-column: 5;
+  }
+  .ls-station[data-i="5"] {
+    grid-column: 6;
+  }
+  .ls-station[data-i="6"] {
+    grid-column: 7;
+  }
+  .ls-station[data-i="7"] {
+    grid-column: 8;
+  }
+}
+.ls-station-hit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0 2px;
+  text-align: center;
+  cursor: pointer;
+}
+.ls-station-hit:focus-visible {
+  outline: none;
+}
+.ls-station-hit:focus-visible .ls-station-dot {
+  outline: 2px solid #69bff8;
+  outline-offset: 4px;
+}
+.ls-station-hit > span:not(.ls-station-dot) {
+  transition: opacity 0.4s ease;
+}
+.ls-station[data-state="pending"] .ls-station-hit > span:not(.ls-station-dot) {
+  opacity: 0.55;
+}
+.ls-station-dot {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  font-size: 14px;
+  color: rgb(241 241 238 / 0.72);
+  background: #0a1d44;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
+  transition:
+    color 0.4s ease,
+    background-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+.ls-station[data-state="active"] .ls-station-dot {
+  color: #fff;
+  box-shadow:
+    inset 0 0 0 1.5px #69bff8,
+    0 0 26px -4px rgb(105 191 248 / 0.65);
+}
+.ls-station[data-state="done"] .ls-station-dot {
+  color: #06142f;
+  background: #69bff8;
+  box-shadow: 0 0 20px -6px rgb(105 191 248 / 0.85);
+}
+.ls-station-hit:hover .ls-station-dot {
+  box-shadow: inset 0 0 0 1.5px rgb(105 191 248 / 0.7);
+}
+/* The lead: a halo of light that travels the line and rings the station it has reached. */
+.ls-lead {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
+  border-radius: 999px;
+  translate: var(--x) var(--y);
+  box-shadow:
+    inset 0 0 0 1.5px rgb(105 191 248 / 0.95),
+    0 0 26px rgb(105 191 248 / 0.4),
+    inset 0 0 18px rgb(105 191 248 / 0.25);
+  pointer-events: none;
+  transition: translate 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+}
+@media (max-width: 639px) {
+  .ls-track {
+    padding: 14px 14px 24px;
+  }
+  .ls-track-head {
+    margin-bottom: 24px;
+  }
+}
+
+/* ---------- Ökosystem: the ring ---------- */
+
+/* The edge fade lives on this wrapper, so the element holding the perspective is never masked. */
+.ls-ring-mask {
+  position: relative;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 16%, #000 84%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 16%, #000 84%, transparent 100%);
+}
+@media (min-width: 768px) {
+  .ls-ring-mask {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  }
+}
+.ls-ring-stage {
+  position: relative;
+  height: 250px;
+  perspective: 900px;
+  perspective-origin: 50% 0%;
+}
+@media (min-width: 768px) {
+  .ls-ring-stage {
+    height: 340px;
+    perspective: 1600px;
+  }
+}
+/* One flat card; its own transform places it on the ring (ecosystem.tsx). */
+.ls-ring-card {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  width: 156px;
+  height: 108px;
+  margin: -54px 0 0 -78px;
+  overflow: hidden;
+  border-radius: 18px;
+}
+@media (min-width: 768px) {
+  .ls-ring-card {
+    top: 60%;
+    width: 256px;
+    height: 144px;
+    margin: -72px 0 0 -128px;
+  }
+}
+/* The floor light under the ring. */
+.ls-ring-stage::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  width: min(1000px, 130%);
+  height: 220px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(26 111 224 / 0.3), rgb(26 111 224 / 0.1) 55%, rgb(26 111 224 / 0));
+  pointer-events: none;
+}
+.ls-ring-face {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.ls-ring-front {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 13px 13px 12px;
+  background:
+    radial-gradient(100% 80% at 100% 0%, rgb(26 111 224 / 0.25), rgb(26 111 224 / 0) 60%),
+    linear-gradient(180deg, #10295c 0%, #0a1f4a 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.15),
+    inset 0 0 0 1px rgb(255 255 255 / 0.11);
+  transition: box-shadow 0.45s ease;
+}
+@media (min-width: 768px) {
+  .ls-ring-front {
+    padding: 18px 18px 16px;
+  }
+}
+.ls-ring-card[data-lit] .ls-ring-front {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    inset 0 0 0 1px rgb(105 191 248 / 0.9),
+    inset 0 0 40px -12px rgb(105 191 248 / 0.45);
+}
+.ls-ring-back {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #0b1f49 0%, #071636 100%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+}
+.ls-ring-back img {
+  width: 46px;
+  height: auto;
+  opacity: 0.16;
+}
+.ls-ring-card[data-lit] .ls-ring-back {
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.7);
+}
+.ls-ring-shade {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #040c1e;
+  pointer-events: none;
+}
+.ls-ring-title {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #fff;
+  overflow-wrap: anywhere;
+}
+.ls-ring-tools {
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgb(241 241 238 / 0.62);
+}
+@media (min-width: 768px) {
+  .ls-ring-title {
+    font-size: 19px;
+  }
+  .ls-ring-tools {
+    font-size: 14px;
+  }
+}
+.ls-sync {
+  display: none;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: rgb(241 241 238 / 0.5);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  transition:
+    color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+@media (min-width: 768px) {
+  .ls-sync {
+    display: inline-flex;
+  }
+}
+.ls-sync-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(241 241 238 / 0.32);
+  transition: background-color 0.4s ease;
+}
+.ls-ring-card[data-lit] .ls-sync {
+  color: #69bff8;
+  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.55);
+}
+.ls-ring-card[data-lit] .ls-sync-dot {
+  background: #69bff8;
+  box-shadow: 0 0 8px #69bff8;
+}
+
+.ls-eco-bar {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  margin-top: 22px;
+  text-align: center;
+}
+@media (min-width: 1024px) {
+  .ls-eco-bar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 460px) minmax(0, 1fr);
+    align-items: center;
+    margin-top: 26px;
+  }
+  .ls-eco-status {
+    justify-self: start;
+  }
+  .ls-eco-button {
+    justify-self: end;
+  }
+}
+.ls-eco-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: rgb(241 241 238 / 0.65);
+}
+.ls-eco-readout {
+  min-height: 92px;
+}
+.ls-eco-step {
+  animation: ls-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.ls-eco-segments {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 12px;
+}
+.ls-eco-segments > span {
+  width: 24px;
+  height: 3px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 0.13);
+  transition: background-color 0.4s ease;
+}
+.ls-eco-segments > span[data-on] {
+  background: #69bff8;
+}
+.ls-eco-closing {
+  font-size: clamp(1.25rem, 1rem + 0.9vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  color: #f1f1ee;
+  text-wrap: balance;
+}
+
+/* ---------- Vorgehen: the staircase ---------- */
+
+.ls-vorgehen-head {
+  position: relative;
+  z-index: 2;
+}
+.ls-stairs {
+  display: flex;
+  flex-direction: column;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ls-stair {
+  width: calc(78% + var(--k) * 5.5%);
+}
+.ls-stair-block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px 20px 14px;
+  background: linear-gradient(90deg, rgb(26 80 170 / 0.3), rgb(10 33 80 / 0.12));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07);
+}
+.ls-stair:first-child .ls-stair-block {
+  border-top-right-radius: 16px;
+}
+.ls-stair:last-child .ls-stair-block {
+  border-bottom-right-radius: 16px;
+}
+/* Phones: the lit line traces the stair: the part of the step's top that reaches past the step above (the tread),
+   then down its outer edge (the riser). The first step's whole top is a tread. */
+.ls-stair-tread {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: calc(100% * (78 + 5.5 * (var(--k) - 1)) / (78 + 5.5 * var(--k)));
+  border-top: 2px solid #69bff8;
+  border-right: 2px solid rgb(105 191 248 / 0.75);
+  border-top-right-radius: 16px;
+  filter: drop-shadow(0 0 6px rgb(105 191 248 / 0.55));
+}
+.ls-stair:first-child .ls-stair-tread {
+  left: 0;
+}
+.ls-stair-text {
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgb(241 241 238 / 0.66);
+  hyphens: auto;
+}
+.ls-stair-num {
+  margin-top: 14px;
+  font-size: 44px;
+}
+.ls-vorgehen-title {
+  font-size: clamp(1.875rem, 1.25rem + 1.5vw, 2.625rem);
+  line-height: 1.08;
+}
+@media (min-width: 1024px) {
+  .ls-vorgehen {
+    min-height: 640px;
+  }
+  .ls-vorgehen-head {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 38%;
+  }
+  .ls-stairs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: end;
+    height: 640px;
+    margin: 0;
+    /* The steps rise out of the baseline: clipped only along the foot. */
+    clip-path: inset(-160px -160px 0 -160px);
+  }
+  .ls-stair {
+    width: auto;
+    height: calc(36% + var(--k) * 16%);
+  }
+  .ls-stair-block {
+    padding: 26px 22px 16px;
+    border-radius: 18px 0 0 0;
+    background: linear-gradient(180deg, rgb(26 80 170 / 0.34) 0%, rgb(10 33 80 / 0.16) 45%, rgb(6 21 54 / 0) 100%);
+    box-shadow: inset 1px 0 0 rgb(255 255 255 / 0.07);
+  }
+  .ls-stair:first-child .ls-stair-block {
+    border-top-right-radius: 0;
+    box-shadow: none;
+  }
+  .ls-stair:last-child .ls-stair-block {
+    border-radius: 18px 18px 0 0;
+  }
+  .ls-stair-tread,
+  .ls-stair:first-child .ls-stair-tread {
+    inset: 0 0 auto 0;
+    width: auto;
+    height: 2px;
+    border: 0;
+    border-radius: 18px 0 0 0;
+    background: linear-gradient(90deg, #69bff8, rgb(105 191 248 / 0.3));
+    filter: none;
+    box-shadow: 0 0 16px rgb(105 191 248 / 0.45);
+  }
+  .ls-stair:last-child .ls-stair-tread {
+    border-radius: 18px 18px 0 0;
+  }
+  .ls-stair-num {
+    margin-top: auto;
+    padding-top: 10px;
+    font-size: clamp(3rem, 1.6rem + 1.8vw, 4rem);
+  }
+}
+
+/* ---------- Closing ---------- */
+
+.ls-closing-light {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ls-closing-glow {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  width: min(1180px, 150vw);
+  height: 560px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(26 111 224 / 0.34), rgb(26 111 224 / 0.12) 52%, rgb(26 111 224 / 0));
+}
+/* One wide orbit arc low in the section, the hero's rings echoed once. */
+.ls-closing-arc {
+  position: absolute;
+  left: 50%;
+  top: 76%;
+  width: min(1600px, 220vw);
+  aspect-ratio: 1 / 0.34;
+  translate: -50% 0;
+  border-radius: 50%;
+  border: 1px solid rgb(105 191 248 / 0.5);
+  box-shadow:
+    0 -24px 70px -36px rgb(105 191 248 / 0.55),
+    inset 0 24px 60px -40px rgb(105 191 248 / 0.4);
+  -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 34%, #000 66%, transparent 96%);
+  mask-image: linear-gradient(90deg, transparent 4%, #000 34%, #000 66%, transparent 96%);
+}
+
+/* Phones: each use list is one row you swipe sideways, bleeding to the screen edges and faded there (shared.tsx). */
+@media (max-width: 639px) {
+  .ls-use-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    /* A row that does not wrap would otherwise widen its column to the width of all its pills (intrinsic sizing);
+       capped at the screen width, its outer width with the negative margins is exactly the content column. */
+    max-width: 100vw;
+    margin-inline: -20px;
+    padding-inline: 20px;
+    padding-bottom: 2px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 20px, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(90deg, transparent 0, #000 20px, #000 calc(100% - 32px), transparent);
+  }
+  .ls-use-row::-webkit-scrollbar {
+    display: none;
+  }
+  .ls-use-row > .ls-use {
+    flex: none;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+}

@@ -1,50 +1,43 @@
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
-import { CasesSection } from "@/components/sections/cases";
-import { CompareSection } from "@/components/sections/compare";
+import { SiteShell } from "@/components/site/site-shell";
 import { CtaSection } from "@/components/sections/cta";
-import { Hero } from "@/components/sections/hero";
-import { ImpactSection } from "@/components/sections/impact";
-import { PartnersSection } from "@/components/sections/partners";
-import { ProblemSection } from "@/components/sections/problem";
-import { ProcessSection } from "@/components/sections/process";
-import { PromiseSection } from "@/components/sections/promise";
-import { RealitySection } from "@/components/sections/reality";
-import { ServicesSection } from "@/components/sections/services";
-import { SolutionSection } from "@/components/sections/solution";
-import { SystemSection } from "@/components/sections/system-hub";
-import { VoicesSection } from "@/components/sections/voices";
-import { WhySection } from "@/components/sections/why";
-import { WorkshopSection } from "@/components/sections/workshop";
-import { RevealObserver } from "@/components/system/reveal-observer";
-import { SmoothScroll } from "@/components/system/smooth-scroll";
+import { CasesSection } from "@/components/v11/cases";
+import { CompareSection } from "@/components/v11/compare";
+import { HeroIntoProblem } from "@/components/v11/hero";
+import { ImpactSection } from "@/components/v11/impact";
+import { PartnersSection } from "@/components/v11/partners";
+import { ProcessSection } from "@/components/v11/process";
+import { PromiseSection } from "@/components/v11/promise";
+import { ReasonsSection } from "@/components/v11/reasons";
+import { ServicesSection } from "@/components/v11/services";
+import { SolutionSection } from "@/components/v11/solution";
+import { SystemSection } from "@/components/v11/system-hub";
+import { VoicesSection } from "@/components/v11/voices";
+import { WhySection } from "@/components/v11/why";
+import { WorkshopSection } from "@/components/v11/workshop";
 
-// The client's own section order from brandedgenius.de (the second film removed at the developer's request).
-export default function Home() {
+/*
+  The homepage: v11 "Feedback Plus", approved by the client on 2026-11-16 and now the only version (the ten earlier
+  ones live on in the git tag versions-archive-2026-11-16; their old addresses redirect here). v1's page with the
+  client's changes from his Loom rounds, on one fixed navy background, no section sliding over another.
+*/
+export default function HomePage() {
   return (
-    <>
-      <Header />
-      <main id="main" className="overflow-x-clip">
-        <Hero />
-        <ProblemSection />
-        <RealitySection />
-        <CompareSection />
-        <PromiseSection />
-        <SolutionSection />
-        <SystemSection />
-        <ServicesSection />
-        <CasesSection />
-        <ProcessSection />
-        <WhySection />
-        <ImpactSection />
-        <WorkshopSection />
-        <PartnersSection />
-        <VoicesSection />
-        <CtaSection />
-      </main>
-      <Footer />
-      <RevealObserver />
-      <SmoothScroll />
-    </>
+    <SiteShell>
+      <HeroIntoProblem />
+      <ReasonsSection />
+      <CompareSection />
+      <PromiseSection />
+      <SolutionSection />
+      <SystemSection />
+      <ServicesSection />
+      <CasesSection />
+      <ProcessSection />
+      <WhySection />
+      <ImpactSection />
+      <WorkshopSection />
+      <PartnersSection />
+      <VoicesSection />
+      <CtaSection />
+    </SiteShell>
   );
 }

@@ -1,0 +1,222 @@
+/* /kontakt (2026-11-16). Prefix kt-. Everything here moves by transform and opacity only, and stands still under reduced motion. */
+
+/* ---------- "Direkter Draht": one line through four stations, a light travelling down it ---------- */
+.kt-path::before,
+.kt-path::after {
+  content: "";
+  position: absolute;
+  left: 8.5px;
+  top: 14px;
+  bottom: 20px;
+  width: 1px;
+}
+.kt-path::before {
+  background: linear-gradient(180deg, rgb(105 191 248 / 0.45), rgb(105 191 248 / 0.12));
+}
+/* The travelling light: a short bright stretch of the line, sliding down it (its gradient moves inside the 1px line,
+   so it fits any height of the list). */
+.kt-path::after {
+  background-image: linear-gradient(180deg, rgb(220 236 255 / 0), #dcecff 50%, rgb(220 236 255 / 0));
+  background-size: 100% 80px;
+  background-repeat: no-repeat;
+  animation: kt-travel 5s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+@keyframes kt-travel {
+  0% {
+    background-position: 0 -80px;
+  }
+  86%,
+  100% {
+    background-position: 0 calc(100% + 80px);
+  }
+}
+/* Each station brightens as the light passes it (staggered along the same 5s loop). */
+.kt-node {
+  animation: kt-glow 5s ease-out infinite;
+  animation-delay: calc(var(--kt-i, 0) * 0.92s);
+}
+@keyframes kt-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(105 191 248 / 0);
+  }
+  6% {
+    box-shadow: 0 0 0 6px rgb(105 191 248 / 0.18), 0 0 18px 2px rgb(105 191 248 / 0.45);
+  }
+  22% {
+    box-shadow: 0 0 0 0 rgb(105 191 248 / 0);
+  }
+}
+.kt-node-end {
+  animation: none;
+}
+.kt-ping {
+  animation: kt-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes kt-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  80%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* ---------- "Direkter Kontakt": one panel, two doors, the bG mark on the seam ---------- */
+.kt-door {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 28px 36px;
+  min-height: 236px;
+  outline-offset: -4px;
+}
+@media (min-width: 768px) {
+  .kt-door {
+    padding: 48px 48px 52px;
+    min-height: 300px;
+  }
+}
+/* The sky light that floods a door from its outer edge on hover or focus. */
+.kt-door::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.kt-door-left::before {
+  background: radial-gradient(90% 120% at 0% 50%, rgb(105 191 248 / 0.16), rgb(0 75 160 / 0.1) 45%, transparent 75%);
+}
+.kt-door-right::before {
+  background: radial-gradient(90% 120% at 100% 50%, rgb(105 191 248 / 0.16), rgb(0 75 160 / 0.1) 45%, transparent 75%);
+}
+.kt-door:hover::before,
+.kt-door:focus-visible::before {
+  opacity: 1;
+}
+.kt-door-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  color: #69bff8;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.03);
+  transition: border-color 0.3s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.kt-door:hover .kt-door-icon,
+.kt-door:focus-visible .kt-door-icon {
+  border-color: rgb(105 191 248 / 0.55);
+  transform: translateY(-3px);
+}
+.kt-door-arrow {
+  transition: transform 0.3s ease;
+}
+.kt-door:hover .kt-door-arrow,
+.kt-door:focus-visible .kt-door-arrow {
+  transform: translate(3px, -3px);
+}
+/* The seam: a hairline between the doors (horizontal when they stack), the bG mark on it. */
+.kt-seam {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1px;
+  background: rgb(255 255 255 / 0.1);
+}
+.kt-seam img {
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: #0b2152;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  height: 44px;
+}
+@media (min-width: 768px) {
+  .kt-seam {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    height: auto;
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- The close: a beacon of three widening rings behind the sentence ---------- */
+.kt-beacon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.kt-beacon span {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  left: -190px;
+  top: -190px;
+  border-radius: 999px;
+  border: 1px solid rgb(105 191 248 / 0.28);
+  opacity: 0;
+  animation: kt-ring 8.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+.kt-beacon span:nth-child(2) {
+  animation-delay: 2.8s;
+}
+.kt-beacon span:nth-child(3) {
+  animation-delay: 5.6s;
+}
+@media (min-width: 768px) {
+  .kt-beacon span {
+    width: 560px;
+    height: 560px;
+    left: -280px;
+    top: -280px;
+  }
+}
+@keyframes kt-ring {
+  0% {
+    transform: scale(0.35);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kt-path::after,
+  .kt-ping {
+    display: none;
+  }
+  .kt-node {
+    animation: none;
+  }
+  .kt-beacon span {
+    animation: none;
+    opacity: 0.35;
+  }
+  .kt-beacon span:nth-child(2) {
+    transform: scale(1.4);
+    opacity: 0.2;
+  }
+  .kt-beacon span:nth-child(3) {
+    transform: scale(1.8);
+    opacity: 0.1;
+  }
+}

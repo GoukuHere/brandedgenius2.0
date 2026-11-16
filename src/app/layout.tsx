@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { MotionProvider } from "@/components/system/motion-provider";
-import { PageBackground } from "@/components/system/page-background";
-import { VersionNav } from "@/components/system/version-nav";
 import "./globals.css";
 
 /*
@@ -18,24 +16,27 @@ const brand = localFont({
   display: "swap",
 });
 
+/*
+  2026-11-16: v11 is the only version (the client approved it); the site gains the subpages. The whole preview stays
+  out of search engines: the client's live site is brandedgenius.de, and the same copy indexed on vercel.app would
+  compete with it.
+*/
 export const metadata: Metadata = {
-  title: "KI-Automatisierung, die Ergebnisse schafft | Branded Genius",
+  title: { default: "KI-Automatisierung, die Ergebnisse schafft | Branded Genius", template: "%s | Branded Genius" },
+  robots: { index: false, follow: false },
   description:
     "Branded Genius entwickelt KI-Agenten, Automatisierungen und intelligente Workflows für Marketing, Vertrieb, Kundenservice und interne Prozesse – von der Potenzialanalyse bis zur Umsetzung.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#111111",
+  themeColor: "#061536",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de" className={`dark ${brand.variable}`}>
       <body>
-        <PageBackground />
         <MotionProvider>{children}</MotionProvider>
-        {/* Every version the client reviews (v1 the homepage, v2 to v7 the layout concepts), on every page. */}
-        <VersionNav />
       </body>
     </html>
   );
