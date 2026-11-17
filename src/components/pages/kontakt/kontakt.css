@@ -65,6 +65,40 @@
   }
 }
 
+/* ---------- The form panel: his LeadConnector form and our panel as one surface ---------- */
+/* The panel takes his form card's own colour (rgb 6 24 39), so the embedded card disappears into it. */
+.kt-form-panel {
+  background: #061827;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.1),
+    0 40px 90px -40px rgb(0 0 0 / 0.7);
+}
+/* His card (#_builder-form inside the frame) draws a 1px white frame with 8px corners and a soft drop shadow. The crop
+   hides them: 4px off both sides and, in his phone style, off the top (see the container query below), and 20px off the foot, where the frame and its shadow end (his button
+   ends about 25px above the frame's foot, so it stays whole). 1px would do on paper, but the frame and the clip snap
+   to device pixels differently and a sliver of the white edge showed; 4px also clears the rounded corners. */
+.kt-form-crop {
+  overflow: hidden;
+  container-type: inline-size;
+}
+.kt-form-frame {
+  display: block;
+  width: calc(100% + 8px);
+  max-width: none;
+  margin: -4px -4px -20px;
+  border: 0;
+  /* Our page is color-scheme dark and his form's page is not. When the two differ, Chrome paints the frame's
+     background white behind his card, so the frame takes his page's scheme and stays see-through. */
+  color-scheme: light;
+}
+/* From a 500px frame (this crop plus its 8px) his form uses its wide style: the card starts 10px above the frame, so its
+   top edge is already out of sight, and his logo's glow begins 2px from the top. No top crop there. */
+@container (min-width: 492px) {
+  .kt-form-frame {
+    margin-top: 0;
+  }
+}
+
 /* ---------- "Direkter Kontakt": one panel, two doors, the bG mark on the seam ---------- */
 .kt-door {
   position: relative;

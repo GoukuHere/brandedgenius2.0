@@ -7,7 +7,9 @@ import { KONTAKT_FORM, KONTAKT_HERO } from "@/content/pages/kontakt";
 
 /*
   Kontakt, first screen: his headline and line, and beside them the real thing, his own contact form (his
-  LeadConnector form, the one every "Anfrage" button on the site opens), embedded in the page's one lit glass panel.
+  LeadConnector form, the one every "Anfrage" button on the site opens). The panel takes the form card's own colour
+  and the frame hides the card's white edge, so form and panel read as one surface (kontakt.css). His form keeps its
+  white labels only in a frame at least 500px wide; under that it falls back to dark grey labels, on his own site too.
   The provider's embed script sizes the frame to the form, so it is never cut off.
 
   Left, under the headline: his "Direkter Draht", the four steps of an enquiry (Ausgangspunkt, Impuls, Abstimmung,
@@ -63,31 +65,37 @@ export function KontaktHero() {
             </div>
           </div>
 
-          <div id="anfrage" className="scroll-mt-28">
-            <div className="glass glass-lit relative overflow-hidden rounded-[28px] p-5 sm:p-8">
+          {/* Under 600px wide on tablets (his card stops at 800px and its white frame would show beside it); the
+              frame stays at least 500px wide from small tablets up, the width his form keeps its white labels at. */}
+          <div id="anfrage" className="w-full max-w-[600px] scroll-mt-28 lg:max-w-none">
+            <div className="kt-form-panel relative overflow-hidden rounded-[28px]">
               <BorderBeam colorFrom="#69bff8" colorTo="#004ba0" duration={14} size={220} />
-              <h2 className="t-h3 text-white">{h.formTitle}</h2>
-              <p className="mt-3 text-[15px] leading-relaxed text-white/65">{h.formText}</p>
-              <div className="mt-6 overflow-hidden rounded-[16px]">
-                <iframe
-                  src={KONTAKT_FORM.src}
-                  id={`inline-${KONTAKT_FORM.id}`}
-                  title={KONTAKT_FORM.title}
-                  loading="lazy"
-                  className="block w-full border-0"
-                  style={{ height: 1120 }}
-                  data-layout="{'id':'INLINE'}"
-                  data-trigger-type="alwaysShow"
-                  data-trigger-value=""
-                  data-activation-type="alwaysActivated"
-                  data-activation-value=""
-                  data-deactivation-type="neverDeactivate"
-                  data-deactivation-value=""
-                  data-form-name={KONTAKT_FORM.title}
-                  data-height="1120"
-                  data-layout-iframe-id={`inline-${KONTAKT_FORM.id}`}
-                  data-form-id={KONTAKT_FORM.id}
-                />
+              <div className="px-5 pt-7 text-center sm:px-8 sm:pt-9">
+                <h2 className="t-h3 text-white">{h.formTitle}</h2>
+                <p className="mx-auto mt-3 max-w-[440px] text-[15px] leading-relaxed text-white/65">{h.formText}</p>
+              </div>
+              <div className="px-1 pt-5 pb-4 sm:px-4 sm:pb-6">
+                <div className="kt-form-crop">
+                  <iframe
+                    src={KONTAKT_FORM.src}
+                    id={`inline-${KONTAKT_FORM.id}`}
+                    title={KONTAKT_FORM.title}
+                    loading="lazy"
+                    className="kt-form-frame"
+                    style={{ height: 1120 }}
+                    data-layout="{'id':'INLINE'}"
+                    data-trigger-type="alwaysShow"
+                    data-trigger-value=""
+                    data-activation-type="alwaysActivated"
+                    data-activation-value=""
+                    data-deactivation-type="neverDeactivate"
+                    data-deactivation-value=""
+                    data-form-name={KONTAKT_FORM.title}
+                    data-height="1120"
+                    data-layout-iframe-id={`inline-${KONTAKT_FORM.id}`}
+                    data-form-id={KONTAKT_FORM.id}
+                  />
+                </div>
               </div>
             </div>
           </div>
