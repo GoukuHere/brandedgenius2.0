@@ -126,7 +126,7 @@ export function HeroIntoProblem() {
           id="top"
           inert={phase !== "hero"}
           style={{ scale: heroScale, opacity: heroOpacity }}
-          className="absolute inset-0 z-[2] flex flex-col overflow-hidden bg-[linear-gradient(160deg,#0a2a62_0%,#061536_100%)] will-change-transform motion-reduce:!transform-none lg:bg-[#080d1b] lg:bg-none"
+          className="absolute inset-0 z-[2] flex flex-col overflow-hidden bg-[linear-gradient(160deg,#082250_0%,#05112c_100%)] will-change-transform motion-reduce:!transform-none lg:bg-[#080d1b] lg:bg-none"
         >
           {/*
             Phones and tablets: the film fills the whole height between the header and the headline, so the screen has

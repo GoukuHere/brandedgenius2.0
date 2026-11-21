@@ -13,7 +13,8 @@ import { cn } from "@/lib/utils";
   client's own line "Zwei Wege. Zwei Ergebnisse." becomes the picture. One drawing across the width, both ways
   leaving one start point:
   - the classic way, a thin grey dashed line that runs into loops, tangles and breaks off with an X, its result
-    ("Viel Aufwand. Wenig Wirkung. Kein Fortschritt.") beside the break;
+    ("Viel Aufwand. Wenig Wirkung. Kein Fortschritt.") above the break on desktop (round 5: the mirror of the sky
+    way's result), under the knot on phones;
   - the Branded Genius way, one clean sky line through five points, each labelled with one of its steps, ending at
     its result ("Klare Strategie. Messbare Ergebnisse. Nachhaltiges Wachstum.").
   The classic way's five points and the "VS" are cut (the knot says it; they stay for screen readers).
@@ -46,32 +47,40 @@ type Layout = {
   points: Label[];
 };
 
+/*
+  Desktop, round 5 (Roman, 2026-11-18: the bottom line is good; the classic way should match it, "maybe in the same
+  line ... it's not like looking equal"). The two ways now mirror each other around the shared start point: the
+  classic way rises as far (112) as the Branded Genius way falls, runs to the same end x and breaks off there with its
+  X; each way's name sits 22 above its own line at the same x (200), and each result sits 22 above its line,
+  right-aligned to the end (1170), with its mark. The tangle keeps clear of the two labels above it: it only leaves
+  its line upwards (to 52) between them.
+*/
+const START_Y = 174;
+const TOP_Y = START_Y - 112;
+const BOT_Y = START_Y + 112;
+const GAP = 22;
 const DESK: Layout = {
   w: 1200,
-  h: 398,
-  start: [24, 214],
-  // A scribble, not a pattern: loops of different sizes, two of them running back over the line, a zigzag, a tail.
+  h: 352,
+  start: [24, START_Y],
+  // A scribble, not a pattern: it climbs to its line, then loops of different sizes (two running back over it), a
+  // zigzag, one wide loop and a messy tail to the break.
   knot: [
-    [24, 214], [70, 206], [112, 180], [146, 140], [176, 110], [214, 104], [226, 130], [204, 146], [182, 128], [196, 96],
-    [240, 76], [290, 90], [318, 124], [300, 162], [256, 160], [240, 128], [268, 92], [318, 70], [368, 66], [402, 92],
-    [388, 120], [352, 110], [360, 78], [404, 58], [452, 62], [476, 92], [458, 126], [420, 130], [414, 98], [450, 78],
-    [506, 78], [536, 98], [552, 72], [580, 96], [600, 70], [636, 88], [662, 102], [690, 96], [712, 100],
+    [24, 174], [60, 172], [92, 160], [116, 130], [140, 92], [164, 68], [200, 62], [250, 64], [290, 80], [312, 112],
+    [296, 138], [262, 134], [250, 106], [276, 82], [320, 70], [370, 64], [410, 74], [430, 100], [414, 122], [388, 116],
+    [384, 92], [408, 72], [452, 62], [490, 70], [516, 56], [540, 80], [566, 52], [592, 82], [618, 58], [646, 72],
+    [690, 64], [730, 84], [748, 120], [726, 150], [690, 144], [680, 112], [706, 86], [752, 70], [800, 64], [850, 70],
+    [880, 92], [902, 74], [930, 96], [956, 72], [990, 84], [1030, 66], [1070, 72], [1110, 60], [1140, 66], [1170, 62],
   ],
-  way: "M24 214 C84 214 100 326 180 326 L1170 326",
-  nodes: [
-    [300, 326],
-    [490, 326],
-    [680, 326],
-    [870, 326],
-    [1060, 326],
-  ],
-  end: [1170, 326],
+  way: `M24 ${START_Y} C84 ${START_Y} 100 ${BOT_Y} 180 ${BOT_Y} L1170 ${BOT_Y}`,
+  nodes: [300, 490, 680, 870, 1060].map((x) => [x, BOT_Y] as Pt),
+  end: [1170, BOT_Y],
   along: "x",
-  classicTitle: { x: 24, y: 4 },
-  classicResult: { x: 742, y: 100, ay: "middle" },
-  oursTitle: { x: 200, y: 304, ay: "bottom" },
-  oursResult: { x: 1170, y: 304, ax: "end", ay: "bottom" },
-  points: [300, 490, 680, 870, 1060].map((x) => ({ x, y: 346, ax: "middle" as const, w: 172 })),
+  classicTitle: { x: 200, y: TOP_Y - GAP, ay: "bottom" },
+  classicResult: { x: 1170, y: TOP_Y - GAP, ax: "end", ay: "bottom" },
+  oursTitle: { x: 200, y: BOT_Y - GAP, ay: "bottom" },
+  oursResult: { x: 1170, y: BOT_Y - GAP, ax: "end", ay: "bottom" },
+  points: [300, 490, 680, 870, 1060].map((x) => ({ x, y: BOT_Y + 20, ax: "middle" as const, w: 172 })),
 };
 
 const PHONE: Layout = {
@@ -102,7 +111,7 @@ const PHONE: Layout = {
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const WAY_DRAW = 2.2; // s, eased out (fast, then settling)
-const KNOT_DRAW = 2.8; // s
+const KNOT_DRAW = 3; // s
 const PERIOD = 3.8; // s, one run of the light along the sky way (it runs for RUN of it, then rests)
 const RUN = 0.72;
 const DASH = 0.12; // the light's length, as a share of the way
@@ -316,7 +325,10 @@ function Ways({ layout }: { layout: Layout }) {
         </p>
       </Place>
       <Place at={layout.classicResult} layout={layout} show={show} transition={after(KNOT_DRAW + 0.15)}>
-        <p className="text-[15px] leading-snug text-silver lg:whitespace-nowrap">{COMPARE.classic.result}</p>
+        <p className={cn("flex gap-2.5 text-[15px] leading-snug text-silver", layout.along === "x" ? "items-center whitespace-nowrap" : "items-start")}>
+          {layout.along === "x" && <X aria-hidden strokeWidth={1.75} className="size-4 shrink-0" />}
+          {COMPARE.classic.result}
+        </p>
       </Place>
       <Place at={layout.oursTitle} layout={layout} show={show} transition={after(0.25)}>
         <p className="flex items-center gap-2.5 text-[15px] font-medium whitespace-nowrap text-white">

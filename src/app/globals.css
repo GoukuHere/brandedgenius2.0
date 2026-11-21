@@ -278,10 +278,28 @@
 }
 /*
   SpecularButton (React Bits, reactbits.dev), sized and coloured for this site: a button with slightly curved
-  corners (--radius-button) whose thin edge light
-  (drawn by the component's WebGL canvas) follows the pointer when it comes near. Sizes match the site's buttons:
-  40, 48 and 56px tall. No backdrop blur (not needed here, and it costs a layer per button).
+  corners (--radius-button) whose thin edge light follows the pointer when it comes near. Sizes match the site's
+  buttons: 40, 48 and 56px tall. No backdrop blur (not needed here, and it costs a layer per button).
+  Round 5 (2026-11-21): the light is CSS, no WebGL canvas (see the component). The component's one shared pointer
+  listener sets --sb-x / --sb-y (the nearest point on the edge) and --sb-on (0 to 1, how near the pointer is); these
+  are registered so the light glides between them. At rest the light sits on the top left corner (3.5px is the 45
+  degree point of a 12px corner) at --sb-idle.
 */
+@property --sb-x {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 3.5px;
+}
+@property --sb-y {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 3.5px;
+}
+@property --sb-on {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
 @layer components {
   .specular-button {
     --sb-radius: var(--radius-button);
@@ -309,12 +327,22 @@
     box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.45);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    /* The light's soft pool inside the button, only while the pointer is near. */
+    background-image: radial-gradient(
+      96px 56px at var(--sb-x) var(--sb-y),
+      color-mix(in srgb, var(--sb-line, #ffffff) calc(var(--sb-on) * 9%), transparent),
+      transparent 72%
+    );
     transition:
       transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
       filter 0.25s ease-out,
-      background-color 0.25s ease-out;
+      background-color 0.25s ease-out,
+      --sb-x 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+      --sb-y 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+      --sb-on 0.45s ease-out;
   }
   .specular-button:active {
+    --sb-on: 1;
     transform: scale(0.97);
   }
   .specular-button:focus-visible {
@@ -343,14 +371,57 @@
     padding: 0 32px;
     font-size: 16px;
   }
+  /*
+    The edge: a ring masked to the border carrying the key light at --sb-x / --sb-y (full strength for about 22px,
+    gone by about 96px, as the shader's window) and a back light at the mirrored point at 45%, over the faint
+    hairline in --sb-base at 60%. The glow is a blurred copy of the two lights alone (no hairline), so the light
+    blooms on both sides of the line as the shader's did; the blur sits on the wrapper because a mask clips its own
+    element's filter.
+  */
   .specular-button__light {
+    --sb-level: calc(var(--sb-idle, 0.35) + (var(--sb-max, 1) - var(--sb-idle, 0.35)) * var(--sb-on));
+    --sb-lights:
+      radial-gradient(
+        96px circle at var(--sb-x) var(--sb-y),
+        color-mix(in srgb, var(--sb-line, #ffffff) calc(var(--sb-level) * 100%), transparent) 0%,
+        color-mix(in srgb, var(--sb-line, #ffffff) calc(var(--sb-level) * 100%), transparent) 24%,
+        color-mix(in srgb, var(--sb-line, #ffffff) calc(var(--sb-level) * 45%), transparent) 55%,
+        transparent 100%
+      ),
+      radial-gradient(
+        64px circle at calc(100% - var(--sb-x)) calc(100% - var(--sb-y)),
+        color-mix(in srgb, var(--sb-line, #ffffff) calc(var(--sb-level) * 45%), transparent) 0%,
+        color-mix(in srgb, var(--sb-line, #ffffff) calc(var(--sb-level) * 20%), transparent) 50%,
+        transparent 100%
+      );
     position: absolute;
-    inset: -24px;
+    inset: 0;
     z-index: 1;
     display: block;
-    width: calc(100% + 48px);
-    height: calc(100% + 48px);
+    padding: 1.25px;
+    border-radius: inherit;
     pointer-events: none;
+    background: var(--sb-lights), color-mix(in srgb, var(--sb-base, #525252) 60%, transparent);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+  }
+  .specular-button__glow {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    filter: blur(4px);
+    opacity: 0.9;
+  }
+  .specular-button__glow > .specular-button__light {
+    padding: 2.5px;
+    background: var(--sb-lights);
   }
   .specular-button__label {
     position: relative;

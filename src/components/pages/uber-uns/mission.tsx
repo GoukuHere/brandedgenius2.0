@@ -110,9 +110,6 @@ export function UberMission() {
           <p data-reveal="up" data-rd="2" className="mx-auto mt-7 max-w-[720px] text-[20px] leading-[1.5] tracking-[-0.01em] text-pretty text-white/90 md:mt-9 md:text-[24px]">
             {UU_MISSION.lead}
           </p>
-          <p data-reveal="up" data-rd="3" className="mx-auto mt-5 max-w-[640px] text-[15px] leading-[1.7] text-pretty text-white/60 md:text-[16px]">
-            {UU_MISSION.text}
-          </p>
         </div>
 
         <div ref={chart} className="relative mt-16 md:mt-24">

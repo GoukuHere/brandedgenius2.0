@@ -3,10 +3,12 @@
 import { animate, motion, useMotionTemplate, useMotionValue, useMotionValueEvent, useSpring, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
+import { getLenis } from "@/components/system/smooth-scroll";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { CASES } from "@/content/site";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { CaseArt, hasCaseArt } from "./case-art";
 import { CountUp } from "./count";
 
 /*
@@ -29,6 +31,12 @@ import { CountUp } from "./count";
   the section is on screen (the line under the current area fills like a story); picking one stops the turns,
   hovering or focusing holds them.
 
+  Round 5 (2026-11-21, Roman: "when you click on it ... something is lagging ... a little bit smoother"): the deck
+  follows the scroll directly (it used to pass through a spring on top of Lenis's smoothing, so it arrived late), a
+  pick glides there through Lenis in a set time that grows a little with the distance (the browser's own smooth
+  scroll and Lenis used to fight: on a slowed CPU the old click took 5.8s and stopped on the wrong card). Extra
+  will-change layers for the cards were measured and made it slower, so there are none.
+
   The pointer moves the point of view over the deck a little (its perspective origin). The cards move by transform
   and opacity only, each drawn on its own (no shared 3D space, so one never cuts through another). Every case is in
   the markup for screen readers as one list; the deck is hidden from them.
@@ -48,6 +56,8 @@ const pad = (i: number) => String(i + 1).padStart(2, "0");
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
+/** A click's glide to its card: eases in and out, so the deck starts and lands softly. */
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 /** The deck's position on the scroll: each card rests in front for 40% of its step, then the next comes forward. */
 function staircase(k: number) {
   const i = Math.floor(k);
@@ -62,6 +72,8 @@ function staircase(k: number) {
   - dx, dy, dz: one slot further back; ry, rx: how the slots are turned.
   - ax, ay, az, ary, arx: the front card's pose.
   Phones size for Safari's own screen height (about 660 to 750px with its bars): a compact card and slim strips.
+  Round 5: the cards grew for the infographic band (40px on desktop and tablets, 88px on short desktop windows, 16px
+  on phones, where the stage still has to fit Safari's screen).
 */
 type Geo = {
   w: number;
@@ -79,14 +91,14 @@ type Geo = {
   ary: number;
   arx: number;
 };
-const DESK: Geo = { w: 520, h: 340, fanH: 640, top: 90, dx: 30, dy: -50, dz: -48, ry: 20, rx: 4, ax: -52, ay: 44, az: 110, ary: 9, arx: 2 };
-const DESK_SHORT: Geo = { w: 460, h: 272, fanH: 500, top: 76, dx: 26, dy: -40, dz: -42, ry: 18, rx: 4, ax: -46, ay: 36, az: 90, ary: 8, arx: 2 };
-const TABLET: Geo = { w: 440, h: 340, fanH: 600, top: 90, dx: 20, dy: -46, dz: -44, ry: 16, rx: 4, ax: -35, ay: 42, az: 90, ary: 7, arx: 2 };
+const DESK: Geo = { w: 520, h: 380, fanH: 680, top: 90, dx: 30, dy: -50, dz: -48, ry: 20, rx: 4, ax: -52, ay: 44, az: 110, ary: 9, arx: 2 };
+const DESK_SHORT: Geo = { w: 460, h: 360, fanH: 588, top: 76, dx: 26, dy: -40, dz: -42, ry: 18, rx: 4, ax: -46, ay: 36, az: 90, ary: 8, arx: 2 };
+const TABLET: Geo = { w: 440, h: 380, fanH: 640, top: 90, dx: 20, dy: -46, dz: -44, ry: 16, rx: 4, ax: -35, ay: 42, az: 90, ary: 7, arx: 2 };
 /* Phones: a compact card; under 660px of screen (an iPhone mini in Safari) the strips a little slimmer still. */
 const phoneGeo = (width: number, height: number): Geo => {
   const w = Math.min(330, Math.round(width * 0.88));
   const short = height < 660;
-  return { w, h: 272, fanH: short ? 400 : 420, top: 66, dx: 5, dy: short ? -24 : -28, dz: -30, ry: 14, rx: 4, ax: -8, ay: 22, az: 46, ary: 6, arx: 2 };
+  return { w, h: 288, fanH: short ? 416 : 436, top: 66, dx: 5, dy: short ? -24 : -28, dz: -30, ry: 14, rx: 4, ax: -8, ay: 22, az: 46, ary: 6, arx: 2 };
 };
 function geoFor(): Geo {
   if (window.matchMedia("(min-width: 1024px)").matches) return window.matchMedia("(max-height: 780px)").matches ? DESK_SHORT : DESK;
@@ -103,13 +115,13 @@ function geoFor(): Geo {
   for a gain, down by it for a cut (the cut part stays as a faint outline). Cards on desktop and tablets grew 50px
   for the photo; phones keep their Safari-fitted size, and their results keep the count without bars.
 */
+/*
+  Round 5 (the client's Loom of 2026-11-18: "you need to put an infographic" on each card): Marketing, Vertrieb,
+  Kundenservice, Backoffice and CRM now carry a drawing of their system (case-art.tsx) in place of their photo, in the
+  band between the label and the case. Telefonie keeps a picture (a person on a call, half human, half machine).
+*/
 const PHOTOS: Record<string, { src: string; position?: string }> = {
-  Marketing: { src: "/media/v11/cases/marketing.webp", position: "78% 50%" },
-  Vertrieb: { src: "/media/v11/cases/vertrieb.webp" },
-  Kundenservice: { src: "/media/v11/cases/kundenservice.webp" },
-  Backoffice: { src: "/media/v11/cases/backoffice.webp" },
   Telefonie: { src: "/media/v11/cases/telefonie.webp" },
-  CRM: { src: "/media/v11/cases/crm.webp", position: "50% 40%" },
 };
 
 /** A result's figure as a share (0 to 1) and whether it is a cut ("−62%") or a gain ("+43%"). */
@@ -168,7 +180,6 @@ export function CasesSection() {
   const runway = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const progress = useSectionProgress(runway, ["start start", "end end"]);
-  const smooth = useSpring(progress, { stiffness: 120, damping: 28, mass: 0.6, skipInitialAnimation: true });
   const pinnedValue = useMotionValue(0);
   const timed = useMotionValue(0);
   const geo = useMotionValue<Geo>(DESK);
@@ -176,7 +187,7 @@ export function CasesSection() {
 
   // Where the deck stands: on the scroll where the section pins, else on its own time.
   const deck = useTransform(() => {
-    const scrolled = staircase(clamp(smooth.get() * UNITS - REST, 0, COUNT - 1));
+    const scrolled = staircase(clamp(progress.get() * UNITS - REST, 0, COUNT - 1));
     const own = timed.get();
     return pinnedValue.get() ? scrolled : own;
   });
@@ -229,10 +240,16 @@ export function CasesSection() {
   const pick = (i: number) => {
     const el = runway.current;
     if (pinned && el) {
-      // Scroll to the middle of that card's rest on the runway.
+      // Scroll to the middle of that card's rest on the runway. Through Lenis when it runs (one smoothing, a set
+      // duration that grows a little with the distance), else the browser's own smooth scroll.
       const top = el.getBoundingClientRect().top + window.scrollY;
       const travel = el.offsetHeight - window.innerHeight;
-      window.scrollTo({ top: top + ((i + REST) / UNITS) * travel, behavior: "smooth" });
+      const goal = top + ((i + REST) / UNITS) * travel;
+      const lenis = getLenis();
+      if (lenis) {
+        const steps = Math.abs(goal - window.scrollY) / (travel / UNITS);
+        lenis.scrollTo(goal, { duration: Math.min(1.1, 0.5 + steps * 0.12), easing: easeInOut, lock: true });
+      } else window.scrollTo({ top: goal, behavior: "smooth" });
       return;
     }
     setManual(true);
@@ -471,6 +488,7 @@ function Card({
         <span className="text-[14px] leading-none font-medium tracking-[-0.005em] text-white sm:hidden">{item.area}</span>
         <span className="hidden text-[16px] leading-none font-medium tracking-[-0.005em] text-white sm:inline">{item.name}</span>
       </div>
+      {hasCaseArt(item.area) && <CaseArt area={item.area} play={on && live} />}
       <motion.div style={{ opacity: detail }} className="v11-fan-detail">
         <p className="text-[17px] leading-[1.25] font-medium tracking-[-0.015em] text-balance text-white sm:text-[22px] lg:text-[24px]">{item.tagline}</p>
         <ul role="list" className="mt-3.5 grid gap-2.5 sm:mt-6 sm:grid-cols-3 sm:gap-5">

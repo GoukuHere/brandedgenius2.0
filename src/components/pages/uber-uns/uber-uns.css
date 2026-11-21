@@ -110,12 +110,6 @@
     animation-play-state: running;
   }
 }
-/* The deck: on wider screens the two paragraphs sit side by side with a hairline between them. */
-@media (min-width: 768px) {
-  .uu-deck > p + p {
-    box-shadow: inset 1px 0 0 rgb(255 255 255 / 0.1);
-  }
-}
 /* Phones: the mark sits behind the headline, a touch stronger, since the text covers more of it. */
 @media (max-width: 767px) {
   .uu-mark {
@@ -280,4 +274,13 @@
 
 .uu-rule-centre[data-reveal="rule"] {
   transform-origin: 50% 50%;
+}
+
+/* The founder portrait (round 5): beside the long bio on desktop it stays in view while the text scrolls past, where
+   the whole 3:4 frame fits under the header (about 650px tall at 1280px and up). */
+@media (min-width: 1024px) and (min-height: 780px) {
+  .uu-founder-photo {
+    position: sticky;
+    top: 112px;
+  }
 }

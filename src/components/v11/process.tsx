@@ -2,10 +2,11 @@
 
 import { motion, useMotionValue, useMotionValueEvent, useSpring, type MotionValue } from "motion/react";
 import Image from "next/image";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { PROCESS } from "@/content/site";
+import { ArrowUpRight, Check } from "lucide-react";
+import { LINKS, PROCESS } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 /*
@@ -257,7 +258,44 @@ const ProcessStep = memo(function ProcessStep({
           sizes="(min-width:1024px) 520px, 100vw"
           className={cn("object-cover transition-opacity duration-300 ease-out", FOCUS[step.img], active ? "opacity-100" : "opacity-70")}
         />
+        {index === 0 && <AnalysisCard active={active} />}
       </div>
     </li>
   );
 });
+
+/*
+  Round 5 (the client's Loom of 2026-11-18, V3 0:26): step 01 shows his KI-Potenzialanalyse being worked through, "a
+  checklist ... with the question based on ... our AI potential analysis". A glass card on the photo carries his
+  KI-Potenzial-Check: its six questions, each as the short topic it asks about (read from his survey's own page on
+  2026-11-21), ticked one after another while the step is in focus, and a link that opens the real check. Phones show
+  the first four. Under reduced motion the ticks simply stand.
+*/
+const CHECK_TOPICS = ["Größter KI-Hebel", "Größter Zeitfresser", "Genutzte Systeme", "Ziel der KI", "Unternehmensgröße", "Förderfähigkeit"];
+
+function AnalysisCard({ active }: { active: boolean }) {
+  return (
+    <div data-active={active || undefined} className="v11-check absolute right-3 bottom-3 z-[2] w-[min(232px,64%)] rounded-[14px] p-3.5 sm:right-4 sm:bottom-4 sm:w-[248px] sm:p-4">
+      <p className="text-[13px] leading-none font-medium text-white sm:text-[14px]">KI-Potenzial-Check</p>
+      <ul role="list" className="mt-3 space-y-2">
+        {CHECK_TOPICS.map((topic, i) => (
+          <li key={topic} className={cn("flex items-center gap-2.5 text-[12.5px] leading-none text-white/85 sm:text-[13px]", i > 3 && "max-sm:hidden")}>
+            <span aria-hidden className="v11-check-box relative grid size-4 shrink-0 place-items-center rounded-[5px]" style={{ "--i": i } as CSSProperties}>
+              <Check strokeWidth={2.5} className="v11-check-mark size-3 text-[#06142f]" />
+            </span>
+            {topic}
+          </li>
+        ))}
+      </ul>
+      <a
+        href={LINKS.analysis}
+        target="_blank"
+        rel="noopener"
+        className="group mt-3.5 inline-flex min-h-6 cursor-pointer items-center gap-1 text-[12.5px] font-medium text-sky transition-colors duration-200 hover:text-white sm:text-[13px]"
+      >
+        Check starten
+        <ArrowUpRight aria-hidden className="size-3.5 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+      </a>
+    </div>
+  );
+}

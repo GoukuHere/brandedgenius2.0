@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { BenefitsSection } from "@/components/pages/use-cases/benefits";
 import { ClosingSection } from "@/components/pages/use-cases/closing";
-import { FeaturedSection } from "@/components/pages/use-cases/featured";
 import { UseCasesHero } from "@/components/pages/use-cases/hero";
 import { ProjectsSection } from "@/components/pages/use-cases/projects";
 import { SiteShell } from "@/components/site/site-shell";
@@ -18,17 +17,17 @@ export const metadata: Metadata = {
   from the homepage or the other pages. Sections live in src/components/pages/use-cases/:
   - hero: his headline over his seven project names in outlined type, drifting in depth and parting with the scroll;
   - projekte: his filter chips over the seven projects as posters with cover art, each opening its full case view;
-  - mega-screen: his featured case as an isometric stack (Web, KI-Agent, CRM) with a lead dropping through it;
   - mehrwert: his six benefits as a radar chart that grows with the scroll;
   - anfrage: the seven projects' marks converging into one point above his closing call to action.
   His six-step process is left out here on purpose: the Über uns page carries it.
+  Round 5 (2026-11-18, Roman): the featured Mega Screen block came off ("the filter ... is completely enough ... if we
+  display like from that customer here again, that will be too much. You can remove that").
 */
 export default function UseCasesPage() {
   return (
     <SiteShell>
       <UseCasesHero />
       <ProjectsSection />
-      <FeaturedSection />
       <BenefitsSection />
       <ClosingSection />
     </SiteShell>

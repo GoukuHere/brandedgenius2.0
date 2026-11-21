@@ -12,7 +12,7 @@ import { MARKETING } from "./marketing";
   v11's four service drawings (2026-11-13), replacing the shared fine-line scenes on this page only (v1 keeps those).
   The client found the old ones abstract ("it's not a chatbot", "better graphics instead of this"), so each is now a
   real product interface that tells one short story per loop, in real words and real tool names:
-    agents     a workflow canvas: E-Mail, the KI-Agent, GoHighLevel, Google Calendar, ClickUp
+    agents     a workflow canvas: E-Mail, the KI-Agent, then CRM, Kalender, Projektmanagement, Finanz-Tool (round 5)
     chat       a chat widget qualifying a lead (the lines are drafts the client still approves: chat.tsx, CHAT_SCRIPT)
     calls      an incoming call, the caller and the AI taking turns, a slot booked in the week
     marketing  a CRM pipeline: leads move from column to column and land in CRM; Conversion steps up

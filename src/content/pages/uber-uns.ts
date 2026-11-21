@@ -5,11 +5,8 @@
 export const UU_HERO = {
   title: "Wir machen KI verständlich,",
   accent: "praktisch und profitabel.",
-  // His two paragraphs, shortened by omission.
-  text: [
-    "Branded Genius unterstützt Unternehmen dabei, künstliche Intelligenz, Automatisierung und digitales Marketing gezielt einzusetzen, um nachhaltig zu wachsen.",
-    "Wir setzen Technologie nicht ein, nur weil sie neu ist. Wir entwickeln Lösungen, die echte geschäftliche Herausforderungen lösen und messbaren Mehrwert schaffen.",
-  ],
+  // Round 5 (Roman, 2026-11-18: "less text"): one sentence of his own, from his second paragraph.
+  text: "Wir entwickeln Lösungen, die echte geschäftliche Herausforderungen lösen und messbaren Mehrwert schaffen.",
   cta: "Unsere Expertise entdecken",
   kind: "KI-Agentur",
   tagline: "Strategie • Umsetzung • Exzellenz",
@@ -18,14 +15,17 @@ export const UU_HERO = {
 export const UU_WHO = {
   title: "Ihr Partner für",
   accent: "KI-gestütztes Unternehmenswachstum",
-  text: "Branded Genius ist eine deutsche Agentur für KI, Automatisierung und digitales Wachstum. Wir ersetzen manuelle Abläufe und isolierte Systeme durch vernetzte, praxisnahe Lösungen – von der Strategie über die Umsetzung bis zur laufenden Optimierung.",
+  // Round 5 (Roman, 2026-11-18: "team picture ... instead of text text text"): his first sentence, and the team photo.
+  text: "Branded Genius ist eine deutsche Agentur für KI, Automatisierung und digitales Wachstum.",
+  photo: "/media/photos/team.webp",
+  alt: "Roman Tränkle und das Team von Branded Genius",
 };
 
 export const UU_MISSION = {
   title: "Wir machen künstliche Intelligenz für Unternehmen",
   accent: "zugänglich.",
+  // Round 5 (Roman, 2026-11-18: "a lot of text"): the lead stays, his three-sentence paragraph under it is gone.
   lead: "Unsere Mission ist es, KI für Unternehmen jeder Größe verständlich und nutzbar zu machen.",
-  text: "Viele Unternehmen wissen, dass künstliche Intelligenz ihre Arbeitsweise verändern wird. Häufig fehlt jedoch ein klarer Einstieg und das Wissen, wie KI sinnvoll eingesetzt werden kann. Wir erkennen, wo Technologie den größten Mehrwert schaffen kann, und entwickeln daraus klare, funktionierende Lösungen.",
   goalsIntro: "Unsere Mission basiert auf drei zentralen Zielen:",
   goals: [
     { title: "Geschäftsprozesse vereinfachen", tag: "Effizienz & Fokus" },

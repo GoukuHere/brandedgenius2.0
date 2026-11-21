@@ -69,29 +69,16 @@ export const REALITY = {
   title: "Die häufigsten Gründe, warum KI-Projekte",
   accent: "nicht produktiv werden.",
   text: "Viele Unternehmen investieren in KI-Tools, doch ohne klare Strategie und Struktur bleiben Potenziale ungenutzt und Ergebnisse aus.",
+  // Round 5 (Roman, 2026-11-18: the steps should fit the heading): the six reasons rewritten to the copy standard,
+  // each a concrete moment in one or two short sentences. The pictures are still the old ones until the new ones,
+  // made for each step, are in.
   items: [
-    { title: "Keine klare KI-Roadmap", text: "KI-Tools werden ausprobiert, aber ohne strukturierten Umsetzungsplan.", img: "/media/reality/roadmap.webp" },
-    {
-      title: "Tool-Chaos statt System",
-      text: "Viele Tools werden genutzt, aber nicht sinnvoll miteinander verbunden oder in einen klaren Prozess integriert.",
-      img: "/media/reality/tool-chaos.webp",
-    },
-    {
-      title: "Manuelle Prozesse bleiben bestehen",
-      text: "Wiederkehrende Aufgaben kosten weiterhin Zeit und Ressourcen, obwohl sie automatisiert werden könnten.",
-      img: "/media/reality/manuell.webp",
-    },
-    {
-      title: "Mitarbeiter sind unsicher",
-      text: "Teams wissen nicht, welche Tools sie nutzen dürfen oder wie KI richtig eingesetzt werden soll.",
-      img: "/media/reality/unsicher.webp",
-    },
-    { title: "Datenschutz wird zu spät berücksichtigt", text: "Compliance und interne Regeln werden häufig erst am Ende berücksichtigt.", img: "/media/reality/datenschutz.webp" },
-    {
-      title: "Keine KPIs und keine klare Wirkung",
-      text: "KI wird getestet, aber der Business-Impact wird nicht gemessen oder transparent ausgewertet.",
-      img: "/media/reality/kpis.webp",
-    },
+    { title: "Kein Fahrplan für KI", text: "Jedes Team testet eigene Tools. Niemand legt fest, was zuerst kommt.", img: "/media/reality/roadmap.webp" },
+    { title: "Tools ohne Verbindung", text: "Ihr Team kopiert Daten von Hand zwischen CRM, E-Mail und Tabellen.", img: "/media/reality/tool-chaos.webp" },
+    { title: "Routinearbeit frisst Zeit", text: "Angebote, Rechnungen und Termine tippt Ihr Team weiter von Hand ab.", img: "/media/reality/manuell.webp" },
+    { title: "Das Team ist unsicher", text: "Niemand weiß, welche Tools erlaubt sind. Also bleibt die KI liegen.", img: "/media/reality/unsicher.webp" },
+    { title: "Datenschutz kommt zu spät", text: "Kurz vor dem Start prüft jemand die Regeln. Dann steht das Projekt.", img: "/media/reality/datenschutz.webp" },
+    { title: "Der Nutzen bleibt unsichtbar", text: "Die KI läuft. Wie viel Zeit und Geld sie spart, misst niemand.", img: "/media/reality/kpis.webp" },
   ],
 };
 
@@ -175,7 +162,8 @@ export const SYSTEM = {
     { title: "WhatsApp", tools: ["Business API"] },
     { title: "Project Management", tools: ["ClickUp", "Asana", "Trello"] },
     { title: "Calendar Booking", tools: ["Google Calendar", "Calendly", "Microsoft Bookings"] },
-    { title: "AI Agents", tools: ["Branded Genius AI Agents", "Individuelle KI-Agenten"] },
+    // Round 5 (Roman, 2026-11-18): only "Individuelle KI-Agenten" from his own words, plus Claude Code and Codex.
+    { title: "AI Agents", tools: ["Individuelle KI-Agenten", "Claude Code", "Codex"] },
   ],
 };
 

@@ -4,7 +4,7 @@ import { UU_FOUNDER } from "@/content/pages/uber-uns";
 
 /*
   Über uns, the founder: an editorial spread. Roman's portrait large on the left (it opens from its foot as it comes
-  into view and drifts a little slower than the page); on the right his quote set big in the heading style, the title
+  into view); on the right his quote set big in the heading style, the title
   sentence in off-white and the second in the brand gradient. His heading follows as the quote's byline (it is the
   section's h2, first in the markup), after a short sky rule. His four bio paragraphs sit in a narrow, quiet column,
   set in from the quote, so the right side steps down like a magazine page.
@@ -14,11 +14,16 @@ export function UberFounder() {
     <section id="gruender" className="relative py-16 md:py-24">
       <Container>
         <div className="grid items-start gap-12 lg:grid-cols-12 lg:gap-x-8">
+          {/*
+            Round 5 (2026-11-18, Roman: "that picture for me is wrong cropped, you need to crop it correctly"). The frame
+            used to stretch to the height of the bio (488x892 at 1659px, against the photo's 3:4) and pinned the crop
+            to the left edge, which cut off his arm and shoulder and pressed him against the frame. Now the frame has
+            the photo's own 3:4 shape on every screen, so the whole picture shows (his head, both arms, the wall
+            sign), with no drift zoom; on desktop it stays beside the bio while the text scrolls past (uber-uns.css).
+          */}
           <figure
             data-reveal="photo"
-            data-parallax
-            // Desktop: the portrait runs the full height of the text beside it, like a full-page photo in a magazine.
-            className="frame relative aspect-[4/5] w-full shadow-[0_40px_80px_-40px_rgb(1_4_12/0.95)] lg:col-span-5 lg:aspect-auto lg:min-h-[620px] lg:self-stretch"
+            className="uu-founder-photo frame relative aspect-[3/4] w-full shadow-[0_40px_80px_-40px_rgb(1_4_12/0.95)] lg:col-span-5"
           >
             <Image
               src={UU_FOUNDER.photo}
@@ -26,8 +31,7 @@ export function UberFounder() {
               fill
               quality={85}
               sizes="(min-width: 1280px) 500px, (min-width: 1024px) 40vw, 92vw"
-              // The tall desktop crop keeps the whole BRANDED GENIUS wall sign beside him.
-              className="object-cover object-[50%_16%] lg:object-[4%_20%]"
+              className="object-cover object-[50%_30%]"
             />
             {/* A navy grade at the foot, so the photo sits in the page's light. */}
             <span aria-hidden className="absolute inset-0 bg-[linear-gradient(0deg,rgb(4_12_30/0.55)_0%,rgb(4_12_30/0)_38%)]" />

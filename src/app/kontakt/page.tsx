@@ -1,7 +1,4 @@
 import type { Metadata } from "next";
-import { KontaktClosing } from "@/components/pages/kontakt/closing";
-import { KontaktDirect } from "@/components/pages/kontakt/direct";
-import { KontaktFaq } from "@/components/pages/kontakt/faq";
 import { KontaktHero } from "@/components/pages/kontakt/hero";
 import { SiteShell } from "@/components/site/site-shell";
 import "@/components/pages/kontakt/kontakt.css";
@@ -14,16 +11,13 @@ export const metadata: Metadata = {
 
 /*
   /kontakt (2026-11-16), from the client's own copy on brandedgenius.de/kontakt/: his headline and "Direkter Draht"
-  beside his real contact form, his two direct channels as one split panel, his five questions answered in the open,
-  and a close over a quiet beacon. Nothing here repeats a homepage section.
+  beside his real contact form. Round 5 (2026-11-18, Roman: "remove everything ... in the contact, we need only the
+  contact form"): the page is this one section; the doors, the questions and the close came off.
 */
 export default function KontaktPage() {
   return (
     <SiteShell>
       <KontaktHero />
-      <KontaktDirect />
-      <KontaktFaq />
-      <KontaktClosing />
     </SiteShell>
   );
 }

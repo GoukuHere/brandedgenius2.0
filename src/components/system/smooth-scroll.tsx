@@ -19,6 +19,10 @@ import { useEffect } from "react";
   The first site (v1) dropped Lenis for native scrolling after the client found the page slow; this one is kept light
   (no touch smoothing, one requestAnimationFrame loop that idles at rest).
 */
+/** The page's Lenis while it runs (null with reduced motion or before it starts), for code that scrolls the page. */
+let current: Lenis | null = null;
+export const getLenis = () => current;
+
 export function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
@@ -35,6 +39,8 @@ export function SmoothScroll() {
       stopInertiaOnNavigate: true,
     });
 
+    current = lenis;
+
     const sync = () => {
       const held = document.documentElement.style.overflow === "hidden" || document.body.classList.contains("overflow-hidden");
       if (held) lenis.stop();
@@ -47,6 +53,7 @@ export function SmoothScroll() {
 
     return () => {
       watcher.disconnect();
+      if (current === lenis) current = null;
       lenis.destroy();
     };
   }, []);

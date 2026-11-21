@@ -1,30 +1,32 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValueEvent, useSpring, useTransform, type MotionValue } from "motion/react";
+import { animate, motion, useMotionValue, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Heading } from "@/components/system/primitives";
+import { getLenis } from "@/components/system/smooth-scroll";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { REALITY } from "@/content/site";
-import { cn } from "@/lib/utils";
 
 /*
-  v11 Die Realität: v2's Problem chapter (the client: "please take also that section here, do it like this, I like
-  that style") in place of v1's reasons list ("not really good, the other one is better"), as a normal section of
-  v1's page in normal scrolling ("not this scrolling by scrolling"): the Realität headline (v1's Problem headline is
-  already right above it), the six reasons one at a time with a row of bars, and their photos filling the right of
-  the section and dissolving into the page towards the text. Phones: headline, photo in a frame, bars, reason.
+  v11 Die Realität: the six reasons why KI projects stall, a slider that steps with the scroll.
 
-  Round 4 (the client's Loom of 2026-11-12, at 0:46): "before it was like kind of slider animation ... step by step
-  before it's going to the next section ... there is no slider effect anymore. So if you can put it inside, that will
-  be great." That was v2's chapter: the panel held while the six reasons stepped with the scroll. So, on every screen
-  tall enough (PIN, the same as the Versprechen's), the section is a runway with a sticky one-screen stage: the photo
-  and the text hold, each reason has its own stretch of the scroll, the bars fill with it (scroll-linked and
-  reversible), and after the sixth the page moves on. A bar scrolls to its reason.
+  Round 5 (the client's Loom of 2026-11-18, 0:17 to 0:45): "the animation and effect are good, but you see the header
+  are still the same ... The header should be maybe somewhere in the middle, and then if you have the first one, you're
+  scrolling up the second one coming, the third one ... to keep the header always same." Before, the heading sat on
+  the left of every reason, so a new reason read as the same screen with other small text. Now:
+  - The heading stands once, centred at the top of the stage, and stays; the bars sit under it.
+  - Under them a window holds the six slides, each a reason with its own picture (number, title and line on the
+    left, the picture on the right; on phones the picture above the text). As you scroll, the slide in the window
+    moves up and out while the next comes up from below; each rests for a while before the next comes (the same
+    staircase as the Use Cases deck). Scroll-linked and reversible, no extra spring on top of Lenis.
+  - On every screen tall enough (PIN) the section is a runway with a sticky one-screen stage; a bar glides to its
+    slide through Lenis.
 
-  Short windows (phones on their side, desktop windows under 720px): the reasons take turns on their own while the
-  section is on screen, DWELL ms each, as before; a bar picks one and stops the turns, hovering or focusing holds
-  them. Reduced motion: no turns, the bars still pick. Every reason is in the markup for screen readers as one list.
+  Short windows (phones on their side, desktop windows under 720px): the slides take turns on their own while the
+  section is on screen, DWELL ms each, the window gliding up to the next; a bar picks one and stops the turns,
+  hovering or focusing holds them. Reduced motion: no turns, the bars still pick, the window jumps. Every reason is in
+  the markup for screen readers as one list; the moving view is hidden from them.
 */
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -34,13 +36,23 @@ const COUNT = REASONS.length;
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 // Keep in step with v11.css (.v11-reasons) and the Versprechen's PIN.
 const PIN = "(min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px)";
-const stepAt = (progress: number) => Math.min(COUNT - 1, Math.max(0, Math.floor(progress * COUNT)));
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+const smoothstep = (t: number) => t * t * (3 - 2 * t);
+/** Each slide rests for 40% of its stretch of the scroll, then the next comes up (as the Use Cases deck). */
+function staircase(k: number) {
+  const i = Math.floor(k);
+  return i + smoothstep(clamp((k - i - 0.3) / 0.4, 0, 1));
+}
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 export function ReasonsSection() {
   const root = useRef<HTMLElement>(null);
   // 0 when the stage pins (section top at the screen top), 1 when it lets go (section bottom at the screen bottom).
   const progress = useSectionProgress(root, ["start start", "end end"]);
-  const smooth = useSpring(progress, { stiffness: 120, damping: 28, mass: 0.6, skipInitialAnimation: true });
+  const pinnedValue = useMotionValue(0);
+  const timed = useMotionValue(0);
+  // Where the slides stand: on the scroll where the stage pins, else on their own time.
+  const deck = useTransform(() => (pinnedValue.get() ? staircase(clamp(progress.get() * COUNT - 0.5, 0, COUNT - 1)) : timed.get()));
 
   // Live while the section is on screen and the tab is visible.
   const [onScreen, setOnScreen] = useState(false);
@@ -60,6 +72,7 @@ export function ReasonsSection() {
     const onQuery = () => {
       setReduced(motionQuery.matches);
       setPinned(pinQuery.matches);
+      pinnedValue.set(pinQuery.matches ? 1 : 0);
     };
     onQuery();
     motionQuery.addEventListener("change", onQuery);
@@ -70,32 +83,36 @@ export function ReasonsSection() {
       motionQuery.removeEventListener("change", onQuery);
       pinQuery.removeEventListener("change", onQuery);
     };
-  }, []);
+  }, [pinnedValue]);
   const live = onScreen && visible;
 
   const [active, setActive] = useState(0);
   const [run, setRun] = useState(0); // a new number restarts the running bar
   const [manual, setManual] = useState(false);
   const [held, setHeld] = useState(false);
-  const reason = REASONS[active];
 
-  // Pinned: the reason follows the scroll. On a switch into the pinned layout it takes the scroll's reason at once.
-  useMotionValueEvent(smooth, "change", (p) => {
-    if (pinned) setActive(stepAt(p));
+  // Held: the current slide follows the scroll. Else the slides glide to the chosen one.
+  useMotionValueEvent(deck, "change", (k) => {
+    if (pinned) setActive(clamp(Math.round(k), 0, COUNT - 1));
   });
-  const [wasPinned, setWasPinned] = useState(pinned);
-  if (wasPinned !== pinned) {
-    setWasPinned(pinned);
-    if (pinned) setActive(stepAt(smooth.get()));
-  }
+  useEffect(() => {
+    if (pinned) return undefined;
+    const controls = animate(timed, active, { duration: reduced ? 0 : 0.9, ease: EASE });
+    return () => controls.stop();
+  }, [pinned, active, reduced, timed]);
 
   const pick = (i: number) => {
     const el = root.current;
     if (pinned && el) {
-      // Scroll to the middle of that reason's stretch of the runway.
+      // Glide to the middle of that slide's rest on the runway (through Lenis when it runs).
       const top = el.getBoundingClientRect().top + window.scrollY;
       const travel = el.offsetHeight - window.innerHeight;
-      window.scrollTo({ top: top + ((i + 0.5) / COUNT) * travel, behavior: reduced ? "auto" : "smooth" });
+      const goal = top + ((i + 0.5) / COUNT) * travel;
+      const lenis = getLenis();
+      if (lenis) {
+        const steps = Math.abs(goal - window.scrollY) / (travel / COUNT);
+        lenis.scrollTo(goal, { duration: Math.min(1.1, 0.5 + steps * 0.12), easing: easeInOut, lock: true });
+      } else window.scrollTo({ top: goal, behavior: "smooth" });
       return;
     }
     setManual(true);
@@ -106,7 +123,7 @@ export function ReasonsSection() {
     setActive((a) => (a + 1) % COUNT);
     setRun((r) => r + 1);
   };
-  const running = !manual;
+  const running = !manual && !reduced;
   const paused = !live || held;
 
   const hold = pinned
@@ -117,39 +134,34 @@ export function ReasonsSection() {
         onFocus: () => setHeld(true),
         onBlur: () => setHeld(false),
       };
-  const bars = pinned ? (
-    <ScrollBars progress={smooth} active={active} onPick={pick} />
-  ) : (
-    <Bars active={active} run={run} running={running} paused={paused} onPick={pick} onDone={advance} />
-  );
 
   return (
     <section ref={root} id="realitaet" aria-label={`${REALITY.title} ${REALITY.accent}`} className="v11-reasons relative overflow-x-clip py-16 md:py-24">
-      {/* The stage: held for the length of the runway on tall enough screens (v11.css), its content centred. */}
+      {/* The stage: held for the length of the runway on tall enough screens (v11.css). */}
       <div className="v11-reasons-stage relative">
-        {/* Desktop: the photos fill the right of the stage and dissolve into the page towards the text. */}
-        <div aria-hidden className="v11-photo-fade absolute inset-y-0 right-0 hidden w-[56%] overflow-hidden md:block">
-          <ReasonPhotos active={active} sizes="56vw" />
-        </div>
+        <Container className="v11-reasons-inner relative flex w-full flex-col">
+          <div className="mx-auto w-full max-w-[860px] text-center">
+            <Heading title={REALITY.title} accent={REALITY.accent} className="mx-auto text-balance" />
+          </div>
 
-        <Container className="relative w-full">
-          <div className="md:w-[44%] md:pr-10">
-            <Heading title={REALITY.title} accent={REALITY.accent} />
+          <div className="v11-reasons-bars mx-auto mt-6 w-full max-w-[460px] md:mt-8" {...hold}>
+            {pinned ? (
+              <ScrollBars progress={progress} active={active} onPick={pick} />
+            ) : (
+              <Bars active={active} run={run} running={running} paused={paused} onPick={pick} onDone={advance} />
+            )}
+          </div>
 
-            {/* Phones: the photo in a frame between the heading and the reason. */}
-            <div aria-hidden className="v11-reasons-frame relative mt-8 aspect-[4/3] overflow-hidden rounded-panel shadow-[inset_0_0_0_1px_rgb(255_255_255/0.09)] md:hidden">
-              <ReasonPhotos active={active} sizes="92vw" />
-            </div>
-
-            <div className="v11-reasons-steps mt-8" {...hold}>
-              {bars}
-              <ReasonText index={active} title={reason.title} text={reason.text} />
-            </div>
+          {/* The window: one slide at a time; the next comes up from below as the current one moves up and out. */}
+          <div aria-hidden className="v11-reasons-window relative mt-6 md:mt-10" {...hold}>
+            {REASONS.map((r, i) => (
+              <Slide key={r.title} index={i} deck={deck} title={r.title} text={r.text} img={r.img} />
+            ))}
           </div>
         </Container>
       </div>
 
-      {/* All six reasons for screen readers, in order; the changing view above is hidden from them. */}
+      {/* All six reasons for screen readers, in order; the moving view above is hidden from them. */}
       <ol className="sr-only">
         {REASONS.map((r) => (
           <li key={r.title}>
@@ -161,7 +173,27 @@ export function ReasonsSection() {
   );
 }
 
-/** Held: one bar per reason, each filling over its own stretch of the scroll. Each scrolls to its reason. */
+/** One reason: its number, title and line beside (desktop) or under (phones) its picture, placed by the deck. */
+function Slide({ index, deck, title, text, img }: { index: number; deck: MotionValue<number>; title: string; text: string; img: string }) {
+  const y = useTransform(() => `${((index - deck.get()) * 100).toFixed(3)}%`);
+  const opacity = useTransform(() => clamp(1 - Math.abs(index - deck.get()) * 0.85, 0, 1));
+  const visibility = useTransform(() => (Math.abs(index - deck.get()) < 1.2 ? "visible" : "hidden"));
+  return (
+    <motion.div style={{ y, opacity, visibility }} className="v11-slide absolute inset-0 grid md:grid-cols-12 md:items-center md:gap-x-10">
+      <div className="v11-slide-photo relative overflow-hidden rounded-panel md:order-2 md:col-span-7 md:h-full">
+        <Image src={img} alt="" fill sizes="(min-width: 768px) 56vw, 92vw" className="object-cover" />
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgb(6_21_54/0.5)_0%,rgb(6_21_54/0)_45%),linear-gradient(0deg,rgb(0_75_160/0.2),rgb(0_75_160/0.2))]" />
+      </div>
+      <div className="v11-slide-text md:order-1 md:col-span-5">
+        <p className="num text-[15px] text-sky">{pad(index)}</p>
+        <h3 className="mt-2 text-[21px] leading-[1.2] font-medium tracking-[-0.015em] text-balance text-white md:text-[30px] lg:text-[34px]">{title}</h3>
+        <p className="mt-2 max-w-[460px] text-[15px] leading-[1.5] text-pretty text-white/70 md:mt-4 md:text-[18px] md:leading-[1.6]">{text}</p>
+      </div>
+    </motion.div>
+  );
+}
+
+/** Held: one bar per reason, each filling over its own stretch of the scroll. Each glides to its slide. */
 function ScrollBars({ progress, active, onPick }: { progress: MotionValue<number>; active: number; onPick: (i: number) => void }) {
   return (
     <div className="-my-3 flex gap-1.5">
@@ -231,48 +263,6 @@ function Bars({
           </button>
         );
       })}
-    </div>
-  );
-}
-
-/** The six reasons' photos, one shown at a time, under a royal grade so each sits in the panel's light (v2's). */
-function ReasonPhotos({ active, sizes }: { active: number; sizes: string }) {
-  return (
-    <>
-      {REASONS.map((r, i) => (
-        <Image
-          key={r.img}
-          src={r.img}
-          alt=""
-          fill
-          sizes={sizes}
-          className={cn(
-            "object-cover transition-[opacity,scale] duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)]",
-            i === active ? "scale-100 opacity-100" : "scale-[1.06] opacity-0"
-          )}
-        />
-      ))}
-      <div className="absolute inset-0 bg-[linear-gradient(0deg,rgb(6_21_54/0.55)_0%,rgb(6_21_54/0)_45%),linear-gradient(0deg,rgb(0_75_160/0.24),rgb(0_75_160/0.24))]" />
-    </>
-  );
-}
-
-function ReasonText({ index, title, text, compact = false }: { index: number; title: string; text: string; compact?: boolean }) {
-  return (
-    <div aria-hidden className={cn("relative", compact ? "mt-4 min-h-[124px]" : "mt-6 min-h-[156px]")}>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.45, ease: EASE }}
-        >
-          <p className="num text-[15px] text-sky">{pad(index)}</p>
-          <h3 className={cn("mt-2 font-medium tracking-[-0.015em] text-white", compact ? "text-[21px] leading-[1.2]" : "text-[26px] leading-[1.2]")}>{title}</h3>
-          <p className={cn("mt-2 max-w-[460px] text-white/70", compact ? "text-[15px] leading-[1.5]" : "text-[17px] leading-[1.6]")}>{text}</p>
-        </motion.div>
-      </AnimatePresence>
     </div>
   );
 }

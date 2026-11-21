@@ -1,29 +1,40 @@
-import { CalendarDays, Contact, ListChecks, Mail, type LucideIcon } from "lucide-react";
-import { type Box, CheckBadge, Comet, flash, ink, Lines, Mark, Panel, Port, rise, type Scene, SKY, Text, Well, Wire } from "./kit";
+import { CalendarDays, Contact, ListChecks, Mail, Receipt, type LucideIcon } from "lucide-react";
+import { type Box, CheckBadge, Comet, flash, ink, Lines, Mark, Panel, Port, rise, type Scene, sky, SKY, Text, Well, Wire } from "./kit";
 
 /*
   KI-Agenten & Workflows: a workflow canvas in the manner of n8n or Make. An e-mail triggers the agent, which hands
-  the work on to three connected tools. One run per loop: a light travels the wires, each node lights up in turn and
-  takes a check when it is done; then the canvas settles back.
+  the work on to the connected systems, one after another. One run per loop: a light travels the wires, each block
+  lights up in turn and takes a check when its step is done; then the canvas settles back.
+
+  Round 5 (the client's Loom of 2026-11-18, 2:58 to 3:47): "Put CRM here ... on German ... project management tool
+  ... finance tool ... better that workflow", and bigger blocks with a little more explanation. The systems are now
+  four German categories (CRM, Kalender, Projektmanagement, and the new Finanz-Tool) in place of the brand names, the
+  blocks are larger, each carries one short line of what happens there, and the run reaches the systems in that
+  order: the contact is created, the appointment booked, the task opened, the invoice prepared.
 */
 
-const LOOP = 11;
+const LOOP = 12.5;
 const B = {
   mail: 0.5,
   mailDone: 1.0,
-  wire: [1.0, 1.9] as const,
-  agent: 1.9,
-  agentDone: 3.4,
-  tools: [3.4, 3.75, 4.1],
-  travel: 0.95,
-  settle: 0.35,
-  reset: [9.6, 10.4] as const,
+  wire: [1.0, 1.8] as const,
+  agent: 1.8,
+  agentDone: 3.2,
+  // The systems, one after another.
+  tools: [3.2, 4.1, 5.0, 5.9],
+  travel: 0.75,
+  settle: 0.3,
+  reset: [11.4, 12.2] as const,
 };
 
-const TOOLS: { name: string; icon: LucideIcon }[] = [
-  { name: "GoHighLevel", icon: Contact },
-  { name: "Google Calendar", icon: CalendarDays },
-  { name: "ClickUp", icon: ListChecks },
+type Step = { name: string; line: string; icon: LucideIcon };
+const MAIL: Step = { name: "E-Mail", line: "Anfrage kommt an", icon: Mail };
+const AGENT_LINE = "Liest und sortiert die Anfrage";
+const TOOLS: Step[] = [
+  { name: "CRM", line: "Kontakt angelegt", icon: Contact },
+  { name: "Kalender", line: "Termin gebucht", icon: CalendarDays },
+  { name: "Projektmanagement", line: "Aufgabe erstellt", icon: ListChecks },
+  { name: "Finanz-Tool", line: "Rechnung vorbereitet", icon: Receipt },
 ];
 
 function run(t: number) {
@@ -48,20 +59,28 @@ function run(t: number) {
   };
 }
 
-type Size = { well: number; glyph: number; font: number; pad: number; gap: number; badge: number; r: number };
-const WIDE_SIZE: Size = { well: 40, glyph: 20, font: 19, pad: 12, gap: 14, badge: 24, r: 16 };
-const PHONE_SIZE: Size = { well: 26, glyph: 15, font: 13, pad: 7, gap: 8, badge: 18, r: 12 };
+type Size = { well: number; glyph: number; name: number; line: number; pad: number; gap: number; badge: number; r: number };
+const WIDE_SIZE: Size = { well: 48, glyph: 24, name: 21, line: 16, pad: 16, gap: 16, badge: 26, r: 18 };
+const PHONE_SIZE: Size = { well: 30, glyph: 16, name: 14, line: 12, pad: 9, gap: 10, badge: 18, r: 12 };
 
-/** A canvas node: a glyph in its well and the node's name; a check on its corner once its step is done. */
-function Node({ box, icon, name, lit, done, size }: { box: Box; icon: LucideIcon; name: string; lit: number; done: number; size: Size }) {
+/**
+ * A canvas block: a glyph in its well, the block's name and its line of what happens there (quiet until its step is
+ * done, then bright); a check on its corner once done.
+ */
+function Node({ box, step, lit, done, size }: { box: Box; step: Step; lit: number; done: number; size: Size }) {
   return (
     <>
       <Panel {...box} r={size.r} lit={lit}>
-        <div className="flex h-full items-center" style={{ paddingLeft: size.pad, gap: size.gap }}>
-          <Well icon={icon} size={size.well} glyph={size.glyph} lit={lit} r={size.r - 4} />
-          <span className="leading-none font-medium whitespace-nowrap" style={{ fontSize: size.font, color: ink(0.92) }}>
-            {name}
-          </span>
+        <div className="flex h-full items-center" style={{ paddingLeft: size.pad, paddingRight: size.pad, gap: size.gap }}>
+          <Well icon={step.icon} size={size.well} glyph={size.glyph} lit={lit} r={size.r - 5} />
+          <div className="min-w-0">
+            <p className="leading-none font-medium whitespace-nowrap" style={{ fontSize: size.name, color: ink(0.95) }}>
+              {step.name}
+            </p>
+            <p className="leading-none whitespace-nowrap" style={{ fontSize: size.line, marginTop: size.line * 0.5, color: done > 0.01 ? sky(0.55 + 0.45 * done) : ink(0.55) }}>
+              {step.line}
+            </p>
+          </div>
         </div>
       </Panel>
       <CheckBadge cx={box.x + box.w - 4} cy={box.y + 4} d={size.badge} on={done} />
@@ -87,12 +106,17 @@ function Agent({ box, lit, thinking, done, size, mark, t }: { box: Box; lit: num
   return (
     <>
       <Panel {...box} r={size.r + 2} lit={lit}>
-        <div className="flex h-full items-center" style={{ paddingInline: wide ? 18 : 10, gap: wide ? 14 : 7 }}>
+        <div className="flex h-full items-center" style={{ paddingInline: wide ? 22 : 11, gap: wide ? 16 : 9 }}>
           <Mark h={mark} />
-          <span className="flex-1 leading-none font-medium whitespace-nowrap" style={{ fontSize: size.font + 1, color: ink(0.95) }}>
-            KI-Agent
-          </span>
-          <Spinner d={wide ? 22 : 14} angle={t * 400} on={thinking} />
+          <div className="min-w-0 flex-1">
+            <p className="leading-none font-medium whitespace-nowrap" style={{ fontSize: size.name + 2, color: ink(0.97) }}>
+              KI-Agent
+            </p>
+            <p className="leading-none whitespace-nowrap" style={{ fontSize: size.line, marginTop: size.line * 0.55, color: done > 0.01 ? sky(0.55 + 0.45 * done) : ink(0.55) }}>
+              {AGENT_LINE}
+            </p>
+          </div>
+          <Spinner d={wide ? 24 : 15} angle={t * 400} on={thinking} />
         </div>
       </Panel>
       <CheckBadge cx={box.x + box.w - 4} cy={box.y + 4} d={size.badge} on={done} />
@@ -100,18 +124,19 @@ function Agent({ box, lit, thinking, done, size, mark, t }: { box: Box; lit: num
   );
 }
 
-/* Desktop: the trigger and the agent on the line through the middle, the tools fanned out on the right, the two
-   ends grouped as on a canvas ("Prozesse", "Systeme"). */
+/* Desktop: the trigger and the agent on the line through the middle, the four systems stacked on the right in the
+   order the run reaches them; the two ends grouped as on a canvas ("Prozess", "Systeme"). */
+const MID = 240;
 const WIDE = {
-  mail: { x: 88, y: 208, w: 216, h: 64 },
-  agent: { x: 500, y: 188, w: 280, h: 104 },
-  tools: [100, 208, 316].map((y) => ({ x: 980, y, w: 236, h: 64 })),
+  mail: { x: 52, y: MID - 44, w: 268, h: 88 },
+  agent: { x: 420, y: MID - 58, w: 352, h: 116 },
+  tools: [34, 138, 242, 346].map((y) => ({ x: 912, y, w: 336, h: 84 })),
 };
-const WIDE_IN = `M${WIDE.mail.x + WIDE.mail.w} 240H${WIDE.agent.x}`;
+const WIDE_IN = `M${WIDE.mail.x + WIDE.mail.w} ${MID}H${WIDE.agent.x}`;
 const WIDE_OUT = WIDE.tools.map((b) => {
   const [x0, x1, y] = [WIDE.agent.x + WIDE.agent.w, b.x, b.y + b.h / 2];
   const mid = (x0 + x1) / 2;
-  return `M${x0} 240C${mid} 240 ${mid} ${y} ${x1} ${y}`;
+  return `M${x0} ${MID}C${mid} ${MID} ${mid} ${y} ${x1} ${y}`;
 });
 
 function wide(t: number) {
@@ -119,12 +144,11 @@ function wide(t: number) {
   return (
     <>
       {/* The canvas groups. */}
-      <div className="absolute rounded-[22px]" style={{ left: 64, top: 152, width: 264, height: 144, boxShadow: `inset 0 0 0 1px ${ink(0.07)}` }} />
-      <div className="absolute rounded-[22px]" style={{ left: 956, top: 50, width: 284, height: 354, boxShadow: `inset 0 0 0 1px ${ink(0.07)}` }} />
-      <Text x={88} y={178} size={17}>
-        Prozesse
+      <div className="absolute rounded-[24px]" style={{ left: 32, top: 132, width: 308, height: 172, boxShadow: `inset 0 0 0 1px ${ink(0.07)}` }} />
+      <Text x={52} y={160} size={16}>
+        Prozess
       </Text>
-      <Text x={980} y={76} size={17}>
+      <Text x={1248} y={14} size={16} align="end">
         Systeme
       </Text>
 
@@ -139,17 +163,17 @@ function wide(t: number) {
         ))}
       </Lines>
 
-      <Node box={WIDE.mail} icon={Mail} name="E-Mail" lit={s.mail.lit} done={s.mail.done} size={WIDE_SIZE} />
-      <Agent box={WIDE.agent} lit={s.agent.lit} thinking={s.agent.thinking} done={s.agent.done} size={WIDE_SIZE} mark={30} t={t} />
+      <Node box={WIDE.mail} step={MAIL} lit={s.mail.lit} done={s.mail.done} size={WIDE_SIZE} />
+      <Agent box={WIDE.agent} lit={s.agent.lit} thinking={s.agent.thinking} done={s.agent.done} size={WIDE_SIZE} mark={34} t={t} />
       {TOOLS.map((tool, i) => (
-        <Node key={tool.name} box={WIDE.tools[i]} icon={tool.icon} name={tool.name} lit={s.tools[i].lit} done={s.tools[i].done} size={WIDE_SIZE} />
+        <Node key={tool.name} box={WIDE.tools[i]} step={tool} lit={s.tools[i].lit} done={s.tools[i].done} size={WIDE_SIZE} />
       ))}
 
       {/* Ports sit over the panel rims. */}
       <Lines w={1280} h={480}>
-        <Port cx={WIDE.mail.x + WIDE.mail.w} cy={240} on={s.mail.done} />
-        <Port cx={WIDE.agent.x} cy={240} on={s.wire.done} />
-        <Port cx={WIDE.agent.x + WIDE.agent.w} cy={240} on={s.agent.done} />
+        <Port cx={WIDE.mail.x + WIDE.mail.w} cy={MID} on={s.mail.done} />
+        <Port cx={WIDE.agent.x} cy={MID} on={s.wire.done} />
+        <Port cx={WIDE.agent.x + WIDE.agent.w} cy={MID} on={s.agent.done} />
         {WIDE.tools.map((b, i) => (
           <Port key={b.y} cx={b.x} cy={b.y + b.h / 2} on={s.tools[i].wire} />
         ))}
@@ -158,43 +182,41 @@ function wide(t: number) {
   );
 }
 
-/* Phone: the trigger above the agent on the left, the three tools stacked on the right. */
+/* Phone: the trigger above the agent, then the four systems down a spine on the left, in the order the run reaches
+   them, each branching off it. */
+/* Inset from the stage's edges, so the corner checks (radius 9) stay whole inside the plate. */
 const PHONE = {
-  mail: { x: 6, y: 14, w: 138, h: 40 },
-  agent: { x: 6, y: 84, w: 138, h: 52 },
-  tools: [14, 90, 166].map((y) => ({ x: 176, y, w: 158, h: 40 })),
+  mail: { x: 10, y: 16, w: 318, h: 54 },
+  agent: { x: 10, y: 94, w: 318, h: 62 },
+  tools: [184, 246, 308, 370].map((y) => ({ x: 44, y, w: 284, h: 50 })),
 };
-const P_MID = PHONE.mail.x + PHONE.mail.w / 2;
-const PHONE_IN = `M${P_MID} ${PHONE.mail.y + PHONE.mail.h}V${PHONE.agent.y}`;
-const PHONE_OUT = PHONE.tools.map((b) => {
-  const [x0, x1, y] = [PHONE.agent.x + PHONE.agent.w, b.x, b.y + b.h / 2];
-  const mid = (x0 + x1) / 2;
-  return `M${x0} 110C${mid} 110 ${mid} ${y} ${x1} ${y}`;
-});
+const SPINE_X = 26;
+const P_IN = `M${SPINE_X} ${PHONE.mail.y + PHONE.mail.h}V${PHONE.agent.y}`;
+const PHONE_OUT = PHONE.tools.map((b) => `M${SPINE_X} ${PHONE.agent.y + PHONE.agent.h}V${b.y + b.h / 2}H${b.x}`);
 
 function phone(t: number) {
   const s = run(t);
   return (
     <>
-      <Lines w={340} h={220}>
-        <Wire d={PHONE_IN} done={s.wire.done} width={1} />
+      <Lines w={340} h={432}>
+        <Wire d={P_IN} done={s.wire.done} width={1} />
         {PHONE_OUT.map((d, i) => (
           <Wire key={d} d={d} done={s.tools[i].wire} width={1} />
         ))}
-        <Comet d={PHONE_IN} p={s.wire.p} width={1.5} />
+        <Comet d={P_IN} p={s.wire.p} width={1.5} />
         {PHONE_OUT.map((d, i) => (
           <Comet key={d} d={d} p={s.tools[i].p} width={1.5} />
         ))}
       </Lines>
-      <Node box={PHONE.mail} icon={Mail} name="E-Mail" lit={s.mail.lit} done={s.mail.done} size={PHONE_SIZE} />
-      <Agent box={PHONE.agent} lit={s.agent.lit} thinking={s.agent.thinking} done={s.agent.done} size={PHONE_SIZE} mark={18} t={t} />
+      <Node box={PHONE.mail} step={MAIL} lit={s.mail.lit} done={s.mail.done} size={PHONE_SIZE} />
+      <Agent box={PHONE.agent} lit={s.agent.lit} thinking={s.agent.thinking} done={s.agent.done} size={PHONE_SIZE} mark={20} t={t} />
       {TOOLS.map((tool, i) => (
-        <Node key={tool.name} box={PHONE.tools[i]} icon={tool.icon} name={tool.name} lit={s.tools[i].lit} done={s.tools[i].done} size={PHONE_SIZE} />
+        <Node key={tool.name} box={PHONE.tools[i]} step={tool} lit={s.tools[i].lit} done={s.tools[i].done} size={PHONE_SIZE} />
       ))}
-      <Lines w={340} h={220}>
-        <Port cx={P_MID} cy={PHONE.mail.y + PHONE.mail.h} on={s.mail.done} r={3.5} />
-        <Port cx={P_MID} cy={PHONE.agent.y} on={s.wire.done} r={3.5} />
-        <Port cx={PHONE.agent.x + PHONE.agent.w} cy={110} on={s.agent.done} r={3.5} />
+      <Lines w={340} h={432}>
+        <Port cx={SPINE_X} cy={PHONE.mail.y + PHONE.mail.h} on={s.mail.done} r={3.5} />
+        <Port cx={SPINE_X} cy={PHONE.agent.y} on={s.wire.done} r={3.5} />
+        <Port cx={SPINE_X} cy={PHONE.agent.y + PHONE.agent.h} on={s.agent.done} r={3.5} />
         {PHONE.tools.map((b, i) => (
           <Port key={b.y} cx={b.x} cy={b.y + b.h / 2} on={s.tools[i].wire} r={3.5} />
         ))}
@@ -205,7 +227,7 @@ function phone(t: number) {
 
 export const AGENTS: Scene = {
   loop: LOOP,
-  still: 6.4,
+  still: 8,
   wide: { w: 1280, h: 480, draw: wide },
-  phone: { w: 340, h: 220, draw: phone },
+  phone: { w: 340, h: 432, draw: phone },
 };
