@@ -888,6 +888,42 @@ body:has(.v11) {
   }
 }
 
+/*
+  Round 5 (the developer, 2026-11-22: "the heading on left should also change with slide"): the heading and the line
+  under the bars change with the step (the section's question, then each reason). Every version stands in the same
+  grid cell, so the tallest sets the height and nothing below moves; the one on show rises in, the others fade out.
+  The runway grew by one step (380svh) for the question.
+*/
+.v11-reasons-swap > * {
+  grid-area: 1 / 1;
+  opacity: 0;
+  translate: 0 14px;
+  visibility: hidden;
+  transition:
+    opacity 0.35s ease,
+    translate 0.6s var(--ease-out-expo),
+    visibility 0s linear 0.35s;
+}
+.v11-reasons-swap > [data-on] {
+  opacity: 1;
+  translate: 0 0;
+  visibility: visible;
+  transition:
+    opacity 0.45s ease 0.1s,
+    translate 0.7s var(--ease-out-expo) 0.1s,
+    visibility 0s;
+}
+/* The headings sit on the bars: a shorter one leaves its room above it, so it stays with its line. */
+.v11-reasons-swap-end > * {
+  align-self: end;
+}
+@media (prefers-reduced-motion: reduce) {
+  .v11-reasons-swap > * {
+    transition: none;
+    translate: none;
+  }
+}
+
 /* ---------- Die Realität on the scroll (reasons.tsx, PIN) ---------- */
 
 /*
@@ -901,7 +937,7 @@ body:has(.v11) {
 */
 @media (min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px) {
   .v11-reasons {
-    height: 340svh;
+    height: 380svh;
     padding-top: 0;
     padding-bottom: 0;
   }
@@ -922,9 +958,5 @@ body:has(.v11) {
   }
   .v11-reasons-steps {
     margin-top: 16px;
-  }
-  /* Room for the longest reason (two-line title, two-line text), so the stage never re-centres between reasons. */
-  .v11-reasons-steps > div:last-child {
-    min-height: 176px;
   }
 }

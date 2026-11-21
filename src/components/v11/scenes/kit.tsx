@@ -67,6 +67,8 @@ export type Scene<W = unknown> = {
   words: Record<Locale, W>;
   wide: Comp<W>;
   phone: Comp<W>;
+  /** Short desktop windows (600 to 759px tall): a wide, low composition; without it they take the phone one. */
+  short?: Comp<W>;
 };
 
 const PANEL_BG = `linear-gradient(180deg, rgb(255 255 255 / 0.075), rgb(255 255 255 / 0.03)), #0a1d44`;

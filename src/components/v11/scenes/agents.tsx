@@ -94,6 +94,7 @@ function run(t: number) {
 type Size = { well: number; glyph: number; name: number; line: number; pad: number; gap: number; badge: number; r: number };
 const WIDE_SIZE: Size = { well: 48, glyph: 24, name: 21, line: 16, pad: 16, gap: 16, badge: 26, r: 18 };
 const PHONE_SIZE: Size = { well: 30, glyph: 16, name: 14, line: 12, pad: 9, gap: 10, badge: 18, r: 12 };
+const SHORT_SIZE: Size = { well: 44, glyph: 22, name: 20, line: 16, pad: 14, gap: 14, badge: 26, r: 16 };
 
 /**
  * A canvas block: a glyph in its well, the block's name and its line of what happens there (quiet until its step is
@@ -134,7 +135,7 @@ function Spinner({ d, angle, on }: { d: number; angle: number; on: number }) {
 }
 
 function Agent({ box, label, lit, thinking, done, size, mark, t }: { box: Box; label: Label; lit: number; thinking: number; done: number; size: Size; mark: number; t: number }) {
-  const wide = size === WIDE_SIZE;
+  const wide = size !== PHONE_SIZE;
   return (
     <>
       <Panel {...box} r={size.r + 2} lit={lit}>
@@ -215,6 +216,65 @@ function wide(t: number, words: Words) {
   );
 }
 
+/*
+  Short desktop windows (600 to 759px tall; the developer, 2026-11-22: "it looks small, maybe it should take horizontal
+  space?"). The plate may only be as tall as the screen less 440px there, so the tall phone composition came out a
+  narrow strip. This one is wide and low: the trigger and the agent along the top, the four systems side by side
+  under them, fed in order from one line under the agent. At a 720px window it renders about 1000px wide, so the
+  words stay 12 to 16px.
+*/
+const SHORT = {
+  mail: { x: 60, y: 36, w: 340, h: 104 },
+  agent: { x: 500, y: 30, w: 420, h: 116 },
+  tools: [20, 333, 646, 959].map((x) => ({ x, y: 236, w: 300, h: 100 })),
+};
+const S_MID = 88;
+const S_BUS = 192;
+const S_DROP = SHORT.agent.x + SHORT.agent.w / 2;
+const SHORT_IN = `M${SHORT.mail.x + SHORT.mail.w} ${S_MID}H${SHORT.agent.x}`;
+const SHORT_OUT = SHORT.tools.map((b) => `M${S_DROP} ${SHORT.agent.y + SHORT.agent.h}V${S_BUS}H${b.x + b.w / 2}V${b.y}`);
+
+function short(t: number, words: Words) {
+  const s = run(t);
+  const { mail: MAIL, tools: TOOLS } = steps(words);
+  return (
+    <>
+      <Text x={SHORT.mail.x} y={16} size={16}>
+        {words.process}
+      </Text>
+      <Text x={SHORT.tools[0].x} y={216} size={16}>
+        {words.systems}
+      </Text>
+
+      <Lines w={1280} h={360}>
+        <Wire d={SHORT_IN} done={s.wire.done} />
+        {SHORT_OUT.map((d, i) => (
+          <Wire key={d} d={d} done={s.tools[i].wire} />
+        ))}
+        <Comet d={SHORT_IN} p={s.wire.p} />
+        {SHORT_OUT.map((d, i) => (
+          <Comet key={d} d={d} p={s.tools[i].p} />
+        ))}
+      </Lines>
+
+      <Node box={SHORT.mail} step={MAIL} lit={s.mail.lit} done={s.mail.done} size={SHORT_SIZE} />
+      <Agent box={SHORT.agent} label={words.agent} lit={s.agent.lit} thinking={s.agent.thinking} done={s.agent.done} size={SHORT_SIZE} mark={32} t={t} />
+      {TOOLS.map((tool, i) => (
+        <Node key={tool.name} box={SHORT.tools[i]} step={tool} lit={s.tools[i].lit} done={s.tools[i].done} size={SHORT_SIZE} />
+      ))}
+
+      <Lines w={1280} h={360}>
+        <Port cx={SHORT.mail.x + SHORT.mail.w} cy={S_MID} on={s.mail.done} />
+        <Port cx={SHORT.agent.x} cy={S_MID} on={s.wire.done} />
+        <Port cx={S_DROP} cy={SHORT.agent.y + SHORT.agent.h} on={s.agent.done} />
+        {SHORT.tools.map((b, i) => (
+          <Port key={b.x} cx={b.x + b.w / 2} cy={b.y} on={s.tools[i].wire} />
+        ))}
+      </Lines>
+    </>
+  );
+}
+
 /* Phone: the trigger above the agent, then the four systems down a spine on the left, in the order the run reaches
    them, each branching off it. */
 /* Inset from the stage's edges, so the corner checks (radius 9) stay whole inside the plate. */
@@ -264,5 +324,6 @@ export const AGENTS: Scene<Words> = {
   still: 8,
   words: WORDS,
   wide: { w: 1280, h: 480, draw: wide },
+  short: { w: 1280, h: 360, draw: short },
   phone: { w: 340, h: 432, draw: phone },
 };

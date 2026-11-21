@@ -21,7 +21,10 @@ import { MARKETING } from "./marketing";
   a narrower, taller phone composition (at most 440px wide, centred) so its words stay 12 to 13px on a phone. The
   stage is scaled as a whole to its box (a transform, never zoom, so iOS scales the text with it). A short desktop
   window (600 to 759px tall) caps the drawing's height so the plate fits under the header; the wide stage would then
-  shrink its words below 11px, so such a window gets the compact composition too.
+  shrink its words below 11px, so such a window got the compact composition too. Round 5 (the developer, 2026-11-22:
+  "all should be horizontal, because making them vertical cause too much space left of both left and right sides"):
+  short windows now take a wide composition: the scene's own wide, low one (agents) or its desktop one, scaled to the
+  plate's height (about 11px words at a 760px window).
 
   Behaviour is the shared shell's (sections/service-scenes.tsx): plays only while `playing` (the front plate), from its
   still frame, and only while a fifth of it is on screen; resets to the still frame when it stops; reduced motion
@@ -65,13 +68,25 @@ const FRAME = [
   "max-lg:aspect-(--scene-phone) max-lg:max-w-[440px]",
   "lg:[@media(max-height:599px)]:aspect-[1280/480]",
   "lg:[@media(min-height:760px)]:aspect-[1280/480] lg:[@media(min-height:760px)]:max-w-[calc((100svh_-_440px)_*_2.6667)]",
-  "lg:[@media(min-height:600px)_and_(max-height:759px)]:aspect-(--scene-phone)",
-  "lg:[@media(min-height:600px)_and_(max-height:759px)]:max-w-[min(440px,calc((100svh_-_440px)_*_var(--scene-phone-ratio)))]",
+  "lg:[@media(min-height:600px)_and_(max-height:759px)]:aspect-(--scene-short)",
+  "lg:[@media(min-height:600px)_and_(max-height:759px)]:max-w-[min(var(--scene-short-max),calc((100svh_-_440px)_*_var(--scene-short-ratio)))]",
 ].join(" ");
 
 function frame(id: SceneId) {
   const { w, h } = SCENES[id].phone;
-  return { style: { "--scene-phone": `${w} / ${h}`, "--scene-phone-ratio": (w / h).toFixed(4) } as CSSProperties, className: FRAME };
+  // Short desktop windows (round 5, the developer: "all should be horizontal"): the scene's own wide, low composition
+  // where it has one, else its wide one, scaled to the height the plate leaves; never the tall phone one there.
+  const sh = SCENES[id].short ?? SCENES[id].wide;
+  return {
+    style: {
+      "--scene-phone": `${w} / ${h}`,
+      "--scene-phone-ratio": (w / h).toFixed(4),
+      "--scene-short": `${sh.w} / ${sh.h}`,
+      "--scene-short-ratio": (sh.w / sh.h).toFixed(4),
+      "--scene-short-max": "100%",
+    } as CSSProperties,
+    className: FRAME,
+  };
 }
 
 /** An empty box of the drawing's size, holding its place until the page runs. */
@@ -140,7 +155,7 @@ export function ServiceAnimation({ id, playing, className }: { id: SceneId; play
     };
   }, [scene, live]);
 
-  const comp = wide ? scene.wide : scene.phone;
+  const comp = wide ? scene.wide : lg && short ? (scene.short ?? scene.wide) : scene.phone;
   const t = live ? clock : scene.still;
   const f = frame(id);
   return (
