@@ -4,7 +4,7 @@ import { Check, X } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { COMPARE } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 /*
@@ -26,6 +26,8 @@ import { cn } from "@/lib/utils";
 
   Phones and tablets: the ways run downwards; the grey one curls into its knot to the right of the start, the sky
   one runs down the left through its points to its result.
+
+  Round 5 (DE/EN): copy by language.
 */
 
 type Pt = [number, number];
@@ -138,6 +140,7 @@ function smooth(points: Pt[]) {
 }
 
 export function CompareSection() {
+  const { COMPARE } = useCopy().site;
   return (
     // Where the Versprechen below pins (its stage centres the card in the screen), v1's smaller foot keeps v1's gap.
     <Section id="unterschied" className="lg:[@media(min-height:720px)]:pb-12">
@@ -178,6 +181,7 @@ export function CompareSection() {
 }
 
 function Ways({ layout }: { layout: Layout }) {
+  const { COMPARE } = useCopy().site;
   const id = useId().replace(/:/g, "");
   const reduced = useReducedMotion();
   const box = useRef<HTMLDivElement>(null);

@@ -2,7 +2,7 @@
 import { Check } from "lucide-react";
 import { Fragment } from "react";
 import { Container, Heading } from "@/components/system/primitives";
-import { UU_TRUST } from "@/content/pages/uber-uns";
+import { getCopy } from "@/i18n/server";
 import { OnScreen } from "./on-screen";
 
 /*
@@ -14,9 +14,11 @@ import { OnScreen } from "./on-screen";
 
   Two drawings of the seal: one for wide screens and one for phones, each sized so the ring text renders at 13px or
   more. Every ring's text is spaced to close its circle exactly (textLength).
+  Round 5 (DE/EN): copy by language; each drawing gets its rings' text from the copy when it renders.
 */
 
-type Variant = { box: number; rings: { r: number; font: number }[]; text: readonly (readonly string[])[]; hair: number[]; ticks: [number, number]; disc: number };
+type Variant = { box: number; rings: { r: number; font: number }[]; hair: number[]; ticks: [number, number]; disc: number };
+type RingText = readonly (readonly string[])[];
 
 /*
   Text rings (baseline radius and type size), hairline circles, the bezel ticks and the centre disc, in the drawing's
@@ -29,7 +31,6 @@ const LG: Variant = {
     { r: 230, font: 16.4 },
     { r: 196, font: 15.2 },
   ],
-  text: UU_TRUST.rings.full,
   hair: [252, 218, 184],
   ticks: [168, 174],
   disc: 158,
@@ -40,7 +41,6 @@ const SM: Variant = {
     { r: 158, font: 14.6 },
     { r: 131, font: 14.6 },
   ],
-  text: UU_TRUST.rings.short,
   hair: [176, 150, 124],
   ticks: [110, 115],
   disc: 104,
@@ -53,7 +53,7 @@ function circlePath(c: number, r: number) {
   return `M ${c} ${c - r} A ${r} ${r} 0 1 1 ${c} ${c + r} A ${r} ${r} 0 1 1 ${c} ${c - r}`;
 }
 
-function SealArt({ v, id, className }: { v: Variant; id: string; className: string }) {
+function SealArt({ v, text, id, className }: { v: Variant; text: RingText; id: string; className: string }) {
   const c = v.box / 2;
   const ticks = Array.from({ length: 72 }, (_, i) => {
     const a = (i / 72) * TAU;
@@ -80,7 +80,7 @@ function SealArt({ v, id, className }: { v: Variant; id: string; className: stri
       </svg>
 
       {/* The two rings of promises, each its own layer so it can turn without repainting. */}
-      {v.text.map((ring, k) => {
+      {text.map((ring, k) => {
         const { r, font } = v.rings[k];
         return (
           <svg key={k} viewBox={`0 0 ${v.box} ${v.box}`} className={`uu-seal-ring absolute inset-0 h-full w-full ${k ? "uu-seal-ring-b" : "uu-seal-ring-a"}`}>
@@ -111,15 +111,16 @@ function SealArt({ v, id, className }: { v: Variant; id: string; className: stri
   );
 }
 
-export function UberTrust() {
+export async function UberTrust() {
+  const { UU_TRUST } = (await getCopy()).uberUns;
   const half = Math.ceil(UU_TRUST.promises.length / 2);
   return (
     <section id="vertrauen" className="relative py-16 md:py-24">
       <Container>
         <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-x-8">
           <OnScreen className="uu-seal relative mx-auto aspect-square w-full max-w-[340px] md:max-w-[460px] lg:col-span-5 lg:max-w-[480px]">
-            <SealArt v={SM} id="uu-seal-sm" className="absolute inset-0 md:hidden" />
-            <SealArt v={LG} id="uu-seal-lg" className="absolute inset-0 hidden md:block" />
+            <SealArt v={SM} text={UU_TRUST.rings.short} id="uu-seal-sm" className="absolute inset-0 md:hidden" />
+            <SealArt v={LG} text={UU_TRUST.rings.full} id="uu-seal-lg" className="absolute inset-0 hidden md:block" />
             {/* The centre: the bG mark and the client's standard. */}
             <div className="absolute inset-0 grid place-items-center">
               <div className="flex flex-col items-center text-center">

@@ -10,13 +10,14 @@ import { KwResults } from "@/components/pages/ki-workshop/results";
 import { KwSteps } from "@/components/pages/ki-workshop/steps";
 import { KwTrainer } from "@/components/pages/ki-workshop/trainer";
 import { SiteShell } from "@/components/site/site-shell";
+import { getCopy } from "@/i18n/server";
 import "@/components/pages/ki-workshop/ki-workshop.css";
 
-// The client's own page title and description from brandedgenius.de/ki-workshop/.
-export const metadata: Metadata = {
-  title: "KI-Workshop für Unternehmen",
-  description: "Praxisnahe KI-Workshops für Unternehmen: Entdecken Sie konkrete Einsatzmöglichkeiten, Automatisierungen und Strategien für den effizienten Einsatz von künstlicher Intelligenz.",
-};
+// The page title and description in the page's language (round 5: the German is the client's own, now in the copy module).
+export async function generateMetadata(): Promise<Metadata> {
+  const { KW_META } = (await getCopy()).kiWorkshop;
+  return { title: KW_META.title, description: KW_META.description };
+}
 
 /*
   /ki-workshop: built 2026-11-16 from the client's own copy on brandedgenius.de/ki-workshop/, in sections that repeat nothing

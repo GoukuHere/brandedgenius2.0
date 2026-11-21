@@ -4,7 +4,7 @@ import { animate, motion, useMotionValue, useMotionValueEvent, useTransform, typ
 import { Play, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { ECOSYSTEM } from "@/content/pages/leistungen";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { DemoButton, useMedia, useOnScreen, useReducedMotion, useTabVisible } from "./shared";
 
@@ -22,12 +22,9 @@ import { DemoButton, useMedia, useOnScreen, useReducedMotion, useTabVisible } fr
 
   Phones: a smaller ring whose sides fade into the page edges (nothing overflows). Off screen, in a hidden tab and with
   reduced motion the ring holds still (reduced motion: the readout and lights still step, the ring jumps).
+  Round 5 (DE/EN): copy by language; the closing line's white-to-sky half starts at a word index from the copy.
 */
 
-const PLATFORMS = ECOSYSTEM.platforms;
-const STEPS = ECOSYSTEM.steps;
-const N = PLATFORMS.length;
-const STEP_DEG = 360 / N;
 /** Idle: one turn in 80 seconds. */
 const IDLE_DEG_PER_MS = 360 / 80000;
 const STEP_MS = 2100;
@@ -36,8 +33,8 @@ const HOLD_MS = 1700;
 const norm = (deg: number) => ((((deg + 180) % 360) + 360) % 360) - 180;
 
 /** The ring's angle that brings a step's platform (or the middle of two neighbours) to the front. */
-function frontFor(step: number) {
-  const [a, b] = STEPS[step].platforms.map((p) => p * STEP_DEG);
+function frontFor(platforms: readonly number[], stepDeg: number) {
+  const [a, b] = platforms.map((p) => p * stepDeg);
   if (b === undefined) return a;
   const gap = norm(b - a);
   return Math.abs(gap) <= 110 ? a + gap / 2 : a;
@@ -47,6 +44,7 @@ const subscribeNothing = () => () => {};
 const useMounted = () => useSyncExternalStore(subscribeNothing, () => true, () => false);
 
 export function EcosystemSection() {
+  const { ECOSYSTEM } = useCopy().leistungen;
   return (
     <Section id="oekosystem">
       <Container>
@@ -58,24 +56,28 @@ export function EcosystemSection() {
         </div>
         <Ring />
         <p data-reveal="up" className="ls-eco-closing mx-auto mt-14 max-w-[760px] text-center md:mt-16">
-          {closingParts()}
+          {closingParts(ECOSYSTEM.closing, ECOSYSTEM.closingAccentAt)}
         </p>
       </Container>
     </Section>
   );
 }
 
-/** His closing line, with its second half (his own line break) in the brand's white-to-sky. */
-function closingParts() {
-  const [first, ...rest] = ECOSYSTEM.closing.split(" vernetztes");
+/** His closing line, with its second half (his own line break, from word `at` on) in the brand's white-to-sky. */
+function closingParts(line: string, at: number) {
+  const words = line.split(" ");
   return (
     <>
-      {first} <span className="accent">vernetztes{rest.join(" vernetztes")}</span>
+      {words.slice(0, at).join(" ")} <span className="accent">{words.slice(at).join(" ")}</span>
     </>
   );
 }
 
 function Ring() {
+  const { ECOSYSTEM } = useCopy().leistungen;
+  const PLATFORMS = ECOSYSTEM.platforms;
+  const STEPS = ECOSYSTEM.steps;
+  const stepDeg = 360 / PLATFORMS.length;
   const mounted = useMounted();
   const stage = useRef<HTMLDivElement>(null);
   const phone = useMedia("(max-width: 767px)");
@@ -141,12 +143,12 @@ function Ring() {
       list.ids.push(
         window.setTimeout(() => {
           setStep(i);
-          turnTo(frontFor(i));
+          turnTo(frontFor(STEPS[i].platforms, stepDeg));
         }, i * STEP_MS)
       );
     });
     list.ids.push(window.setTimeout(reset, (STEPS.length - 1) * STEP_MS + STEP_MS + HOLD_MS));
-  }, [reset, turnTo]);
+  }, [reset, turnTo, STEPS, stepDeg]);
 
   useEffect(() => {
     const list = timers.current;
@@ -174,7 +176,7 @@ function Ring() {
         <div className="ls-ring-stage">
           {mounted
             ? PLATFORMS.map((platform, i) => (
-                <RingCard key={platform.title} i={i} rot={rot} radius={radius} lit={lit.has(i)} title={platform.title} tools={platform.tools} />
+                <RingCard key={platform.title} i={i} stepDeg={stepDeg} rot={rot} radius={radius} lit={lit.has(i)} title={platform.title} tools={platform.tools} sync={ECOSYSTEM.sync} />
               ))
             : null}
         </div>
@@ -206,21 +208,27 @@ function Ring() {
 
 function RingCard({
   i,
+  stepDeg,
   rot,
   radius,
   lit,
   title,
   tools,
+  sync,
 }: {
   i: number;
+  /** The angle between two cards (a full turn over the platforms). */
+  stepDeg: number;
   rot: MotionValue<number>;
   radius: MotionValue<number>;
   lit: boolean;
   title: string;
   tools: string;
+  /** His "Sync" label. */
+  sync: string;
 }) {
   // The card's angle on the ring, 0 in front.
-  const theta = useTransform(() => norm(i * STEP_DEG - rot.get()));
+  const theta = useTransform(() => norm(i * stepDeg - rot.get()));
   /*
     A card that has turned away flips itself half a turn more and shows its back: one flat face, so no browser has to
     sort two faces in 3D (no preserve-3d, no backface-visibility), and the back is never a mirrored front.
@@ -255,7 +263,7 @@ function RingCard({
             <h3 className="ls-ring-title">{title}</h3>
             <span className="ls-sync">
               <span aria-hidden className="ls-sync-dot" />
-              {ECOSYSTEM.sync}
+              {sync}
             </span>
           </div>
           <p className="ls-ring-tools">{tools}</p>

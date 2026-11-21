@@ -3,8 +3,7 @@
 import { Check, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Heading, Section, TextLink } from "@/components/system/primitives";
-import { MARKETING } from "@/content/pages/leistungen";
-import { LINKS } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 import { DemoButton, UsePills, useReducedMotion, useSeenOnce } from "./shared";
 
 /*
@@ -18,10 +17,9 @@ import { DemoButton, UsePills, useReducedMotion, useSeenOnce } from "./shared";
   The track: one row of eight on large screens, a snake of four by two on tablets and of two by four on phones (the
   line turns at the row's end and comes back, so the order always reads as one path). The line and the lead are
   measured from the stations themselves, so the path fits every layout. Reduced motion: the finished pipeline.
+  Round 5 (DE/EN): copy by language.
 */
 
-const STEPS = MARKETING.steps;
-const LAST = STEPS.length - 1;
 /** Per station: the lead arrives, works for a moment, the station ticks, the lead moves on. */
 const STEP_MS = 1400;
 const TICK_AFTER_MS = 850;
@@ -29,6 +27,9 @@ const TICK_AFTER_MS = 850;
 type Geo = { w: number; h: number; pts: { x: number; y: number }[]; d: string; cum: number[]; total: number };
 
 export function MarketingSection() {
+  const copy = useCopy();
+  const { MARKETING } = copy.leistungen;
+  const { LINKS } = copy.site;
   return (
     <Section id="marketing">
       <Container>
@@ -55,6 +56,9 @@ export function MarketingSection() {
 }
 
 function Pipeline() {
+  const { MARKETING } = useCopy().leistungen;
+  const STEPS = MARKETING.steps;
+  const LAST = STEPS.length - 1;
   const box = useRef<HTMLDivElement>(null);
   const stations = useRef<HTMLOListElement>(null);
   const timers = useRef<{ ids: number[] }>({ ids: [] });
@@ -103,7 +107,7 @@ function Pipeline() {
       if (i > 0) list.ids.push(window.setTimeout(() => setCurrent(i), i * STEP_MS));
       list.ids.push(window.setTimeout(() => setTicked(i + 1), i * STEP_MS + TICK_AFTER_MS));
     });
-  }, []);
+  }, [STEPS]);
 
   const autoRan = useRef(false);
   useEffect(() => {

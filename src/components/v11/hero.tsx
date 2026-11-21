@@ -3,7 +3,7 @@
 import { motion, useMotionValueEvent, useScroll, useTransform } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { HERO, MEDIA } from "@/content/site";
+import { useCopy, useWords } from "@/i18n/client";
 import { ProblemTop } from "./problem-top";
 
 /*
@@ -25,9 +25,17 @@ import { ProblemTop } from "./problem-top";
 
   The film plays only while the hero can be seen. Reduced motion: no zoom and no film (the last frame stands), the
   hero and the Problem panel simply cross-fade.
+
+  Round 5 (DE/EN): copy by language.
 */
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+/* The section's own words (round 5, DE/EN); the headline and the film come from the page's copy. */
+const WORDS = {
+  de: { film: "Roman Tränkle, Gründer von Branded Genius, mit zwei KI-Robotern" },
+  en: { film: "Roman Tränkle, founder of Branded Genius, with two AI robots" },
+};
 
 /** The scroll, as a share of the screen height, over which the hero passes and the panel arrives. */
 const ZOOM = 0.8;
@@ -36,6 +44,8 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
 export function HeroIntoProblem() {
+  const { HERO, MEDIA } = useCopy().site;
+  const words = useWords(WORDS);
   const stage = useRef<HTMLDivElement>(null);
   const film = useRef<HTMLVideoElement>(null);
   const geo = useRef({ top: 0, vh: 900 });
@@ -149,7 +159,7 @@ export function HeroIntoProblem() {
               muted
               playsInline
               preload="auto"
-              aria-label="Roman Tränkle, Gründer von Branded Genius, mit zwei KI-Robotern"
+              aria-label={words.film}
             />
             <Image src="/media/hero-final.webp" alt="" fill sizes="100vw" className="hidden object-cover object-[50%_28%] motion-reduce:block lg:object-[50%_0%]" />
           </motion.div>

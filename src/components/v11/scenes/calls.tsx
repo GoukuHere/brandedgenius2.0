@@ -1,11 +1,22 @@
 import { CalendarDays, Check, PhoneIncoming, User } from "lucide-react";
+import type { Locale } from "@/i18n/config";
 import { Comet, Glyph, hash, ink, INK, Lines, Mark, NAVY, Panel, Port, rise, type Scene, SKY, sky, Text, tint, Wire } from "./kit";
 
 /*
   KI-Callbots: an incoming call. The phone rings, the AI answers and the timer runs; the live waveform scrolls with
   the conversation, the caller in off-white and the AI in sky taking turns. In its second turn the AI looks through
   the week and books a slot, which fills sky with a check under "Terminvereinbarung".
+
+  Round 5 (DE/EN): the words on the call and the week come from WORDS, in the page's language.
 */
+
+type Words = { incoming: string; booking: string; days: string[] };
+
+/** Every word on the stage, per language: the call's state, the calendar's title and the five weekdays. */
+const WORDS: Record<Locale, Words> = {
+  de: { incoming: "Eingehend", booking: "Terminvereinbarung", days: ["Mo", "Di", "Mi", "Do", "Fr"] },
+  en: { incoming: "Incoming", booking: "Appointment booking", days: ["Mon", "Tue", "Wed", "Thu", "Fri"] },
+};
 
 const LOOP = 12;
 const B = {
@@ -24,7 +35,6 @@ const B = {
   book: 7.7,
   reset: [10.9, 11.7] as const,
 };
-const DAYS = ["Mo", "Di", "Mi", "Do", "Fr"];
 const TIMES = ["09:00", "10:00", "11:00"];
 /** The cells the AI checks, then the one it books (Do, 10:00). */
 const SCAN: [number, number][] = [
@@ -79,7 +89,7 @@ function Wave({ t, x0, x1, cy, max, pitch, bar, dt }: { t: number; x0: number; x
 type CardSize = { avatar: number; glyph: number; label: number; timer: number; gap: number; pad: number };
 
 /** The call's head: the caller (a person glyph, no face), "Eingehend" and the running timer. */
-function CallHead({ t, size, x, y }: { t: number; size: CardSize; x: number; y: number }) {
+function CallHead({ t, label, size, x, y }: { t: number; label: string; size: CardSize; x: number; y: number }) {
   const ringing = t < B.answer;
   const live = t >= B.answer && t < B.reset[0];
   const d = size.avatar;
@@ -103,7 +113,7 @@ function CallHead({ t, size, x, y }: { t: number; size: CardSize; x: number; y: 
       <div className="flex flex-col" style={{ gap: size.label * 0.45 }}>
         <span className="flex items-center leading-none whitespace-nowrap" style={{ gap: size.label * 0.4, fontSize: size.label, color: ink(0.62) }}>
           <Glyph icon={PhoneIncoming} size={Math.round(size.label * 1.05)} color={ringing || live ? SKY : ink(0.62)} />
-          Eingehend
+          {label}
         </span>
         <span className="leading-none font-medium" style={{ fontSize: size.timer, color: ink(0.95), fontVariantNumeric: "tabular-nums", letterSpacing: "0.01em" }}>
           {timer(t)}
@@ -127,7 +137,7 @@ function LiveDot({ cx, cy, d, t }: { cx: number; cy: number; d: number; t: numbe
 type GridSize = { x: number; y: number; w: number; timeW: number; head: number; rowH: number; cellH: number; font: number; check: number; r: number };
 
 /** The week: day columns, time rows; the AI checks a few cells and books one. */
-function Week({ t, g }: { t: number; g: GridSize }) {
+function Week({ t, g, days: DAYS }: { t: number; g: GridSize; days: string[] }) {
   const keep = 1 - rise(t, B.reset[0], B.reset[1]);
   const colW = (g.w - g.timeW) / DAYS.length;
   const cell = (c: number, r: number) => ({ left: g.x + g.timeW + c * colW + 3, top: g.y + g.head + r * g.rowH + (g.rowH - g.cellH) / 2, width: colW - 6, height: g.cellH });
@@ -177,7 +187,7 @@ const CARD = { x: 96, y: 40, w: 520, h: 400 };
 const CAL = { x: 704, y: 40, w: 480, h: 400 };
 const WIRE = `M${CARD.x + CARD.w} 240H${CAL.x}`;
 
-function wide(t: number) {
+function wide(t: number, words: Words) {
   const keep = 1 - rise(t, B.reset[0], B.reset[1]);
   const booked = rise(t, B.book, B.book + 0.35) * keep;
   const speaking = t >= B.answer ? voice(t).who : -1;
@@ -202,18 +212,18 @@ function wide(t: number) {
           </span>
         </div>
       </Panel>
-      <CallHead t={t} x={CARD.x + 28} y={CARD.y + 28} size={{ avatar: 64, glyph: 28, label: 17, timer: 30, gap: 18, pad: 28 }} />
+      <CallHead t={t} label={words.incoming} x={CARD.x + 28} y={CARD.y + 28} size={{ avatar: 64, glyph: 28, label: 17, timer: 30, gap: 18, pad: 28 }} />
       <LiveDot cx={CARD.x + CARD.w - 40} cy={CARD.y + 44} d={9} t={t} />
 
       <Panel {...CAL} r={24} lit={0.5 * booked}>
         <div className="absolute flex items-center" style={{ left: 28, top: 28, gap: 12 }}>
           <Glyph icon={CalendarDays} size={20} color={tint(booked)} />
           <span className="leading-none font-medium whitespace-nowrap" style={{ fontSize: 17, color: ink(0.75 + 0.2 * booked) }}>
-            Terminvereinbarung
+            {words.booking}
           </span>
         </div>
       </Panel>
-      <Week t={t} g={{ x: CAL.x + 28, y: CAL.y + 78, w: CAL.w - 56, timeW: 72, head: 40, rowH: 86, cellH: 74, font: 17, check: 22, r: 12 }} />
+      <Week t={t} days={words.days} g={{ x: CAL.x + 28, y: CAL.y + 78, w: CAL.w - 56, timeW: 72, head: 40, rowH: 86, cellH: 74, font: 17, check: 22, r: 12 }} />
 
       <Lines w={1280} h={480}>
         <Port cx={CARD.x + CARD.w} cy={240} on={booked} />
@@ -228,7 +238,7 @@ const P_CARD = { x: 4, y: 4, w: 332, h: 92 };
 const P_CAL = { x: 4, y: 104, w: 332, h: 120 };
 const P_WIRE = `M170 ${P_CARD.y + P_CARD.h}V${P_CAL.y}`;
 
-function phone(t: number) {
+function phone(t: number, words: Words) {
   const keep = 1 - rise(t, B.reset[0], B.reset[1]);
   const booked = rise(t, B.book, B.book + 0.35) * keep;
   return (
@@ -242,24 +252,25 @@ function phone(t: number) {
           <Wave t={t} x0={14} x1={P_CARD.w - 14} cy={70} max={26} pitch={6} bar={3} dt={0.08} />
         </svg>
       </Panel>
-      <CallHead t={t} x={P_CARD.x + 14} y={P_CARD.y + 10} size={{ avatar: 34, glyph: 16, label: 12.5, timer: 17, gap: 11, pad: 14 }} />
+      <CallHead t={t} label={words.incoming} x={P_CARD.x + 14} y={P_CARD.y + 10} size={{ avatar: 34, glyph: 16, label: 12.5, timer: 17, gap: 11, pad: 14 }} />
       <LiveDot cx={P_CARD.x + P_CARD.w - 22} cy={P_CARD.y + 20} d={7} t={t} />
       <Panel {...P_CAL} r={18} lit={0.5 * booked}>
         <div className="absolute flex items-center" style={{ left: 14, top: 13, gap: 8 }}>
           <Glyph icon={CalendarDays} size={14} color={tint(booked)} />
           <span className="leading-none font-medium whitespace-nowrap" style={{ fontSize: 13, color: ink(0.75 + 0.2 * booked) }}>
-            Terminvereinbarung
+            {words.booking}
           </span>
         </div>
       </Panel>
-      <Week t={t} g={{ x: P_CAL.x + 14, y: P_CAL.y + 34, w: P_CAL.w - 28, timeW: 44, head: 20, rowH: 20, cellH: 16, font: 12, check: 12, r: 6 }} />
+      <Week t={t} days={words.days} g={{ x: P_CAL.x + 14, y: P_CAL.y + 34, w: P_CAL.w - 28, timeW: 44, head: 20, rowH: 20, cellH: 16, font: 12, check: 12, r: 6 }} />
     </>
   );
 }
 
-export const CALLS: Scene = {
+export const CALLS: Scene<Words> = {
   loop: LOOP,
   still: 8.1,
+  words: WORDS,
   wide: { w: 1280, h: 480, draw: wide },
   phone: { w: 340, h: 228, draw: phone },
 };

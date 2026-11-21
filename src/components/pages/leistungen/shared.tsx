@@ -3,12 +3,13 @@
 import type { LucideIcon } from "lucide-react";
 import { useCallback, useEffect, useState, useSyncExternalStore, type ButtonHTMLAttributes, type ReactNode, type RefObject } from "react";
 import { Heading, TextLink } from "@/components/system/primitives";
-import { LINKS } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 /*
   What the /leistungen sections share: a few browser hooks (all hydration-safe: the server value is the calm one),
   the text column of a service section (heading, text, use cases as pills, link), and the small button the demos use.
+  Round 5 (DE/EN): copy by language.
 */
 
 /** A media query through useSyncExternalStore: false on the server and while hydrating, then the real value. */
@@ -108,6 +109,7 @@ export function ServiceText({
   cta: string;
   className?: string;
 }) {
+  const { LINKS } = useCopy().site;
   return (
     <div className={cn("min-w-0", className)}>
       <Heading title={title} accent={accent} className="ls-service-title" />

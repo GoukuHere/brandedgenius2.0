@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { useWords } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { AGENTS } from "./agents";
 import { CALLS } from "./calls";
@@ -25,6 +26,9 @@ import { MARKETING } from "./marketing";
   Behaviour is the shared shell's (sections/service-scenes.tsx): plays only while `playing` (the front plate), from its
   still frame, and only while a fifth of it is on screen; resets to the still frame when it stops; reduced motion
   shows the still frame and runs no clock. Each frame is a pure function of the time.
+
+  Round 5 (DE/EN): the words drawn on each stage are the scene's own table (kit.tsx, Scene.words); the shell picks the
+  page language's entry and passes it to the draw, so a frame is a pure function of the time and those words.
 */
 
 export type SceneId = "agents" | "chat" | "calls" | "marketing";
@@ -78,6 +82,7 @@ export function SceneBox({ id, className }: { id: SceneId; className?: string })
 
 export function ServiceAnimation({ id, playing, className }: { id: SceneId; playing: boolean; className?: string }) {
   const scene = SCENES[id];
+  const words = useWords(scene.words);
   const box = useRef<HTMLDivElement>(null);
   const [clock, setClock] = useState(scene.still);
   const [wasPlaying, setWasPlaying] = useState(playing);
@@ -143,7 +148,7 @@ export function ServiceAnimation({ id, playing, className }: { id: SceneId; play
       {width > 0 ? (
         <div className="absolute top-0 left-0 origin-top-left" style={{ width: comp.w, height: comp.h, transform: `scale(${width / comp.w})` }}>
           <DotGrid />
-          {comp.draw(t)}
+          {comp.draw(t, words)}
         </div>
       ) : null}
     </div>

@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Container, Heading } from "@/components/system/primitives";
-import { UU_EXPERTISE } from "@/content/pages/uber-uns";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 /*
@@ -16,13 +16,15 @@ import { cn } from "@/lib/utils";
   Wide screens: the frame floats beside the rows and glides to the active one. Phones: the frame stays at the top of
   the screen while the rows pass under it (sticky inside this section only; the page keeps scrolling). The rows never
   change height, so nothing jumps as the active row changes.
+  Round 5 (DE/EN): copy by language.
 */
 
-const AREAS = UU_EXPERTISE.areas;
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 const SPRING = { type: "spring", stiffness: 150, damping: 24, mass: 0.9 } as const;
 
 export function UberExpertise() {
+  const { UU_EXPERTISE } = useCopy().uberUns;
+  const AREAS = UU_EXPERTISE.areas;
   const box = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLDivElement>(null);
   const rows = useRef<(HTMLLIElement | null)[]>([]);
@@ -84,7 +86,7 @@ export function UberExpertise() {
     const centre = row.offsetTop + row.offsetHeight / 2;
     const y = centre - el.offsetHeight / 2;
     setFrameY(Math.round(Math.min(Math.max(y, listTop), Math.max(listTop, listBottom - el.offsetHeight))));
-  }, [active]);
+  }, [active, AREAS.length]);
   useEffect(() => {
     place();
     const ro = new ResizeObserver(place);

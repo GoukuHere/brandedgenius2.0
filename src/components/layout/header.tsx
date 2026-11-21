@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PrimaryLink, SecondaryLink } from "@/components/system/primitives";
-import { HEADER, LINKS, NAV } from "@/content/site";
+import { publicPath, switchPath, type Locale } from "@/i18n/config";
+import { useCopy, useHref, useLocale, useWords } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "./brand-logo";
 
@@ -29,17 +30,68 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  * The page being read (2026-11-16: the nav links to the site's pages, no longer to sections of one page). The sky dot
  * sits under that page's link; a deeper address (a later case-study page, say) lights its parent.
  */
-function useCurrentPage() {
-  const path = usePathname() ?? "/";
-  const hit = NAV.find((item) => (item.href === "/" ? path === "/" : path === item.href || path.startsWith(`${item.href}/`)));
+function useCurrentPage(nav: { href: string }[]) {
+  // The public address (while prerendering, the router reports the internal /de/... route).
+  const path = publicPath(usePathname() ?? "/");
+  const hit = nav.find((item) => (item.href === "/" || item.href === "/en" ? path === item.href : path === item.href || path.startsWith(`${item.href}/`)));
   return hit ? hit.href : null;
 }
 
+/* The header's own words (the rest comes from the page's copy). */
+const WORDS = {
+  de: { skip: "Zum Inhalt springen", home: "Branded Genius, zur Startseite", nav: "Hauptnavigation", mobileNav: "Mobile Navigation", open: "Menü öffnen", close: "Menü schließen", language: "Sprache" },
+  en: { skip: "Skip to content", home: "Branded Genius, home", nav: "Main navigation", mobileNav: "Mobile navigation", open: "Open menu", close: "Close menu", language: "Language" },
+};
+const LANGUAGES: { locale: Locale; label: string; name: string }[] = [
+  { locale: "de", label: "DE", name: "Deutsch" },
+  { locale: "en", label: "EN", name: "English" },
+];
+
+/*
+  Round 5 (the client's message of 2026-11-18: "a switch button to English and German in the top of the navigation"):
+  DE and EN side by side, the current one lit; each leads to the same page in that language. In the bar from sm up,
+  at the top of the menu on phones (the bar has no room there). The site always opens in German.
+*/
+function LanguageSwitch({ className, onPick }: { className?: string; onPick?: () => void }) {
+  const locale = useLocale();
+  const path = publicPath(usePathname() ?? "/");
+  const words = useWords(WORDS);
+  return (
+    <div role="group" aria-label={words.language} className={cn("flex items-center rounded-[10px] border border-white/12 p-0.5", className)}>
+      {LANGUAGES.map((l) => {
+        const on = l.locale === locale;
+        return (
+          // A plain link: the other language has its own root layout, so the change is a full page load anyway, and
+          // the router's prefetch of it from this layout is answered with a 404.
+          <a
+            key={l.locale}
+            href={on ? path : switchPath(path, l.locale)}
+            hrefLang={l.locale}
+            lang={l.locale}
+            aria-label={l.name}
+            aria-current={on ? "true" : undefined}
+            onClick={onPick}
+            className={cn(
+              "grid h-9 min-w-10 cursor-pointer place-items-center rounded-[8px] px-2 text-[13px] font-medium tracking-[0.02em] transition-colors duration-200",
+              on ? "bg-white/[0.1] text-white" : "text-ink/60 hover:text-white"
+            )}
+          >
+            {l.label}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
 export function Header() {
+  const { HEADER, LINKS, NAV } = useCopy().site;
+  const words = useWords(WORDS);
+  const href = useHref();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const current = useCurrentPage();
+  const current = useCurrentPage(NAV);
 
   useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 24));
 
@@ -58,7 +110,7 @@ export function Header() {
         href="#main"
         className="sr-only rounded-[10px] bg-white px-4 py-2 text-[14px] font-medium text-page focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60]"
       >
-        Zum Inhalt springen
+        {words.skip}
       </a>
       <motion.div
         initial={{ y: -16, opacity: 0 }}
@@ -69,11 +121,11 @@ export function Header() {
           scrolled || open ? "glass glass-blur h-[60px] border-transparent" : "h-16 border-white/[0.06] bg-page/40 md:h-[68px]"
         )}
       >
-        <Link href="/" aria-label="Branded Genius, zur Startseite" className="block h-8 shrink-0 md:h-9">
+        <Link href={href("home")} aria-label={words.home} className="block h-8 shrink-0 md:h-9">
           <BrandLogo className="h-full" />
         </Link>
 
-        <nav aria-label="Hauptnavigation" className="hidden xl:block">
+        <nav aria-label={words.nav} className="hidden xl:block">
           <ul className="flex items-center gap-0.5">
             {NAV.map((item) => {
               const on = current === item.href;
@@ -104,6 +156,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageSwitch className="hidden sm:flex" />
           <SecondaryLink href={LINKS.contact} className="hidden h-11 px-5 text-[14px] sm:inline-flex md:h-12 md:px-6 md:text-[15px]">
             {HEADER.cta}
           </SecondaryLink>
@@ -115,7 +168,7 @@ export function Header() {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-controls="mobile-nav"
-            aria-label={open ? "Menü schließen" : "Menü öffnen"}
+            aria-label={open ? words.close : words.open}
             className="relative grid size-11 cursor-pointer place-items-center rounded-button border border-white/12 transition-colors duration-200 hover:bg-white/[0.06] xl:hidden"
           >
             <span className={cn("absolute h-px w-[18px] bg-white transition-transform duration-300", open ? "rotate-45" : "-translate-y-[4px]")} />
@@ -128,13 +181,14 @@ export function Header() {
         {open && (
           <motion.nav
             id="mobile-nav"
-            aria-label="Mobile Navigation"
+            aria-label={words.mobileNav}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
             className="glass absolute inset-x-3 top-[80px] rounded-[20px] bg-[#161616] p-6 md:inset-x-6 xl:hidden"
           >
+            <LanguageSwitch className="mb-3 w-fit sm:hidden" onPick={() => setOpen(false)} />
             <ul className="space-y-1">
               {NAV.map((item) => (
                 <li key={item.href}>

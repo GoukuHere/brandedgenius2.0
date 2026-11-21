@@ -1,8 +1,7 @@
 import { Check } from "lucide-react";
 import Image from "next/image";
 import { Container, Heading, PrimaryLink } from "@/components/system/primitives";
-import { KW_HERO, KW_MEDIA } from "@/content/pages/ki-workshop";
-import { LINKS } from "@/content/site";
+import { getCopy } from "@/i18n/server";
 
 /*
   Hero, split. Left: his headline (the blue phrase "Produktiver arbeiten." on its own line, as on his page), his lead,
@@ -13,8 +12,12 @@ import { LINKS } from "@/content/site";
   headline and the rest follow. Desktop: the frame is 600 to 640px tall and the tag hangs over its left edge.
   The entrances are the site's own (the reveal observer): the photo opens from its foot, the headline's words rise,
   the ticks draw one after another, the tag rises last.
+  Round 5 (DE/EN): copy by language.
 */
-export function KwHero() {
+export async function KwHero() {
+  const copy = await getCopy();
+  const { KW_HERO, KW_MEDIA } = copy.kiWorkshop;
+  const { LINKS } = copy.site;
   return (
     <section id="hero" className="relative pt-[92px] pb-16 md:pt-[120px] md:pb-24 lg:pt-[132px]">
       <Container>

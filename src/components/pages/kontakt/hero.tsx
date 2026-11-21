@@ -2,8 +2,7 @@ import Script from "next/script";
 import type { CSSProperties } from "react";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { Container, Heading, PrimaryLink, SecondaryLink } from "@/components/system/primitives";
-import { LINKS } from "@/content/site";
-import { KONTAKT_FORM, KONTAKT_HERO } from "@/content/pages/kontakt";
+import { getCopy } from "@/i18n/server";
 
 /*
   Kontakt, first screen: his headline and line, and beside them the real thing, his own contact form (his
@@ -18,9 +17,12 @@ import { KONTAKT_FORM, KONTAKT_HERO } from "@/content/pages/kontakt";
   page, the left side "maybe other style to make it more fitting"): this is the whole page now, so on desktop the left
   column stays in view beside the long form (sticky). Pure CSS (kontakt.css), still under reduced motion. Phones: the
   headline, the steps, then the form.
+  Round 5 (DE/EN): copy by language. The form itself is his German form in both languages (same id and address).
 */
-export function KontaktHero() {
-  const h = KONTAKT_HERO;
+export async function KontaktHero() {
+  const copy = await getCopy();
+  const { KONTAKT_HERO: h, KONTAKT_FORM } = copy.kontakt;
+  const { LINKS } = copy.site;
   return (
     <section id="anfrage-start" className="relative pt-32 pb-16 md:pt-40 md:pb-24">
       <Container>

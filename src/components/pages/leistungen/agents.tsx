@@ -3,7 +3,7 @@
 import { Check, LoaderCircle, Play, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Section } from "@/components/system/primitives";
-import { AGENTS } from "@/content/pages/leistungen";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { DemoButton, ServiceText, useReducedMotion, useSeenOnce } from "./shared";
 
@@ -13,10 +13,8 @@ import { DemoButton, ServiceText, useReducedMotion, useSeenOnce } from "./shared
   it is processed and then turning "Erledigt" with a check, while a progress line runs down beside them; his three
   facts sit in the footer. The states and labels are the ones his own console shows. It runs once by itself when it
   first comes into view; the button replays it. Reduced motion: the finished console, and the button still runs it.
+  Round 5 (DE/EN): copy by language.
 */
-
-const C = AGENTS.console;
-const STEPS = C.steps;
 
 /** His own timing: a step is worked on for 900ms, ticks for 350ms, then the next starts 180ms later. */
 const ACTIVE_MS = 900;
@@ -26,6 +24,7 @@ const GAP_MS = 180;
 type Phase = "idle" | "running" | "finished";
 
 export function AgentsSection() {
+  const { AGENTS } = useCopy().leistungen;
   return (
     <Section id="ki-agenten">
       <Container>
@@ -49,6 +48,8 @@ export function AgentsSection() {
 }
 
 function AgentConsole() {
+  const C = useCopy().leistungen.AGENTS.console;
+  const STEPS = C.steps;
   const box = useRef<HTMLDivElement>(null);
   const timers = useRef<{ ids: number[] }>({ ids: [] });
   const seen = useSeenOnce(box, 0.5);
@@ -78,7 +79,7 @@ function AgentConsole() {
       setCurrent(-1);
       setPhase("finished");
     }, t - GAP_MS);
-  }, []);
+  }, [STEPS]);
 
   // Once, when the console first comes well into view (a beat later, so the reader sees it start).
   const autoRan = useRef(false);

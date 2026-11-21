@@ -1,5 +1,6 @@
 import { Check as CheckIcon, type LucideIcon } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
+import type { Locale } from "@/i18n/config";
 
 /*
   The parts the four v11 service drawings share (2026-11-13). Each drawing is a small product interface on a stage of
@@ -9,6 +10,10 @@ import type { CSSProperties, ReactNode } from "react";
 
   Colour: off-white ink, Sky only for what is active or moving, Royal for the visitor's own chat bubbles, navy panels
   with a 1px rim on the plate's navy.
+
+  Round 5 (DE/EN): every word a drawing shows is in its scene's `words` table, one entry per language. The shell
+  (index.tsx) picks the page language's entry and passes it to `draw`, so each frame is a pure function of the time
+  and the words.
 */
 
 export const INK = "#f1f1ee";
@@ -42,20 +47,26 @@ export const hash = (n: number) => {
   return s - Math.floor(s);
 };
 
-export type Comp = {
+/*
+  `draw` is written as a method so the shell can hold the four scenes in one table (Scene<unknown>): a scene's words
+  and its draws always travel together, so the words the shell picks from `words` are the ones its draws expect.
+*/
+export type Comp<W = unknown> = {
   /** Stage size in stage pixels. */
   w: number;
   h: number;
-  draw: (t: number) => ReactNode;
+  draw(t: number, words: W): ReactNode;
 };
 
-export type Scene = {
+export type Scene<W = unknown> = {
   /** One story in seconds, ending in a soft reset. */
   loop: number;
   /** The frame shown while the drawing is not playing (plates behind, reduced motion). Playing resumes from it. */
   still: number;
-  wide: Comp;
-  phone: Comp;
+  /** Every word the drawing shows, per language. */
+  words: Record<Locale, W>;
+  wide: Comp<W>;
+  phone: Comp<W>;
 };
 
 const PANEL_BG = `linear-gradient(180deg, rgb(255 255 255 / 0.075), rgb(255 255 255 / 0.03)), #0a1d44`;

@@ -4,8 +4,8 @@ import { motion, useMotionValue, useTransform, type MotionValue } from "motion/r
 import { useEffect, useRef, type CSSProperties } from "react";
 import { Container, Heading, PrimaryLink, SecondaryLink } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { UC_HERO, UC_ITEMS, type ProjectSlug } from "@/content/pages/use-cases";
-import { LINKS } from "@/content/site";
+import type { ProjectSlug } from "@/content/pages/use-cases";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { useLive } from "./use-live";
 
@@ -17,6 +17,7 @@ import { useLive } from "./use-live";
   most. They fade at the screen's edges and around the text, so the first screen says "real projects" without a card.
 
   Phones: four names, smaller. Reduced motion: the names stand still in their places (no drift, no parting).
+  Round 5 (DE/EN): copy by language.
 */
 
 type Name = {
@@ -53,9 +54,11 @@ const NAMES: Name[] = [
 const RISE = { 1: 70, 2: 160, 3: 260 } as const;
 const SPREAD = { 1: 40, 2: 60, 3: 90 } as const;
 
-const nameOf = (slug: ProjectSlug) => UC_ITEMS.find((item) => item.slug === slug)?.short ?? "";
-
 export function UseCasesHero() {
+  const copy = useCopy();
+  const { UC_HERO, UC_ITEMS } = copy.useCases;
+  const { LINKS } = copy.site;
+  const nameOf = (slug: ProjectSlug) => UC_ITEMS.find((item) => item.slug === slug)?.short ?? "";
   const hero = useRef<HTMLElement>(null);
   useLive(hero, "0px");
   // 0 while the hero fills the screen, 1 once it has scrolled away.
@@ -80,7 +83,7 @@ export function UseCasesHero() {
     >
       <div aria-hidden className="uc-names">
         {NAMES.map((name, i) => (
-          <DriftingName key={name.slug} name={name} index={i} part={part} />
+          <DriftingName key={name.slug} name={name} label={nameOf(name.slug)} index={i} part={part} />
         ))}
       </div>
 
@@ -100,7 +103,7 @@ export function UseCasesHero() {
   );
 }
 
-function DriftingName({ name, index, part }: { name: Name; index: number; part: MotionValue<number> }) {
+function DriftingName({ name, label, index, part }: { name: Name; label: string; index: number; part: MotionValue<number> }) {
   const x = useTransform(() => part.get() * name.side * SPREAD[name.layer]);
   const y = useTransform(() => part.get() * name.up * RISE[name.layer]);
   const opacity = useTransform(() => 1 - part.get() * 0.6);
@@ -119,7 +122,7 @@ function DriftingName({ name, index, part }: { name: Name; index: number; part: 
     <div className={cn("uc-name-slot", !name.p && "max-md:hidden")} style={place}>
       <motion.div style={{ x, y, opacity }} className="will-change-transform">
         <span className="uc-name" data-layer={name.layer}>
-          {nameOf(name.slug)}
+          {label}
         </span>
       </motion.div>
     </div>

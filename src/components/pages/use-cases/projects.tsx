@@ -4,7 +4,8 @@ import { ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { UC_ITEMS, UC_PROJECTS, type FilterId, type Project } from "@/content/pages/use-cases";
+import type { FilterId, Project } from "@/content/pages/use-cases";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { caseStore } from "./case-store";
 import { CaseView } from "./case-view";
@@ -23,23 +24,28 @@ import { useLive } from "./use-live";
 
   His filter on brandedgenius.de assigns no project to a topic (its buttons carry no filter value), so each project
   lists its topics in the copy file, taken from its own tags and solution points.
+  Round 5 (DE/EN): copy by language; the filter keys on the topic ids and the wall on the project slugs (the same in
+  both languages).
 */
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-const listFor = (id: FilterId) => (id === "all" ? UC_ITEMS : UC_ITEMS.filter((project) => project.topics.includes(id)));
-const FIRST = layoutFor(UC_ITEMS);
+const listFor = (items: Project[], id: FilterId) => (id === "all" ? items : items.filter((project) => project.topics.includes(id)));
 
 type State = { filter: FilterId; boxes: Layout["boxes"]; height: Layout["height"]; moved: boolean };
 
 export function ProjectsSection() {
-  const [state, setState] = useState<State>({ filter: "all", boxes: FIRST.boxes, height: FIRST.height, moved: false });
-  const order = useMemo(() => listFor(state.filter).map((project) => project.slug), [state.filter]);
+  const { UC_ITEMS, UC_PROJECTS } = useCopy().useCases;
+  const [state, setState] = useState<State>(() => {
+    const first = layoutFor(UC_ITEMS);
+    return { filter: "all", boxes: first.boxes, height: first.height, moved: false };
+  });
+  const order = useMemo(() => listFor(UC_ITEMS, state.filter).map((project) => project.slug), [UC_ITEMS, state.filter]);
 
   // Posters that leave keep their last place (they fade out there); the others take the new layout's places.
   const choose = (filter: FilterId) =>
     setState((prev) => {
       if (prev.filter === filter) return prev;
-      const next = layoutFor(listFor(filter));
+      const next = layoutFor(listFor(UC_ITEMS, filter));
       return { filter, boxes: { ...prev.boxes, ...next.boxes }, height: next.height, moved: true };
     });
 
@@ -78,7 +84,7 @@ export function ProjectsSection() {
         <div className="uc-wall mt-8 md:mt-12 lg:mt-16" style={wall}>
           {UC_ITEMS.map((project) => {
             const at = order.indexOf(project.slug);
-            return <Poster key={project.slug} project={project} boxes={state.boxes[project.slug] as Boxes} order={Math.max(0, at)} hidden={at < 0} moved={state.moved} />;
+            return <Poster key={project.slug} project={project} open={UC_PROJECTS.open} boxes={state.boxes[project.slug] as Boxes} order={Math.max(0, at)} hidden={at < 0} moved={state.moved} />;
           })}
         </div>
       </Container>
@@ -87,7 +93,7 @@ export function ProjectsSection() {
   );
 }
 
-function Poster({ project, boxes, order, hidden, moved }: { project: Project; boxes: Boxes; order: number; hidden: boolean; moved: boolean }) {
+function Poster({ project, open, boxes, order, hidden, moved }: { project: Project; open: string; boxes: Boxes; order: number; hidden: boolean; moved: boolean }) {
   const slot = useRef<HTMLDivElement>(null);
   const card = useRef<HTMLElement>(null);
   const frame = useRef(0);
@@ -147,11 +153,11 @@ function Poster({ project, boxes, order, hidden, moved }: { project: Project; bo
         <button
           type="button"
           aria-haspopup="dialog"
-          aria-label={`${project.name}: ${UC_PROJECTS.open}`}
+          aria-label={`${project.name}: ${open}`}
           onClick={(event) => caseStore.open(project.slug, event.currentTarget)}
           className="uc-card-open"
         >
-          <span className="hidden md:inline">{UC_PROJECTS.open}</span>
+          <span className="hidden md:inline">{open}</span>
           <ArrowUpRight aria-hidden strokeWidth={1.5} className="size-4" />
         </button>
       </article>

@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Heading } from "@/components/system/primitives";
 import { getLenis } from "@/components/system/smooth-scroll";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { REALITY } from "@/content/site";
+import { useCopy, useWords } from "@/i18n/client";
 
 /*
   v11 Die Realität: the six reasons why KI projects stall, a slider that steps with the scroll.
@@ -31,8 +31,6 @@ import { REALITY } from "@/content/site";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const DWELL = 5200;
-const REASONS = REALITY.items;
-const COUNT = REASONS.length;
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 // Keep in step with v11.css (.v11-reasons) and the Versprechen's PIN.
 const PIN = "(min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px)";
@@ -45,7 +43,18 @@ function staircase(k: number) {
 }
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
+/* The section's own words (round 5, DE/EN); the reasons come from the page's copy. */
+const WORDS = {
+  de: { pick: (n: number, of: number) => `Grund ${n} von ${of} zeigen` },
+  en: { pick: (n: number, of: number) => `Show reason ${n} of ${of}` },
+};
+type Reason = { title: string; text: string; img: string };
+
 export function ReasonsSection() {
+  const { REALITY } = useCopy().site;
+  const REASONS: Reason[] = REALITY.items;
+  const COUNT = REASONS.length;
+  const words = useWords(WORDS);
   const root = useRef<HTMLElement>(null);
   // 0 when the stage pins (section top at the screen top), 1 when it lets go (section bottom at the screen bottom).
   const progress = useSectionProgress(root, ["start start", "end end"]);
@@ -146,9 +155,9 @@ export function ReasonsSection() {
 
           <div className="v11-reasons-bars mx-auto mt-6 w-full max-w-[460px] md:mt-8" {...hold}>
             {pinned ? (
-              <ScrollBars progress={progress} active={active} onPick={pick} />
+              <ScrollBars reasons={REASONS} label={words.pick} progress={progress} active={active} onPick={pick} />
             ) : (
-              <Bars active={active} run={run} running={running} paused={paused} onPick={pick} onDone={advance} />
+              <Bars reasons={REASONS} label={words.pick} active={active} run={run} running={running} paused={paused} onPick={pick} onDone={advance} />
             )}
           </div>
 
@@ -194,23 +203,39 @@ function Slide({ index, deck, title, text, img }: { index: number; deck: MotionV
 }
 
 /** Held: one bar per reason, each filling over its own stretch of the scroll. Each glides to its slide. */
-function ScrollBars({ progress, active, onPick }: { progress: MotionValue<number>; active: number; onPick: (i: number) => void }) {
+type Pick = (n: number, of: number) => string;
+
+function ScrollBars({ reasons, label, progress, active, onPick }: { reasons: Reason[]; label: Pick; progress: MotionValue<number>; active: number; onPick: (i: number) => void }) {
   return (
     <div className="-my-3 flex gap-1.5">
-      {REASONS.map((r, i) => (
-        <ScrollBar key={r.title} index={i} progress={progress} current={i === active} onPick={onPick} />
+      {reasons.map((r, i) => (
+        <ScrollBar key={r.title} index={i} count={reasons.length} label={label} progress={progress} current={i === active} onPick={onPick} />
       ))}
     </div>
   );
 }
 
-function ScrollBar({ index, progress, current, onPick }: { index: number; progress: MotionValue<number>; current: boolean; onPick: (i: number) => void }) {
-  const fill = useTransform(() => Math.min(1, Math.max(0, progress.get() * COUNT - index)));
+function ScrollBar({
+  index,
+  count,
+  label,
+  progress,
+  current,
+  onPick,
+}: {
+  index: number;
+  count: number;
+  label: Pick;
+  progress: MotionValue<number>;
+  current: boolean;
+  onPick: (i: number) => void;
+}) {
+  const fill = useTransform(() => Math.min(1, Math.max(0, progress.get() * count - index)));
   return (
     <button
       type="button"
       onClick={() => onPick(index)}
-      aria-label={`Grund ${index + 1} von ${COUNT} zeigen`}
+      aria-label={label(index + 1, count)}
       aria-current={current ? "step" : undefined}
       className="group relative h-11 min-w-0 flex-1 cursor-pointer rounded-[6px]"
     >
@@ -223,6 +248,8 @@ function ScrollBar({ index, progress, current, onPick }: { index: number; progre
 
 /** One bar per reason: done ones full, the current one filling over its time, the rest empty. Each picks its reason. */
 function Bars({
+  reasons,
+  label,
   active,
   run,
   running,
@@ -230,6 +257,8 @@ function Bars({
   onPick,
   onDone,
 }: {
+  reasons: Reason[];
+  label: Pick;
   active: number;
   run: number;
   running: boolean;
@@ -239,14 +268,14 @@ function Bars({
 }) {
   return (
     <div className="-my-3 flex gap-1.5">
-      {REASONS.map((r, i) => {
+      {reasons.map((r, i) => {
         const state = i < active ? "done" : i === active ? (running ? "running" : "done") : "idle";
         return (
           <button
             key={r.title}
             type="button"
             onClick={() => onPick(i)}
-            aria-label={`Grund ${i + 1} von ${COUNT} zeigen`}
+            aria-label={label(i + 1, reasons.length)}
             aria-current={i === active ? "step" : undefined}
             className="group relative h-11 min-w-0 flex-1 cursor-pointer rounded-[6px]"
           >

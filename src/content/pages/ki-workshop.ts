@@ -5,6 +5,12 @@
   The alt texts are the only words that are not his (accessibility only, never shown).
 */
 
+// The client's own page title and description from brandedgenius.de/ki-workshop/ (round 5: moved here from the page).
+export const KW_META = {
+  title: "KI-Workshop für Unternehmen",
+  description: "Praxisnahe KI-Workshops für Unternehmen: Entdecken Sie konkrete Einsatzmöglichkeiten, Automatisierungen und Strategien für den effizienten Einsatz von künstlicher Intelligenz.",
+};
+
 export const KW_MEDIA = {
   hero: "/media/process/training.webp",
   onsite: "/media/workshop/vor-ort.webp",

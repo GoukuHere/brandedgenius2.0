@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Fragment } from "react";
 import { Container, Heading, PrimaryLink, SecondaryLink, Section } from "@/components/system/primitives";
 import { Tilt } from "@/components/ui/tilt";
-import { LINKS, SOLUTION } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 import { Tile } from "./bento";
 import { IconWell, useIconTurns, type WellHandle } from "./icon-well";
 import type { IconName } from "./icons";
@@ -17,6 +17,8 @@ import type { IconName } from "./icons";
 
   Reading order: heading, text and actions first, then the photo and the plates, then the pillars. On phones the
   photo and the plates are shown above the heading (CSS order; they hold nothing focusable).
+
+  Round 5 (DE/EN): copy by language.
 */
 
 const pad = (i: number) => String(i + 1).padStart(2, "0");
@@ -85,6 +87,7 @@ function Pillar({
 }
 
 export function SolutionSection() {
+  const { LINKS, SOLUTION } = useCopy().site;
   const { area: iconArea, well: iconWell, trigger: iconTrigger } = useIconTurns<HTMLOListElement>(SOLUTION.pillars.length);
   return (
     <Section id="loesung">

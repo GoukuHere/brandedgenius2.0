@@ -1,7 +1,7 @@
 import { ArrowUpRight, Check } from "lucide-react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { BorderBeam } from "@/components/ui/border-beam";
-import { CTA, LINKS } from "@/content/site";
+import { getCopy } from "@/i18n/server";
 
 /*
   Kontakt: the page's closing call to action and its one looping light. A single lit glass panel with a slow
@@ -12,14 +12,16 @@ import { CTA, LINKS } from "@/content/site";
 
   The first row is the original's "Send Message", the client's hosted contact form (labelled with the German label the
   original gives the same form elsewhere, see site.ts); the second books the strategy call. Both open in a new tab.
+
+  Round 5 (DE/EN): copy by language (getCopy).
 */
 
-const ACTIONS = [
-  { href: LINKS.contact, label: CTA.primary },
-  { href: LINKS.booking, label: CTA.secondary },
-];
-
-export function CtaSection() {
+export async function CtaSection() {
+  const { CTA, LINKS } = (await getCopy()).site;
+  const ACTIONS = [
+    { href: LINKS.contact, label: CTA.primary },
+    { href: LINKS.booking, label: CTA.secondary },
+  ];
   return (
     <Section id="kontakt">
       <Container>

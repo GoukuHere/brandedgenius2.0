@@ -2,14 +2,16 @@
 
 import { useId, useState } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { KW_FAQ } from "@/content/pages/ki-workshop";
+import { useCopy } from "@/i18n/client";
 
 /*
   FAQ: every question with his answer, as an accordion in one centred column. Each question is a button with
   aria-expanded that controls its answer region; the answer opens with a smooth height (grid rows from 0fr to 1fr) and
   is hidden from assistive technology while closed. The first answer stands open; any number can be open at once.
+  Round 5 (DE/EN): copy by language.
 */
 export function KwFaq() {
+  const { KW_FAQ } = useCopy().kiWorkshop;
   const [open, setOpen] = useState<number[]>([0]);
   const baseId = useId();
   const toggle = (index: number) => setOpen((prev) => (prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]));

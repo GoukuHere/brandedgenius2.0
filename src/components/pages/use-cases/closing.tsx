@@ -4,8 +4,8 @@ import { motion, useMotionValue, useMotionValueEvent, useTransform, type MotionV
 import { useEffect, useRef } from "react";
 import { Container, Heading, PrimaryLink, SecondaryLink, Section } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { UC_CLOSING, UC_ITEMS, type ProjectSlug } from "@/content/pages/use-cases";
-import { LINKS } from "@/content/site";
+import type { Project, ProjectSlug } from "@/content/pages/use-cases";
+import { useCopy } from "@/i18n/client";
 import { useLive } from "./use-live";
 
 /*
@@ -17,6 +17,7 @@ import { useLive } from "./use-live";
   is not built here (it has no backend on this site); the buttons lead to his booking and his contact form.
 
   Two drawings, one composition: a wide arc from tablets up, a tighter one on phones. Reduced motion: drawn and lit.
+  Round 5 (DE/EN): copy by language.
 */
 
 type Spot = { x: number; y: number };
@@ -66,6 +67,9 @@ function lineFor(d: Drawing, s: Spot) {
 }
 
 export function ClosingSection() {
+  const copy = useCopy();
+  const { UC_CLOSING, UC_ITEMS } = copy.useCases;
+  const { LINKS } = copy.site;
   const band = useRef<HTMLDivElement>(null);
   const progress = useSectionProgress(band, ["start 90%", "end 55%"]);
   const live = useMotionValue(0);
@@ -93,8 +97,8 @@ export function ClosingSection() {
     <Section id="anfrage">
       <Container>
         <div ref={band} role="img" aria-label={UC_CLOSING.label} className="uc-converge uc-live" data-done="">
-          <Converge drawing={WIDE} p={p} className="hidden md:block" />
-          <Converge drawing={NARROW} p={p} className="md:hidden" />
+          <Converge drawing={WIDE} items={UC_ITEMS} p={p} className="hidden md:block" />
+          <Converge drawing={NARROW} items={UC_ITEMS} p={p} className="md:hidden" />
         </div>
 
         <div className="mx-auto mt-10 flex max-w-[1080px] flex-col items-center text-center md:mt-12">
@@ -119,7 +123,7 @@ export function ClosingSection() {
   );
 }
 
-function Converge({ drawing, p, className }: { drawing: Drawing; p: MotionValue<number>; className?: string }) {
+function Converge({ drawing, items, p, className }: { drawing: Drawing; items: Project[]; p: MotionValue<number>; className?: string }) {
   const glow = useTransform(() => clamp01((p.get() - 0.78) / 0.2));
   const haloScale = useTransform(() => 0.4 + 0.6 * glow.get());
   const core = useTransform(() => 0.25 + 0.75 * glow.get());
@@ -135,7 +139,7 @@ function Converge({ drawing, p, className }: { drawing: Drawing; p: MotionValue<
       {drawing.spots.map((spot, i) => (
         <Strand key={i} index={i} d={lineFor(drawing, spot)} p={p} />
       ))}
-      {UC_ITEMS.map((item, i) => (
+      {items.map((item, i) => (
         <Mark key={item.slug} slug={item.slug} spot={drawing.spots[i]} size={drawing.size} index={i} p={p} />
       ))}
       <motion.circle cx={point.x} cy={point.y} r={drawing.size * 0.75} fill={`url(#uc-point-${drawing.w})`} style={{ opacity: glow, scale: haloScale }} className="uc-converge-halo" />

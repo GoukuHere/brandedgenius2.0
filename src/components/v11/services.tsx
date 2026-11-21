@@ -6,7 +6,8 @@ import { useMounted } from "@/components/concepts/shared";
 import { Container, Heading, Section, TextLink } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { MagicCard } from "@/components/ui/magic-card";
-import { SERVICES } from "@/content/site";
+import type { SERVICES } from "@/content/site";
+import { useCopy, useHref } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { isSceneId, SceneBox, ServiceAnimation, type SceneId } from "./scenes";
 
@@ -37,10 +38,12 @@ import { isSceneId, SceneBox, ServiceAnimation, type SceneId } from "./scenes";
   its words stay legible on a phone); v1 keeps the shared fine-line ones. On phones the sticky tops step 12px from
   92px (the header ends at 76px), so the plates, now a little taller, still fit a 667px Safari window. The heading is
   centred from md up, and its accent always starts the second line.
+
+  Round 5 (DE/EN): copy by language; the links go to the Leistungen page in the page's language (its section ids stay
+  German in both).
 */
 
 type Service = (typeof SERVICES.items)[number] & { id: SceneId };
-const ITEMS = SERVICES.items.filter((s): s is Service => isSceneId(s.id));
 /* 2026-11-16: the site has a Leistungen page; each plate's link opens that service's live demo there. */
 const SERVICE_ANCHOR: Record<string, string> = { agents: "ki-agenten", chat: "chatbots", calls: "callbots", marketing: "marketing" };
 
@@ -136,6 +139,7 @@ function Plate({
     window.scrollTo({ top: window.scrollY + edge - top, behavior: "instant" });
   };
 
+  const href = useHref();
   // With the cursor light on, the content lets the pointer through to it; the link takes it back.
   const lit = magic && front;
   // The drawing's coordinates round differently on the server, so it is drawn only in the browser; a box of its size
@@ -187,7 +191,7 @@ function Plate({
               </h3>
               <div data-reveal="up" data-rd="2">
                 <p className="t-body text-white/80">{service.text}</p>
-                <TextLink href={`/leistungen#${SERVICE_ANCHOR[service.id]}`} className="pointer-events-auto mt-3 min-h-11">
+                <TextLink href={href("leistungen", SERVICE_ANCHOR[service.id])} className="pointer-events-auto mt-3 min-h-11">
                   {service.cta}
                 </TextLink>
               </div>
@@ -202,6 +206,9 @@ function Plate({
 }
 
 export function ServicesSection() {
+  const { SERVICES } = useCopy().site;
+  const ITEMS = SERVICES.items.filter((s): s is Service => isSceneId(s.id));
+  const href = useHref();
   const stacked = useMedia(STACKED);
   const magic = useMedia(FINE_POINTER);
   const phone = useMedia(PHONE);
@@ -232,7 +239,7 @@ export function ServicesSection() {
             {SERVICES.text}
           </p>
           <div data-reveal="up" data-rd="3" className="mt-5">
-            <TextLink href="/leistungen" className="min-h-11">
+            <TextLink href={href("leistungen")} className="min-h-11">
               {SERVICES.cta}
             </TextLink>
           </div>

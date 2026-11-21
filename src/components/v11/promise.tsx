@@ -4,7 +4,7 @@ import { motion, useMotionValue, useMotionValueEvent, useSpring } from "motion/r
 import { useEffect, useRef, useState } from "react";
 import { Container, Heading } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { PROMISE } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { PromiseCard } from "./promise-card";
 
@@ -25,22 +25,25 @@ import { PromiseCard } from "./promise-card";
   Reduced motion: no turns there, the ticks still pick.
 
   Every figure is in the markup for screen readers as one list; the card and the changing label are hidden from them.
+
+  Round 5 (DE/EN): copy by language.
 */
 
-const FIGURES = PROMISE.figures;
-const COUNT = FIGURES.length;
+type Figure = { value: string; label: string };
 const DWELL = 4600;
 const EASE = [0.16, 1, 0.3, 1] as const;
 // Keep in step with v11.css (.v11-promise): desktop as in v1, and phones and tablets too (the developer: "it should do
 // the same thing on mobile too, scrolling").
 const PIN = "(min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px)";
 
-// The title ends in a dash: a no-break space keeps it with "schafft", so no line ever starts with it.
-const TITLE = PROMISE.title.replace(/ –$/, " –");
-
-const stepAt = (progress: number) => Math.min(COUNT - 1, Math.max(0, Math.floor(progress * COUNT)));
+const stepAt = (progress: number, count: number) => Math.min(count - 1, Math.max(0, Math.floor(progress * count)));
 
 export function PromiseSection() {
+  const { PROMISE } = useCopy().site;
+  const FIGURES: Figure[] = PROMISE.figures;
+  const COUNT = FIGURES.length;
+  // The title ends in a dash: a no-break space keeps it with "schafft", so no line ever starts with it.
+  const TITLE = PROMISE.title.replace(/ –$/, " –");
   const runway = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   // 0 when the stage pins (section top at the screen top), 1 when it lets go (section bottom at the screen bottom).
@@ -70,7 +73,7 @@ export function PromiseSection() {
       setReduced(motionQuery.matches);
       setPinned(pinQuery.matches);
       pinnedValue.set(pinQuery.matches ? 1 : 0);
-      if (pinQuery.matches) setStep(stepAt(smooth.get()));
+      if (pinQuery.matches) setStep(stepAt(smooth.get(), COUNT));
     };
     onQuery();
     motionQuery.addEventListener("change", onQuery);
@@ -81,11 +84,11 @@ export function PromiseSection() {
       motionQuery.removeEventListener("change", onQuery);
       pinQuery.removeEventListener("change", onQuery);
     };
-  }, [pinnedValue, smooth]);
+  }, [pinnedValue, smooth, COUNT]);
 
   // Pinned: the figure follows the scroll (v1's).
   useMotionValueEvent(smooth, "change", (p) => {
-    if (pinnedValue.get()) setStep(stepAt(p));
+    if (pinnedValue.get()) setStep(stepAt(p, COUNT));
   });
 
   // Not pinned: the next figure after DWELL ms, while the section is on screen and nobody holds or has picked.
@@ -94,7 +97,7 @@ export function PromiseSection() {
     if (!turning) return undefined;
     const id = window.setTimeout(() => setStep((s) => (s + 1) % COUNT), DWELL);
     return () => window.clearTimeout(id);
-  }, [turning, step]);
+  }, [turning, step, COUNT]);
 
   const pick = (i: number) => {
     const el = runway.current;
@@ -123,15 +126,15 @@ export function PromiseSection() {
       <div ref={stage} className="v11-promise-stage">
         <Container className="v11-promise-grid grid items-center gap-y-10 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-x-[clamp(56px,6vw,112px)]">
           <div aria-hidden data-reveal="up" className="mx-auto w-full max-w-[420px] lg:mx-0 lg:max-w-none" {...hold}>
-            <PromiseCard step={step} live={onScreen} progress={smooth} scrollDriven={pinnedValue} />
+            <PromiseCard figures={FIGURES} step={step} live={onScreen} progress={smooth} scrollDriven={pinnedValue} />
           </div>
 
           <div className="min-w-0">
             <Heading title={TITLE} accent={PROMISE.accent} className="max-w-[880px] text-[length:clamp(2.125rem,1.25rem+2.2vw,3.25rem)]" />
 
             <div data-reveal="up" data-rd="2" className="v11-promise-steps mt-10 flex items-center gap-5 xl:mt-14" {...hold}>
-              <Ticks step={step} onPick={pick} />
-              <Label step={step} />
+              <Ticks figures={FIGURES} step={step} onPick={pick} />
+              <Label figures={FIGURES} step={step} />
             </div>
 
             <ul role="list" className="sr-only">
@@ -149,10 +152,10 @@ export function PromiseSection() {
 }
 
 /** v1's four ticks, one per figure, the current one in sky; each picks its figure. */
-function Ticks({ step, onPick }: { step: number; onPick: (i: number) => void }) {
+function Ticks({ figures, step, onPick }: { figures: Figure[]; step: number; onPick: (i: number) => void }) {
   return (
     <div className="flex shrink-0 flex-col">
-      {FIGURES.map((figure, i) => (
+      {figures.map((figure, i) => (
         <button
           key={figure.value}
           type="button"
@@ -174,10 +177,10 @@ function Ticks({ step, onPick }: { step: number; onPick: (i: number) => void }) 
 }
 
 /** The current figure's label (v1's): all four share one cell, so the block never changes height while they cross. */
-function Label({ step }: { step: number }) {
+function Label({ figures, step }: { figures: Figure[]; step: number }) {
   return (
     <div aria-hidden className="grid min-w-0">
-      {FIGURES.map((figure, i) => {
+      {figures.map((figure, i) => {
         const on = i === step;
         return (
           <motion.p

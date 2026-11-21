@@ -2,6 +2,12 @@
 // leaving words out. The six "So arbeiten wir" texts come from the slider script on that page (its saved copy had lost
 // the umlauts, restored here). Each heading keeps the client's own blue phrase as its accent where it can.
 
+// The client's own page title and description from brandedgenius.de/uber-uns/ (round 5: moved here from the page).
+export const UU_META = {
+  title: "Über Branded Genius | KI & Automatisierung",
+  description: "Lernen Sie Branded Genius kennen und erfahren Sie mehr über unsere Mission, unsere Arbeitsweise und unseren Fokus auf KI, Automatisierung und digitale Lösungen.",
+};
+
 export const UU_HERO = {
   title: "Wir machen KI verständlich,",
   accent: "praktisch und profitabel.",

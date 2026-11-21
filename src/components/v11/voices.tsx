@@ -23,7 +23,8 @@ import {
   MorphingDialogContent,
   MorphingDialogTrigger,
 } from "@/components/ui/morphing-dialog";
-import { VOICES } from "@/content/site";
+import type * as Site from "@/content/site";
+import { useCopy, useWords } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 /*
@@ -39,12 +40,44 @@ import { cn } from "@/lib/utils";
 
   Play opens Motion Primitives' MorphingDialog: the portrait grows into a centred 9:16 player and only then is the
   privacy-enhanced youtube-nocookie iframe mounted.
+
+  Round 5 (DE/EN): copy by language (useCopy); the carousel's own words (its names for screen readers, the quote
+  marks) in WORDS below.
 */
 
-type Voice = (typeof VOICES.items)[number];
+type Voice = (typeof Site.VOICES.items)[number];
 
-const ITEMS = VOICES.items;
-const COUNT = ITEMS.length;
+const WORDS = {
+  de: {
+    quote: (text: string) => `„${text}“`,
+    carousel: "Karussell",
+    region: "Kundenstimmen",
+    voice: "Kundenstimme",
+    of: (n: number, count: number, name: string) => `${n} von ${count}: ${name}`,
+    live: (n: number, count: number, name: string) => `Kundenstimme ${n} von ${count}: ${name}`,
+    from: (name: string) => `Kundenstimme von ${name}`,
+    show: (name: string) => `Kundenstimme von ${name} anzeigen`,
+    play: (name: string) => `Video von ${name} abspielen`,
+    close: "Video schließen",
+    next: "Nächste Kundenstimme",
+    previous: "Vorherige Kundenstimme",
+  },
+  en: {
+    quote: (text: string) => `"${text}"`,
+    carousel: "carousel",
+    region: "Client voices",
+    voice: "client voice",
+    of: (n: number, count: number, name: string) => `${n} of ${count}: ${name}`,
+    live: (n: number, count: number, name: string) => `Client voice ${n} of ${count}: ${name}`,
+    from: (name: string) => `Client voice from ${name}`,
+    show: (name: string) => `Show the client voice from ${name}`,
+    play: (name: string) => `Play the video from ${name}`,
+    close: "Close video",
+    next: "Next client voice",
+    previous: "Previous client voice",
+  },
+};
+
 const TRACK_ID = "kundenstimmen-karussell";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -63,7 +96,7 @@ const RADIUS_PHONE = 3.2;
 // The card is 320px wide from lg and 240px below.
 const SIZES = "(min-width: 1024px) 320px, 240px";
 
-const mod = (n: number) => ((n % COUNT) + COUNT) % COUNT;
+const wrap = (n: number, count: number) => ((n % count) + count) % count;
 const rad = (deg: number) => (deg * Math.PI) / 180;
 const embed = (id: string) => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
 
@@ -76,6 +109,11 @@ const BACKDROP_CSS =
   "body>div:has(+div [data-voice-player]){background-color:rgb(0 0 0/0.7);-webkit-backdrop-filter:none;backdrop-filter:none;z-index:50}";
 
 export function VoicesSection() {
+  const { VOICES } = useCopy().site;
+  const words = useWords(WORDS);
+  const ITEMS = VOICES.items;
+  const COUNT = ITEMS.length;
+  const mod = (n: number) => wrap(n, COUNT);
   const regionRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
@@ -123,8 +161,8 @@ export function VoicesSection() {
   useEffect(() => {
     if (!focusCentre.current) return;
     focusCentre.current = false;
-    regionRef.current?.querySelector<HTMLElement>(`[data-i="${mod(pos)}"] [aria-haspopup="dialog"]`)?.focus({ preventScroll: true });
-  }, [pos]);
+    regionRef.current?.querySelector<HTMLElement>(`[data-i="${wrap(pos, COUNT)}"] [aria-haspopup="dialog"]`)?.focus({ preventScroll: true });
+  }, [pos, COUNT]);
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
@@ -180,7 +218,7 @@ export function VoicesSection() {
           </p>
         </div>
 
-        <div ref={regionRef} role="region" aria-roledescription="Karussell" aria-label="Kundenstimmen" onKeyDown={onKeyDown} className="mt-14 md:mt-20">
+        <div ref={regionRef} role="region" aria-roledescription={words.carousel} aria-label={words.region} onKeyDown={onKeyDown} className="mt-14 md:mt-20">
           <div
             ref={stageRef}
             id={TRACK_ID}
@@ -203,6 +241,7 @@ export function VoicesSection() {
               <ArcCard
                 key={voice.youtube}
                 i={i}
+                count={COUNT}
                 voice={voice}
                 centre={i === active}
                 wheel={wheel}
@@ -231,7 +270,7 @@ export function VoicesSection() {
                   transition={{ duration: 0.45, ease: EASE, delay: on ? 0.2 : 0 }}
                 >
                   <blockquote className="text-[20px] leading-[1.45] tracking-[-0.01em] text-balance text-white md:text-[22px]">
-                    <p>„{voice.quote}“</p>
+                    <p>{words.quote(voice.quote)}</p>
                   </blockquote>
                   <figcaption className="mt-5">
                     <span className="block font-medium text-white">{voice.name}</span>
@@ -251,7 +290,7 @@ export function VoicesSection() {
                   onClick={() => goTo(i)}
                   aria-controls={TRACK_ID}
                   aria-current={i === active ? "true" : undefined}
-                  aria-label={`Kundenstimme von ${item.name}`}
+                  aria-label={words.from(item.name)}
                   className="group grid size-11 cursor-pointer place-items-center rounded-button"
                 >
                   <span
@@ -267,7 +306,7 @@ export function VoicesSection() {
           </div>
 
           <p className="sr-only" aria-live="polite" aria-atomic="true">
-            {`Kundenstimme ${active + 1} von ${COUNT}: ${ITEMS[active].name}`}
+            {words.live(active + 1, COUNT, ITEMS[active].name)}
           </p>
         </div>
       </Container>
@@ -278,6 +317,7 @@ export function VoicesSection() {
 /** One portrait on the arc. Its place follows the wheel: upright in the centre, tilted and dimmed to the sides. */
 function ArcCard({
   i,
+  count: COUNT,
   voice,
   centre,
   wheel,
@@ -286,6 +326,7 @@ function ArcCard({
   onSelect,
 }: {
   i: number;
+  count: number;
   voice: Voice;
   centre: boolean;
   wheel: MotionValue<number>;
@@ -293,10 +334,11 @@ function ArcCard({
   radius: MotionValue<number>;
   onSelect: () => void;
 }) {
+  const words = useWords(WORDS);
   const triggerRef = useRef<HTMLButtonElement>(null!);
-  const playLabel = `Video von ${voice.name} abspielen`;
+  const playLabel = words.play(voice.name);
 
-  // MorphingDialogTrigger hard-codes an English aria-label ("Open dialog …"); give the play button its German name.
+  // MorphingDialogTrigger hard-codes an English aria-label ("Open dialog …"); give the play button its own name.
   useEffect(() => {
     triggerRef.current?.setAttribute("aria-label", playLabel);
   }, [playLabel]);
@@ -322,8 +364,8 @@ function ArcCard({
       data-card
       data-i={i}
       role="group"
-      aria-roledescription="Kundenstimme"
-      aria-label={`${i + 1} von ${COUNT}: ${voice.name}`}
+      aria-roledescription={words.voice}
+      aria-label={words.of(i + 1, COUNT, voice.name)}
       aria-hidden={!centre}
       style={{ x, y, rotate: angle, scale, opacity, zIndex, pointerEvents }}
       className="absolute top-0 left-1/2 -ml-[120px] w-[240px] will-change-transform lg:-ml-[160px] lg:w-[320px]"
@@ -367,7 +409,7 @@ function ArcCard({
           type="button"
           tabIndex={-1}
           onClick={onSelect}
-          aria-label={`Kundenstimme von ${voice.name} anzeigen`}
+          aria-label={words.show(voice.name)}
           className="absolute inset-0 z-10 cursor-pointer rounded-panel"
         />
       )}
@@ -383,6 +425,7 @@ const CLOSE_FADE = {
 
 /** The open player: the portrait first, the YouTube iframe once the morph has finished. */
 function Player({ voice, returnTo }: { voice: Voice; returnTo: RefObject<HTMLButtonElement> }) {
+  const words = useWords(WORDS);
   const rootRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [ready, setReady] = useState(false);
@@ -395,23 +438,24 @@ function Player({ voice, returnTo }: { voice: Voice; returnTo: RefObject<HTMLBut
 
   /*
     The shared dialog names itself through ids that do not exist and labels its close button in English. Give the
-    dialog and the button German names, give the dialog the id the play button's aria-controls points at, and send
-    focus back to the play button once the dialog has closed (the component's own return never finds the trigger).
+    dialog and the button names in the page's language, give the dialog the id the play button's aria-controls points
+    at, and send focus back to the play button once the dialog has closed (the component's own return never finds the
+    trigger).
   */
   useEffect(() => {
     const trigger = returnTo.current;
     const root = rootRef.current;
     const dialog = root?.closest<HTMLElement>('[role="dialog"]');
     if (dialog) {
-      dialog.setAttribute("aria-label", `Kundenstimme von ${voice.name}`);
+      dialog.setAttribute("aria-label", words.from(voice.name));
       dialog.removeAttribute("aria-labelledby");
       dialog.removeAttribute("aria-describedby");
       const controls = trigger?.getAttribute("aria-controls");
       if (controls) dialog.id = controls;
     }
-    root?.querySelector('button[aria-label="Close dialog"]')?.setAttribute("aria-label", "Video schließen");
+    root?.querySelector('button[aria-label="Close dialog"]')?.setAttribute("aria-label", words.close);
     return () => trigger?.focus({ preventScroll: true });
-  }, [returnTo, voice.name]);
+  }, [returnTo, voice.name, words]);
 
   // Focus guard after the player: Tab out of the video returns to the close button, Shift+Tab from it enters the video.
   function onGuardFocus(event: FocusEvent<HTMLSpanElement>) {
@@ -436,7 +480,7 @@ function Player({ voice, returnTo }: { voice: Voice; returnTo: RefObject<HTMLBut
           <iframe
             ref={frameRef}
             src={embed(voice.youtube)}
-            title={`Kundenstimme von ${voice.name}`}
+            title={words.from(voice.name)}
             allow="autoplay; encrypted-media; picture-in-picture"
             allowFullScreen
             referrerPolicy="strict-origin-when-cross-origin"
@@ -451,6 +495,7 @@ function Player({ voice, returnTo }: { voice: Voice; returnTo: RefObject<HTMLBut
 
 /** v11: a 60px step button (52px on phones), royal with a lit edge so it reads at once; the arrow nudges the way it points. */
 function StepButton({ direction, onClick }: { direction: 1 | -1; onClick: () => void }) {
+  const words = useWords(WORDS);
   const iconClass = cn(
     "size-6 transition-transform duration-200 ease-out",
     direction === 1 ? "group-hover:translate-x-0.5" : "group-hover:-translate-x-0.5"
@@ -460,7 +505,7 @@ function StepButton({ direction, onClick }: { direction: 1 | -1; onClick: () => 
       type="button"
       onClick={onClick}
       aria-controls={TRACK_ID}
-      aria-label={direction === 1 ? "Nächste Kundenstimme" : "Vorherige Kundenstimme"}
+      aria-label={direction === 1 ? words.next : words.previous}
       className="v11-step group pointer-events-auto grid size-[52px] shrink-0 cursor-pointer place-items-center rounded-button text-white transition-[background-color,box-shadow,scale] duration-200 ease-out active:scale-[0.96] md:size-[60px]"
     >
       {direction === 1 ? (

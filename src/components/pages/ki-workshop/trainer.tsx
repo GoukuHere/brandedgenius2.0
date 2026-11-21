@@ -3,8 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Heading, PrimaryLink, Section } from "@/components/system/primitives";
-import { KW_MEDIA, KW_TRAINER } from "@/content/pages/ki-workshop";
-import { LINKS } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 
 /*
   Trainer: Roman's tall portrait with his seven core competencies around it as a constellation, not a list. Each
@@ -15,6 +14,7 @@ import { LINKS } from "@/content/site";
   The places are fixed per screen (a 592 x 660 stage on large screens, 335 x 470 on phones, both scaled with the width),
   so the line's points are the chips' own centres. His heading (his dash became the line break), his two paragraphs
   and his button sit beside it; on phones the heading comes first, then the portrait, then the text.
+  Round 5 (DE/EN): copy by language (the chips keep their places in both).
 */
 
 type Place = { x: number; y: number; px: number; py: number };
@@ -36,6 +36,9 @@ const LOOP = [0, 1, 3, 6, 5, 4, 2, 0];
 const pct = (v: number, of: number) => `${Math.round((v / of) * 10000) / 100}%`;
 
 export function KwTrainer() {
+  const copy = useCopy();
+  const { KW_MEDIA, KW_TRAINER } = copy.kiWorkshop;
+  const { LINKS } = copy.site;
   const stage = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState(false);
 

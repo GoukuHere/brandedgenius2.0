@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Container, Heading, PrimaryLink } from "@/components/system/primitives";
-import { UU_HERO, UU_WHO } from "@/content/pages/uber-uns";
+import { getCopy } from "@/i18n/server";
 import { OnScreen } from "./on-screen";
 
 /*
@@ -15,8 +15,10 @@ import { OnScreen } from "./on-screen";
   photo as on the homepage, framed wider here (3:2) until he sends a second team shot.
 
   Everything in the first screen is plain server markup with CSS entrances on load, so nothing waits for script.
+  Round 5 (DE/EN): copy by language.
 */
-export function UberHero() {
+export async function UberHero() {
+  const { UU_HERO, UU_WHO } = (await getCopy()).uberUns;
   return (
     <section id="hero" aria-labelledby="uu-title" className="relative">
       <OnScreen className="uu-hero relative isolate">

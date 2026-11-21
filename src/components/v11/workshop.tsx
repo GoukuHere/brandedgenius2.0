@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { WorkshopTopics } from "./workshop-topics";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { WORKSHOP } from "@/content/site";
+import { useCopy, useWords } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 /*
@@ -20,7 +20,14 @@ import { cn } from "@/lib/utils";
   own wrapper and fades in once the panel has room. Collapsed descriptions are visibility: hidden, so assistive
   technology only reads the expanded one. Reduced motion: the global CSS rule cuts every transition to an instant
   change, so the markup is identical on the server and in the browser.
+
+  Round 5 (DE/EN): copy by language (useCopy); the quote marks by language in WORDS.
 */
+
+const WORDS = {
+  de: { quote: (text: string) => `„${text}“` },
+  en: { quote: (text: string) => `"${text}"` },
+};
 
 const HOVER_INTENT_MS = 80; // sweeping the pointer across the row does not flick every panel open
 
@@ -47,6 +54,8 @@ function Title({ text }: { text: string }) {
 }
 
 export function WorkshopSection() {
+  const { WORKSHOP } = useCopy().site;
+  const words = useWords(WORDS);
   const [active, setActive] = useState(0);
   const hoverTimer = useRef<number | undefined>(undefined);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
@@ -112,7 +121,7 @@ export function WorkshopSection() {
             <blockquote className="relative pl-6 text-[22px] leading-[1.42] tracking-[-0.01em] text-pretty text-white/90 sm:text-[24px] xl:text-[26px]">
               <span aria-hidden data-reveal="rule-y" data-rd="2" className="absolute inset-y-0 left-0 w-px bg-sky" />
               <p data-reveal="up" data-rd="4">
-                „{WORKSHOP.quote}“
+                {words.quote(WORKSHOP.quote)}
               </p>
             </blockquote>
             <figcaption data-reveal="up" data-rd="5" className="mt-4 pl-6 text-[15px] leading-normal text-silver">

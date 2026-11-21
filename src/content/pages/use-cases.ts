@@ -24,6 +24,12 @@ export type Project = {
   topics: Exclude<FilterId, "all">[];
 };
 
+/** The page's title and description, his own from brandedgenius.de/use-cases/ (moved here from page.tsx in round 5). */
+export const UC_META = {
+  title: "KI Use Cases für Unternehmen",
+  description: "Entdecken Sie praxisnahe KI Use Cases für Marketing, Vertrieb, Kundenservice und interne Prozesse und erfahren Sie, wie Unternehmen mit KI effizienter arbeiten.",
+};
+
 export const UC_HERO = {
   title: "Digitale Lösungen,",
   accent: "die messbare Fortschritte schaffen.",

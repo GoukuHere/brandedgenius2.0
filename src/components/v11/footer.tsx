@@ -1,7 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 import { ArrowUp, ArrowUpRight } from "lucide-react";
 import { Container, Heading, SecondaryLink } from "@/components/system/primitives";
-import { CONTACT, FOOTER, HEADER, LINKS } from "@/content/site";
+import { getCopy, getWords } from "@/i18n/server";
+
+/* The footer's own words (round 5, DE/EN); the rest comes from the page's copy. */
+const WORDS = {
+  de: { form: "Kontaktformular", legal: "Rechtliches", top: "Nach oben" },
+  en: { form: "Contact form", legal: "Legal", top: "Back to top" },
+};
 
 function Column({ title, links, align = "left" }: { title: string; links: { label: string; href: string }[]; align?: "left" | "right" }) {
   return (
@@ -38,7 +44,12 @@ function Column({ title, links, align = "left" }: { title: string; links: { labe
 // - "a little bit of text, what is that? Like on the right side": Verbinden held one link. It now lists the client's
 //   e-mail and city (both on brandedgenius.de's Impressum; his contact page shows the e-mail) and the contact form.
 //   The mobile number on the Impressum is left out, as his own contact page leaves it out.
-export function Footer() {
+//
+// Round 5 (DE/EN): copy by language (getCopy, the footer's own words in WORDS); the English "Entdecken" links lead to
+// the English pages.
+export async function Footer() {
+  const { CONTACT, FOOTER, HEADER, LINKS } = (await getCopy()).site;
+  const words = await getWords(WORDS);
   return (
     <footer className="relative isolate overflow-hidden border-t border-white/[0.07] pt-16 pb-8 md:pt-24">
       <div
@@ -82,7 +93,7 @@ export function Footer() {
               {FOOTER.connect.links.map((l) => (
                 <li key={l.href + l.label}>
                   <a href={l.href} target="_blank" rel="noopener" className="text-[16px] text-ink/75 transition-colors duration-200 hover:text-white">
-                    Kontaktformular
+                    {words.form}
                   </a>
                 </li>
               ))}
@@ -93,7 +104,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col gap-5 border-t border-white/[0.08] pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="t-small">{FOOTER.copyright}</p>
-          <nav aria-label="Rechtliches" className="flex gap-6">
+          <nav aria-label={words.legal} className="flex gap-6">
             {FOOTER.legal.map((l) => (
               <a key={l.href} href={l.href} target="_blank" rel="noopener" className="text-[14px] text-ink/60 transition-colors duration-200 hover:text-white">
                 {l.label}
@@ -101,7 +112,7 @@ export function Footer() {
             ))}
           </nav>
           <a href="#top" className="group inline-flex items-center gap-2 text-[14px] text-ink/70 transition-colors hover:text-white">
-            Nach oben
+            {words.top}
             <ArrowUp className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
           </a>
         </div>

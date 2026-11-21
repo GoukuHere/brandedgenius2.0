@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Container, Heading } from "@/components/system/primitives";
-import { UU_FOUNDER } from "@/content/pages/uber-uns";
+import { getCopy } from "@/i18n/server";
 
 /*
   Über uns, the founder: an editorial spread. Roman's portrait large on the left (it opens from its foot as it comes
@@ -8,8 +8,10 @@ import { UU_FOUNDER } from "@/content/pages/uber-uns";
   sentence in off-white and the second in the brand gradient. His heading follows as the quote's byline (it is the
   section's h2, first in the markup), after a short sky rule. His four bio paragraphs sit in a narrow, quiet column,
   set in from the quote, so the right side steps down like a magazine page.
+  Round 5 (DE/EN): copy by language.
 */
-export function UberFounder() {
+export async function UberFounder() {
+  const { UU_FOUNDER } = (await getCopy()).uberUns;
   return (
     <section id="gruender" className="relative py-16 md:py-24">
       <Container>

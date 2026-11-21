@@ -1,10 +1,10 @@
 "use client";
 
 import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Container, Heading } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { UU_PROCESS } from "@/content/pages/uber-uns";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 /*
@@ -19,22 +19,21 @@ import { cn } from "@/lib/utils";
 
   Wide screens: the heading and his line on the left, the dial on the right with the step names around it. Phones: the
   heading, the dial with the step numbers around it, and the current step's text under it, sized to fit 600 to 750px.
+  Round 5 (DE/EN): copy by language; the steps (and their count, which shapes the dial) come from the page's copy.
 */
 
-const STEPS = UU_PROCESS.steps;
-const COUNT = STEPS.length;
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 // Keep in step with uber-uns.css (.uu-proc). As the homepage's held stages, without the held stage for reduced motion.
 const PIN =
   "(prefers-reduced-motion: no-preference) and (min-width: 1024px) and (min-height: 720px), (prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 600px)";
-const stepAt = (p: number) => Math.min(COUNT - 1, Math.max(0, Math.floor(p * COUNT)));
+const stepAt = (p: number, count: number) => Math.min(count - 1, Math.max(0, Math.floor(p * count)));
 /** The step for a scroll position, holding the current step within a hair of a boundary so it never flickers there. */
 const HOLD = 0.04; // in steps
-const stepFrom = (p: number, current: number) => {
-  const raw = p * COUNT;
+const stepFrom = (p: number, current: number, count: number) => {
+  const raw = p * count;
   const boundary = Math.round(raw);
   if (Math.abs(raw - boundary) < HOLD && (current === boundary - 1 || current === boundary)) return current;
-  return stepAt(p);
+  return stepAt(p, count);
 };
 
 // The dial's drawing, in its own 600-unit box.
@@ -52,7 +51,8 @@ const arc = (r: number, from: number, to: number) => {
   const b = polar(r, to);
   return `M ${a.x.toFixed(2)} ${a.y.toFixed(2)} A ${r} ${r} 0 ${to - from > 180 ? 1 : 0} 1 ${b.x.toFixed(2)} ${b.y.toFixed(2)}`;
 };
-const SEGMENTS = STEPS.map((_, i) => arc(R, i * (360 / COUNT) + GAP, (i + 1) * (360 / COUNT) - GAP));
+/** The dial's segments, one per step. */
+const segmentsFor = (count: number) => Array.from({ length: count }, (_, i) => arc(R, i * (360 / count) + GAP, (i + 1) * (360 / count) - GAP));
 const FULL = `M ${C} ${C - R} A ${R} ${R} 0 1 1 ${C} ${C + R} A ${R} ${R} 0 1 1 ${C} ${C - R}`;
 const TICKS = Array.from({ length: 60 }, (_, i) => {
   const major = i % 10 === 0;
@@ -62,6 +62,10 @@ const TICKS = Array.from({ length: 60 }, (_, i) => {
 });
 
 export function UberProcess() {
+  const { UU_PROCESS } = useCopy().uberUns;
+  const STEPS = UU_PROCESS.steps;
+  const COUNT = STEPS.length;
+  const SEGMENTS = useMemo(() => segmentsFor(COUNT), [COUNT]);
   const runway = useRef<HTMLElement>(null);
   // 0 when the stage pins (section top at the screen top), 1 when it lets go (section bottom at the screen bottom).
   const progress = useSectionProgress(runway, ["start start", "end end"]);
@@ -81,7 +85,7 @@ export function UberProcess() {
       setReduced(motionQuery.matches);
       setPinned(pinQuery.matches);
       pinnedValue.set(pinQuery.matches ? 1 : 0);
-      if (pinQuery.matches) setStep(stepAt(smooth.get()));
+      if (pinQuery.matches) setStep(stepAt(smooth.get(), COUNT));
     };
     onQuery();
     pinQuery.addEventListener("change", onQuery);
@@ -90,11 +94,11 @@ export function UberProcess() {
       pinQuery.removeEventListener("change", onQuery);
       motionQuery.removeEventListener("change", onQuery);
     };
-  }, [pinnedValue, smooth]);
+  }, [pinnedValue, smooth, COUNT]);
 
   // Held: the step follows the scroll.
   useMotionValueEvent(smooth, "change", (p) => {
-    if (pinnedValue.get()) setStep((current) => stepFrom(p, current));
+    if (pinnedValue.get()) setStep((current) => stepFrom(p, current, COUNT));
   });
 
   // How far the dial has turned, 0 to 1: the scroll when held, the picked step otherwise.

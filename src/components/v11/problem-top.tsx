@@ -1,7 +1,7 @@
 "use client";
 
 import { Container, Heading } from "@/components/system/primitives";
-import { PROBLEM } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { IconWell, useIconTurns } from "./icon-well";
 import type { IconName } from "./icons";
@@ -15,8 +15,11 @@ import type { IconName } from "./icons";
   It is what the hero zooms into (hero.tsx), so it fills one screen and stands in the middle of it, on the page's
   background. It has no entrance of its own: arriving out of the depth is its entrance. `active` is true once it has
   arrived; only then do its icons play.
+
+  Round 5 (DE/EN): copy by language.
 */
 export function ProblemTop({ active = true }: { active?: boolean }) {
+  const { PROBLEM } = useCopy().site;
   return (
     <div className="flex h-full items-center py-24 md:py-28">
       <Container>
@@ -41,6 +44,7 @@ export function ProblemTop({ active = true }: { active?: boolean }) {
 const FACT_ICONS: IconName[] = ["unplug", "layers", "hand"];
 
 function Facts({ active }: { active: boolean }) {
+  const { PROBLEM } = useCopy().site;
   const { area, well, trigger } = useIconTurns<HTMLDListElement>(PROBLEM.reality.length, active);
   return (
     <dl ref={area} className="grid grid-cols-3">

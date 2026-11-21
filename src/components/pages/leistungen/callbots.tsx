@@ -3,7 +3,7 @@
 import { Check, Pause, Play, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Section } from "@/components/system/primitives";
-import { CALLBOTS } from "@/content/pages/leistungen";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { DemoButton, ServiceText, useReducedMotion, useSeenOnce, useTabVisible } from "./shared";
 
@@ -14,10 +14,8 @@ import { DemoButton, ServiceText, useReducedMotion, useSeenOnce, useTabVisible }
   his transcript types out as his own demo types it, and the five topics of the chosen direction light up one by one
   like topics the engine detects. It plays once by itself when it first comes into view; pause, resume and restart
   are his own buttons. Reduced motion: no waveform motion; the transcript and topics appear complete.
+  Round 5 (DE/EN): copy by language (the English transcript types out within the same call length).
 */
-
-const E = CALLBOTS.engine;
-const TEXT = E.transcript;
 
 /** His demo types one character every 62ms. */
 const TYPE_MS = 62;
@@ -39,6 +37,7 @@ const BARS = Array.from({ length: 44 }, (_, i) => {
 type Phase = "ready" | "playing" | "paused" | "ended";
 
 export function CallbotsSection() {
+  const { CALLBOTS } = useCopy().leistungen;
   return (
     <Section id="callbots">
       <Container>
@@ -54,6 +53,8 @@ export function CallbotsSection() {
 }
 
 function VoiceEngine() {
+  const E = useCopy().leistungen.CALLBOTS.engine;
+  const TEXT = E.transcript;
   const box = useRef<HTMLDivElement>(null);
   const seen = useSeenOnce(box, 0.5);
   const reduced = useReducedMotion();

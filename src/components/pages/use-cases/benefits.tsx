@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useTransf
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { UC_BENEFITS } from "@/content/pages/use-cases";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 /*
@@ -19,9 +19,10 @@ import { cn } from "@/lib/utils";
   and haloed once reached). Text never takes the sky colour. Each axis title is a button whose name carries its line,
   so screen readers and the keyboard reach all six.
   Reduced motion and no script: the full shape, every point lit, the last benefit's line shown.
+  Round 5 (DE/EN): copy by language; the helpers below take the number of axes (one per benefit).
 */
 
-const ITEMS = UC_BENEFITS.items;
+type Benefit = { title: string; text: string };
 const R = 220;
 const BASE = 0.2;
 const angle = (i: number) => ((-90 + i * 60) * Math.PI) / 180;
@@ -33,10 +34,10 @@ const ease = (t: number) => 1 - (1 - t) ** 3;
 /** How far axis i has grown at progress p: each axis grows over 3/8 of the run, starting 1/8 after the one before. */
 const reach = (p: number, i: number) => ease(clamp01((p - i / 8) / (3 / 8)));
 /** How many axes have reached the rim (to the eye: the ease leaves the last 2% very slowly). */
-const reached = (p: number) => ITEMS.reduce((n, _, i) => n + (reach(p, i) >= 0.98 ? 1 : 0), 0);
+const reached = (p: number, axes: number) => Array.from({ length: axes }, (_, i) => i).reduce((n, i) => n + (reach(p, i) >= 0.98 ? 1 : 0), 0);
 
-const ring = (k: number) =>
-  ITEMS.map((_, i) => at(i, R * k))
+const ring = (k: number, axes: number) =>
+  Array.from({ length: axes }, (_, i) => at(i, R * k))
     .map(([x, y], i) => `${i ? "L" : "M"}${r1(x)} ${r1(y)}`)
     .join(" ") + " Z";
 
@@ -49,6 +50,9 @@ const wedge = (i: number) => {
 };
 
 export function BenefitsSection() {
+  const { UC_BENEFITS } = useCopy().useCases;
+  const ITEMS: Benefit[] = UC_BENEFITS.items;
+  const AXES = ITEMS.length;
   const chart = useRef<HTMLDivElement>(null);
   const progress = useSectionProgress(chart, ["start 85%", "end 40%"]);
   // The server and reduced motion draw the finished chart; the scroll takes over after mount.
@@ -58,7 +62,7 @@ export function BenefitsSection() {
     const scrolled = progress.get();
     return live.get() ? scrolled : 1;
   });
-  const [count, setCount] = useState(ITEMS.length);
+  const [count, setCount] = useState(AXES);
   const [hover, setHover] = useState<number | null>(null);
   const [picked, setPicked] = useState<{ axis: number; count: number } | null>(null);
 
@@ -67,7 +71,7 @@ export function BenefitsSection() {
   }, [live]);
 
   useMotionValueEvent(p, "change", (v) => {
-    const next = reached(v);
+    const next = reached(v, AXES);
     setCount((prev) => (prev === next ? prev : next));
   });
 
@@ -93,7 +97,7 @@ export function BenefitsSection() {
             <p data-reveal="up" data-rd="2" className="t-lead mt-6 max-w-[520px]">
               {UC_BENEFITS.text}
             </p>
-            <Reading active={active} className="mt-12 hidden xl:block" />
+            <Reading items={ITEMS} active={active} className="mt-12 hidden xl:block" />
           </div>
 
           <div className="xl:order-1 xl:col-span-7">
@@ -101,15 +105,15 @@ export function BenefitsSection() {
               <svg viewBox="-300 -300 600 600" aria-hidden focusable="false" className="uc-radar-svg">
                 <g fill="none" stroke="#ffffff">
                   {[0.25, 0.5, 0.75].map((k) => (
-                    <path key={k} d={ring(k)} strokeOpacity="0.08" />
+                    <path key={k} d={ring(k, AXES)} strokeOpacity="0.08" />
                   ))}
-                  <path d={ring(1)} strokeOpacity="0.2" />
+                  <path d={ring(1, AXES)} strokeOpacity="0.2" />
                   {ITEMS.map((_, i) => {
                     const [x, y] = at(i, R);
                     return <path key={i} d={`M0 0 L${r1(x)} ${r1(y)}`} strokeOpacity={i === active ? 0.45 : 0.1} className="uc-radar-spoke" />;
                   })}
                 </g>
-                <path d={ring(BASE)} fill="none" stroke="#dcecff" strokeOpacity="0.22" strokeDasharray="2 5" />
+                <path d={ring(BASE, AXES)} fill="none" stroke="#dcecff" strokeOpacity="0.22" strokeDasharray="2 5" />
                 <motion.polygon points={points} fill="#69bff8" fillOpacity="0.13" stroke="#69bff8" strokeWidth="2" strokeLinejoin="round" />
                 {ITEMS.map((_, i) => (
                   <Vertex key={i} index={i} p={p} lit={i < count} active={i === active} />
@@ -149,7 +153,7 @@ export function BenefitsSection() {
                 );
               })}
             </div>
-            <Reading active={active} className="mx-auto mt-8 max-w-[520px] md:mt-12 xl:hidden" />
+            <Reading items={ITEMS} active={active} className="mx-auto mt-8 max-w-[520px] md:mt-12 xl:hidden" />
           </div>
         </div>
       </Container>
@@ -170,12 +174,12 @@ function Vertex({ index, p, lit, active }: { index: number; p: MotionValue<numbe
 }
 
 /** The benefit being read: his title and his line, one at a time. */
-function Reading({ active, className }: { active: number; className?: string }) {
-  const item = ITEMS[active];
+function Reading({ items, active, className }: { items: Benefit[]; active: number; className?: string }) {
+  const item = items[active];
   return (
     <div aria-hidden className={cn("uc-reading", className)}>
       <div className="uc-reading-steps">
-        {ITEMS.map((_, i) => (
+        {items.map((_, i) => (
           <span key={i} className={cn(i === active && "is-on")} />
         ))}
       </div>

@@ -6,6 +6,12 @@
   form"), so his "Direkter Kontakt" doors, his five questions and the closing call came off with their sections.
 */
 
+// The client's own page title and description from brandedgenius.de/kontakt/ (round 5: moved here from the page).
+export const KONTAKT_META = {
+  title: "Kontakt",
+  description: "Kontaktieren Sie Branded Genius für KI-Beratung, Automatisierung, Workshops und individuelle digitale Lösungen. Jetzt unverbindlich anfragen.",
+};
+
 export const KONTAKT_HERO = {
   title: "Lassen Sie uns über",
   accent: "Ihr Projekt sprechen.",

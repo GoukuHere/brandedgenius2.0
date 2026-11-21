@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { KW_MEDIA, KW_STEPS } from "@/content/pages/ki-workshop";
+import { useCopy, useWords } from "@/i18n/client";
 
 /*
   Ablauf: his five steps as a project plan (Gantt). Each step is a row: his number, title and line on the left, its bar
@@ -17,6 +17,7 @@ import { KW_MEDIA, KW_STEPS } from "@/content/pages/ki-workshop";
 
   Then his quote, large and calm, centred, with his small round portrait, name and role.
   Reduced motion: the plan stands complete.
+  Round 5 (DE/EN): copy by language, and the quote marks of each language.
 */
 
 // Each step's place on the plan as a share of the time line (start, end): staggered and overlapping.
@@ -29,7 +30,16 @@ const PLAN: [number, number][] = [
 ];
 const pad = (n: number) => String(n).padStart(2, "0");
 
+/* The marks around his quote (round 5, DE/EN): German low-high quotes, English curly ones (a display quote at 36px;
+   straight marks look like inch signs at that size). */
+const WORDS = {
+  de: { open: "„", close: "“" },
+  en: { open: "“", close: "”" },
+};
+
 export function KwSteps() {
+  const { KW_MEDIA, KW_STEPS } = useCopy().kiWorkshop;
+  const words = useWords(WORDS);
   const chart = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState(false);
   const last = KW_STEPS.items.length - 1;
@@ -84,9 +94,9 @@ export function KwSteps() {
         <figure className="mx-auto mt-24 max-w-[960px] text-center md:mt-32 lg:mt-36">
           <blockquote data-reveal="up" className="text-[23px] leading-[1.4] tracking-[-0.015em] text-balance text-white/90 sm:text-[30px] lg:text-[36px] lg:leading-[1.34]">
             <p>
-              <span className="text-sky">„</span>
+              <span className="text-sky">{words.open}</span>
               {KW_STEPS.quote}
-              <span className="text-sky">“</span>
+              <span className="text-sky">{words.close}</span>
             </p>
           </blockquote>
           <figcaption data-reveal="up" data-rd="2" className="mt-8 inline-flex items-center gap-4 text-left lg:mt-10">

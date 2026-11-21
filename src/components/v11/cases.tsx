@@ -5,7 +5,8 @@ import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } fr
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { getLenis } from "@/components/system/smooth-scroll";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { CASES } from "@/content/site";
+import type { CaseStudy } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { CaseArt, hasCaseArt } from "./case-art";
@@ -37,16 +38,15 @@ import { CountUp } from "./count";
   scroll and Lenis used to fight: on a slowed CPU the old click took 5.8s and stopped on the wrong card). Extra
   will-change layers for the cards were measured and made it slower, so there are none.
 
+  Round 5 (DE/EN): copy by language (useCopy); each case's photo and drawing are picked by its id, never its words.
+
   The pointer moves the point of view over the deck a little (its perspective origin). The cards move by transform
   and opacity only, each drawn on its own (no shared 3D space, so one never cuts through another). Every case is in
   the markup for screen readers as one list; the deck is hidden from them.
 */
 
-const ITEMS = CASES.items;
-const COUNT = ITEMS.length;
 const DWELL = 6000;
 const REST = 0.5; // steps of rest before the first card leaves and after the last one has arrived
-const UNITS = COUNT - 1 + 2 * REST;
 const EASE = [0.16, 1, 0.3, 1] as const;
 const PIN =
   "(prefers-reduced-motion: no-preference) and (min-width: 1024px) and (min-height: 640px), " +
@@ -121,7 +121,7 @@ function geoFor(): Geo {
   band between the label and the case. Telefonie keeps a picture (a person on a call, half human, half machine).
 */
 const PHOTOS: Record<string, { src: string; position?: string }> = {
-  Telefonie: { src: "/media/v11/cases/telefonie.webp" },
+  telefonie: { src: "/media/v11/cases/telefonie.webp" },
 };
 
 /** A result's figure as a share (0 to 1) and whether it is a cut ("−62%") or a gain ("+43%"). */
@@ -177,6 +177,10 @@ function pose(r: number, g: Geo) {
 const opacityAt = (r: number) => (r >= 0 ? clamp(1 - Math.max(0, r - 1) * 0.08, 0.5, 1) : clamp(1 + r * 1.6, 0, 1));
 
 export function CasesSection() {
+  const { CASES } = useCopy().site;
+  const ITEMS: CaseStudy[] = CASES.items;
+  const COUNT = ITEMS.length;
+  const UNITS = COUNT - 1 + 2 * REST;
   const runway = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const progress = useSectionProgress(runway, ["start start", "end end"]);
@@ -298,13 +302,13 @@ export function CasesSection() {
           <Container className="w-full">
             <div className="grid gap-y-7 sm:gap-y-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:items-center lg:gap-x-12 xl:gap-x-16">
               <div data-reveal="up" data-rd="2" className="hidden lg:block" {...hold}>
-                <AreaList {...timing} />
+                <AreaList items={ITEMS} {...timing} />
               </div>
               <div data-reveal="up" data-rd="2" {...hold}>
-                <Deck deck={deck} geo={geo} size={size} active={active} live={onScreen} />
+                <Deck items={ITEMS} deck={deck} geo={geo} size={size} active={active} live={onScreen} />
               </div>
               <div data-reveal="up" data-rd="3" className="lg:hidden" {...hold}>
-                <AreaGrid {...timing} />
+                <AreaGrid items={ITEMS} {...timing} />
               </div>
             </div>
           </Container>
@@ -349,7 +353,7 @@ function Line({ on, run, running, paused, onDone }: { on: boolean; run: number; 
 }
 
 /** Desktop: the six areas as a quiet list, a small number and the area, hairlines between. */
-function AreaList({ active, run, running, paused, onPick, onDone }: Timing) {
+function AreaList({ items: ITEMS, active, run, running, paused, onPick, onDone }: Timing & { items: CaseStudy[] }) {
   return (
     <ol role="list" className="border-t border-white/10">
       {ITEMS.map((item, i) => {
@@ -382,7 +386,7 @@ function AreaList({ active, run, running, paused, onPick, onDone }: Timing) {
 }
 
 /** Phones and tablets: the six areas as buttons in rows of three, the current one lit. */
-function AreaGrid({ active, run, running, paused, onPick, onDone }: Timing) {
+function AreaGrid({ items: ITEMS, active, run, running, paused, onPick, onDone }: Timing & { items: CaseStudy[] }) {
   return (
     <ol role="list" className="grid grid-cols-3 gap-2">
       {ITEMS.map((item, i) => {
@@ -410,7 +414,7 @@ function AreaGrid({ active, run, running, paused, onPick, onDone }: Timing) {
 }
 
 /** The deck (see above). Decorative for screen readers; the list after the section carries it. */
-function Deck({ deck, geo, size, active, live }: { deck: MotionValue<number>; geo: MotionValue<Geo>; size: Geo; active: number; live: boolean }) {
+function Deck({ items: ITEMS, deck, geo, size, active, live }: { items: CaseStudy[]; deck: MotionValue<number>; geo: MotionValue<Geo>; size: Geo; active: number; live: boolean }) {
   // The pointer moves the point of view a little: the perspective origin follows it on a soft spring.
   const ox = useMotionValue(50);
   const oy = useMotionValue(42);
@@ -447,7 +451,7 @@ function Card({
   live,
 }: {
   index: number;
-  item: (typeof ITEMS)[number];
+  item: CaseStudy;
   deck: MotionValue<number>;
   geo: MotionValue<Geo>;
   size: Geo;
@@ -470,15 +474,15 @@ function Card({
       style={{ transform, opacity, zIndex, width: size.w, height: size.h, top: `calc(50% + ${size.top}px)` }}
       className="v11-fan-layer"
     >
-      {PHOTOS[item.area] && (
+      {PHOTOS[item.id] && (
         <span aria-hidden className="v11-fan-photo">
           <Image
-            src={PHOTOS[item.area].src}
+            src={PHOTOS[item.id].src}
             alt=""
             fill
             sizes="(min-width: 1024px) 520px, (min-width: 640px) 440px, 90vw"
             className="object-cover"
-            style={{ objectPosition: PHOTOS[item.area].position ?? "50% 50%" }}
+            style={{ objectPosition: PHOTOS[item.id].position ?? "50% 50%" }}
           />
         </span>
       )}
@@ -488,7 +492,7 @@ function Card({
         <span className="text-[14px] leading-none font-medium tracking-[-0.005em] text-white sm:hidden">{item.area}</span>
         <span className="hidden text-[16px] leading-none font-medium tracking-[-0.005em] text-white sm:inline">{item.name}</span>
       </div>
-      {hasCaseArt(item.area) && <CaseArt area={item.area} play={on && live} />}
+      {hasCaseArt(item.id) && <CaseArt id={item.id} play={on && live} />}
       <motion.div style={{ opacity: detail }} className="v11-fan-detail">
         <p className="text-[17px] leading-[1.25] font-medium tracking-[-0.015em] text-balance text-white sm:text-[22px] lg:text-[24px]">{item.tagline}</p>
         <ul role="list" className="mt-3.5 grid gap-2.5 sm:mt-6 sm:grid-cols-3 sm:gap-5">

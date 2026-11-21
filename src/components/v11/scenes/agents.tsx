@@ -1,4 +1,5 @@
 import { CalendarDays, Contact, ListChecks, Mail, Receipt, type LucideIcon } from "lucide-react";
+import type { Locale } from "@/i18n/config";
 import { type Box, CheckBadge, Comet, flash, ink, Lines, Mark, Panel, Port, rise, type Scene, sky, SKY, Text, Well, Wire } from "./kit";
 
 /*
@@ -11,6 +12,8 @@ import { type Box, CheckBadge, Comet, flash, ink, Lines, Mark, Panel, Port, rise
   four German categories (CRM, Kalender, Projektmanagement, and the new Finanz-Tool) in place of the brand names, the
   blocks are larger, each carries one short line of what happens there, and the run reaches the systems in that
   order: the contact is created, the appointment booked, the task opened, the invoice prepared.
+
+  Round 5 (DE/EN): the words on the canvas come from WORDS, in the page's language.
 */
 
 const LOOP = 12.5;
@@ -28,14 +31,43 @@ const B = {
 };
 
 type Step = { name: string; line: string; icon: LucideIcon };
-const MAIL: Step = { name: "E-Mail", line: "Anfrage kommt an", icon: Mail };
-const AGENT_LINE = "Liest und sortiert die Anfrage";
-const TOOLS: Step[] = [
-  { name: "CRM", line: "Kontakt angelegt", icon: Contact },
-  { name: "Kalender", line: "Termin gebucht", icon: CalendarDays },
-  { name: "Projektmanagement", line: "Aufgabe erstellt", icon: ListChecks },
-  { name: "Finanz-Tool", line: "Rechnung vorbereitet", icon: Receipt },
-];
+type Label = { name: string; line: string };
+type Words = { mail: Label; agent: Label; tools: Label[]; process: string; systems: string };
+
+/** Every word on the canvas, per language: the trigger, the agent, the four systems in run order, the two groups. */
+const WORDS: Record<Locale, Words> = {
+  de: {
+    mail: { name: "E-Mail", line: "Anfrage kommt an" },
+    agent: { name: "KI-Agent", line: "Liest und sortiert die Anfrage" },
+    tools: [
+      { name: "CRM", line: "Kontakt angelegt" },
+      { name: "Kalender", line: "Termin gebucht" },
+      { name: "Projektmanagement", line: "Aufgabe erstellt" },
+      { name: "Finanz-Tool", line: "Rechnung vorbereitet" },
+    ],
+    process: "Prozess",
+    systems: "Systeme",
+  },
+  en: {
+    mail: { name: "Email", line: "Request comes in" },
+    agent: { name: "AI agent", line: "Reads and sorts the request" },
+    tools: [
+      { name: "CRM", line: "Contact created" },
+      { name: "Calendar", line: "Appointment booked" },
+      { name: "Project management", line: "Task created" },
+      { name: "Finance tool", line: "Invoice prepared" },
+    ],
+    process: "Process",
+    systems: "Systems",
+  },
+};
+const TOOL_ICONS: LucideIcon[] = [Contact, CalendarDays, ListChecks, Receipt];
+
+/** The blocks' steps in the given words: the trigger, then the four systems. */
+const steps = (words: Words): { mail: Step; tools: Step[] } => ({
+  mail: { ...words.mail, icon: Mail },
+  tools: words.tools.map((tool, i) => ({ ...tool, icon: TOOL_ICONS[i] })),
+});
 
 function run(t: number) {
   const keep = 1 - rise(t, B.reset[0], B.reset[1]);
@@ -101,7 +133,7 @@ function Spinner({ d, angle, on }: { d: number; angle: number; on: number }) {
   );
 }
 
-function Agent({ box, lit, thinking, done, size, mark, t }: { box: Box; lit: number; thinking: number; done: number; size: Size; mark: number; t: number }) {
+function Agent({ box, label, lit, thinking, done, size, mark, t }: { box: Box; label: Label; lit: number; thinking: number; done: number; size: Size; mark: number; t: number }) {
   const wide = size === WIDE_SIZE;
   return (
     <>
@@ -110,10 +142,10 @@ function Agent({ box, lit, thinking, done, size, mark, t }: { box: Box; lit: num
           <Mark h={mark} />
           <div className="min-w-0 flex-1">
             <p className="leading-none font-medium whitespace-nowrap" style={{ fontSize: size.name + 2, color: ink(0.97) }}>
-              KI-Agent
+              {label.name}
             </p>
             <p className="leading-none whitespace-nowrap" style={{ fontSize: size.line, marginTop: size.line * 0.55, color: done > 0.01 ? sky(0.55 + 0.45 * done) : ink(0.55) }}>
-              {AGENT_LINE}
+              {label.line}
             </p>
           </div>
           <Spinner d={wide ? 24 : 15} angle={t * 400} on={thinking} />
@@ -139,17 +171,18 @@ const WIDE_OUT = WIDE.tools.map((b) => {
   return `M${x0} ${MID}C${mid} ${MID} ${mid} ${y} ${x1} ${y}`;
 });
 
-function wide(t: number) {
+function wide(t: number, words: Words) {
   const s = run(t);
+  const { mail: MAIL, tools: TOOLS } = steps(words);
   return (
     <>
       {/* The canvas groups. */}
       <div className="absolute rounded-[24px]" style={{ left: 32, top: 132, width: 308, height: 172, boxShadow: `inset 0 0 0 1px ${ink(0.07)}` }} />
       <Text x={52} y={160} size={16}>
-        Prozess
+        {words.process}
       </Text>
       <Text x={1248} y={14} size={16} align="end">
-        Systeme
+        {words.systems}
       </Text>
 
       <Lines w={1280} h={480}>
@@ -164,7 +197,7 @@ function wide(t: number) {
       </Lines>
 
       <Node box={WIDE.mail} step={MAIL} lit={s.mail.lit} done={s.mail.done} size={WIDE_SIZE} />
-      <Agent box={WIDE.agent} lit={s.agent.lit} thinking={s.agent.thinking} done={s.agent.done} size={WIDE_SIZE} mark={34} t={t} />
+      <Agent box={WIDE.agent} label={words.agent} lit={s.agent.lit} thinking={s.agent.thinking} done={s.agent.done} size={WIDE_SIZE} mark={34} t={t} />
       {TOOLS.map((tool, i) => (
         <Node key={tool.name} box={WIDE.tools[i]} step={tool} lit={s.tools[i].lit} done={s.tools[i].done} size={WIDE_SIZE} />
       ))}
@@ -194,8 +227,9 @@ const SPINE_X = 26;
 const P_IN = `M${SPINE_X} ${PHONE.mail.y + PHONE.mail.h}V${PHONE.agent.y}`;
 const PHONE_OUT = PHONE.tools.map((b) => `M${SPINE_X} ${PHONE.agent.y + PHONE.agent.h}V${b.y + b.h / 2}H${b.x}`);
 
-function phone(t: number) {
+function phone(t: number, words: Words) {
   const s = run(t);
+  const { mail: MAIL, tools: TOOLS } = steps(words);
   return (
     <>
       <Lines w={340} h={432}>
@@ -209,7 +243,7 @@ function phone(t: number) {
         ))}
       </Lines>
       <Node box={PHONE.mail} step={MAIL} lit={s.mail.lit} done={s.mail.done} size={PHONE_SIZE} />
-      <Agent box={PHONE.agent} lit={s.agent.lit} thinking={s.agent.thinking} done={s.agent.done} size={PHONE_SIZE} mark={20} t={t} />
+      <Agent box={PHONE.agent} label={words.agent} lit={s.agent.lit} thinking={s.agent.thinking} done={s.agent.done} size={PHONE_SIZE} mark={20} t={t} />
       {TOOLS.map((tool, i) => (
         <Node key={tool.name} box={PHONE.tools[i]} step={tool} lit={s.tools[i].lit} done={s.tools[i].done} size={PHONE_SIZE} />
       ))}
@@ -225,9 +259,10 @@ function phone(t: number) {
   );
 }
 
-export const AGENTS: Scene = {
+export const AGENTS: Scene<Words> = {
   loop: LOOP,
   still: 8,
+  words: WORDS,
   wide: { w: 1280, h: 480, draw: wide },
   phone: { w: 340, h: 432, draw: phone },
 };

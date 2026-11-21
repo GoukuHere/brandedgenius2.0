@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { KW_DEPARTMENTS } from "@/content/pages/ki-workshop";
+import { useCopy } from "@/i18n/client";
 
 /*
   Bereiche: an org chart. The root node is his "Fokusbereich für Ihr Team" and shows the department in focus with his
@@ -14,9 +14,9 @@ import { KW_DEPARTMENTS } from "@/content/pages/ki-workshop";
   turns. Phones: a vertical tree, a trunk down the left from the root with a short branch into each node.
   The lines are one SVG behind the nodes; their points are measured from the nodes themselves (ResizeObserver), so no
   width is assumed. Semantics: a tab list (the six departments) and its panel (the root).
+  Round 5 (DE/EN): copy by language.
 */
 
-const ITEMS = KW_DEPARTMENTS.items;
 const HOVER_INTENT_MS = 90;
 const TRUNK_X = 22; // phones: the trunk's distance from the left edge
 const r1 = (v: number) => Math.round(v * 10) / 10;
@@ -48,6 +48,8 @@ function branchSide(from: Point, to: Point) {
 }
 
 export function KwDepartments() {
+  const { KW_DEPARTMENTS } = useCopy().kiWorkshop;
+  const ITEMS = KW_DEPARTMENTS.items;
   const stage = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLDivElement>(null);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);

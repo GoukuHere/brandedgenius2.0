@@ -1,13 +1,16 @@
 import { Container, Heading, PrimaryLink } from "@/components/system/primitives";
-import { LINKS } from "@/content/site";
-import { UU_CTA } from "@/content/pages/uber-uns";
+import { getCopy } from "@/i18n/server";
 
 /*
   Über uns, the close: no panel, only type on the page's own ground under one soft local light. The client's heading
   centred, his paragraph, his booking button, and his reassurance as three short lines on one hairline that draws out
   from the middle: the two "Keine" lines quiet, the "Nur" line, the promise, in full white.
+  Round 5 (DE/EN): copy by language (the last line is the promise in both).
 */
-export function UberClosing() {
+export async function UberClosing() {
+  const copy = await getCopy();
+  const { UU_CTA } = copy.uberUns;
+  const { LINKS } = copy.site;
   return (
     <section id="kontakt-cta" className="relative isolate overflow-hidden py-16 md:py-24">
       <div
@@ -20,7 +23,8 @@ export function UberClosing() {
           {UU_CTA.text}
         </p>
         <div data-reveal="up" data-rd="3" className="mt-10 flex justify-center">
-          <PrimaryLink href={LINKS.booking} size="lg">
+          {/* Phones: slimmer padding, and the label may take two lines (it needed 333px of a 320px column at 360). */}
+          <PrimaryLink href={LINKS.booking} size="lg" className="max-sm:h-auto max-sm:min-h-14 max-sm:px-5 max-sm:py-3 max-sm:text-center max-sm:text-[15px] max-sm:whitespace-normal">
             {UU_CTA.cta}
           </PrimaryLink>
         </div>

@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { Container, Section } from "@/components/system/primitives";
 import { Reveal } from "@/components/system/reveal";
 import { Marquee } from "@/components/ui/marquee";
-import { PARTNERS } from "@/content/site";
+import { getCopy } from "@/i18n/server";
 
 /*
   Unsere Partner: the partners' own marks and names on a slow Magic UI Marquee, straight on the page background
@@ -12,6 +12,9 @@ import { PARTNERS } from "@/content/site";
 
   v11 round 4 (the client: "this is fine so far. It could be bigger"): marks 38px instead of 24, names 30px, both
   brighter, and "Unsere Partner" centred above the strip instead of beside it.
+
+  Round 5 (DE/EN): copy by language (getCopy). The marks are keyed by the partners' names, which are the same brand
+  names in both languages.
 */
 
 // Monochrome marks, turned white with brightness(0) invert(1). HighLevel has no mark and Zapier's only available file is
@@ -54,7 +57,8 @@ function Partner({ name }: { name: string }) {
   );
 }
 
-export function PartnersSection() {
+export async function PartnersSection() {
+  const { PARTNERS } = (await getCopy()).site;
   return (
     <Section id="partner" className="py-14 md:py-20">
       <Container>

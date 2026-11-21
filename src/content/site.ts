@@ -75,10 +75,10 @@ export const REALITY = {
   items: [
     { title: "Kein Fahrplan für KI", text: "Jedes Team testet eigene Tools. Niemand legt fest, was zuerst kommt.", img: "/media/reality/roadmap.webp" },
     { title: "Tools ohne Verbindung", text: "Ihr Team kopiert Daten von Hand zwischen CRM, E-Mail und Tabellen.", img: "/media/reality/tool-chaos.webp" },
-    { title: "Routinearbeit frisst Zeit", text: "Angebote, Rechnungen und Termine tippt Ihr Team weiter von Hand ab.", img: "/media/reality/manuell.webp" },
+    { title: "Routinearbeit kostet Zeit", text: "Ihr Team tippt Angebote, Rechnungen und Termine immer noch von Hand ein.", img: "/media/reality/manuell.webp" },
     { title: "Das Team ist unsicher", text: "Niemand weiß, welche Tools erlaubt sind. Also bleibt die KI liegen.", img: "/media/reality/unsicher.webp" },
-    { title: "Datenschutz kommt zu spät", text: "Kurz vor dem Start prüft jemand die Regeln. Dann steht das Projekt.", img: "/media/reality/datenschutz.webp" },
-    { title: "Der Nutzen bleibt unsichtbar", text: "Die KI läuft. Wie viel Zeit und Geld sie spart, misst niemand.", img: "/media/reality/kpis.webp" },
+    { title: "Datenschutz kommt zu spät", text: "Kurz vor dem Start prüft jemand die Regeln. Dann steht das Projekt still.", img: "/media/reality/datenschutz.webp" },
+    { title: "Niemand misst den Nutzen", text: "Die KI läuft. Wie viel Zeit und Geld sie spart, weiß niemand.", img: "/media/reality/kpis.webp" },
   ],
 };
 
@@ -202,6 +202,8 @@ export const SERVICES = {
 };
 
 export type CaseStudy = {
+  /** Stable key (round 5, DE/EN): the deck's photos and drawings are looked up by it, never by the shown words. */
+  id: string;
   area: string;
   /** Second line of the original tab label. */
   kind: string;
@@ -223,6 +225,7 @@ export const CASES = {
   toolsLabel: "Eingesetzte Tools",
   items: [
     {
+      id: "marketing",
       area: "Marketing",
       kind: "Automation",
       name: "Marketing Automation",
@@ -239,6 +242,7 @@ export const CASES = {
       tools: ["n8n", "Make", "Google Ads", "ActiveCampaign", "Zapier"],
     },
     {
+      id: "vertrieb",
       area: "Vertrieb",
       kind: "Automation",
       name: "Vertrieb Automation",
@@ -255,6 +259,7 @@ export const CASES = {
       tools: ["LinkedIn", "HubSpot", "Pipedrive", "Google Ads", "Custom CRM"],
     },
     {
+      id: "kundenservice",
       area: "Kundenservice",
       kind: "Chatbot",
       name: "Kundenservice Chatbot",
@@ -271,6 +276,7 @@ export const CASES = {
       tools: ["Intercom", "Zendesk", "HubSpot", "WhatsApp", "Slack"],
     },
     {
+      id: "backoffice",
       area: "Backoffice",
       kind: "Automation",
       name: "Backoffice Automation",
@@ -287,6 +293,7 @@ export const CASES = {
       tools: ["Zapier", "Slack", "Airtable", "Google Drive", "n8n"],
     },
     {
+      id: "telefonie",
       area: "Telefonie",
       kind: "AI Assistant",
       name: "Telefonie AI Assistant",
@@ -303,6 +310,7 @@ export const CASES = {
       tools: ["Twilio", "Vapi", "ElevenLabs", "HubSpot", "n8n"],
     },
     {
+      id: "crm",
       area: "CRM",
       kind: "Follow-up",
       name: "CRM Follow-up",
@@ -341,13 +349,14 @@ export const WHY = {
   accent: "Umsetzung ist besser.",
   text: "Wir denken nicht nur in Konzepten. Wir setzen um, automatisieren und liefern messbare Ergebnisse mit direkter Anbindung an Ihre Unternehmensführung.",
   center: { title: "Roman Tränkle & Team", text: "KI-Zentrum" },
+  // Each reason's id (round 5, DE/EN) places its tile and picks its picture; the shown words never do.
   reasons: [
-    { title: "Persönliche Experten-Positionierung", text: "Direkte Begleitung durch Roman Tränkle für eine glaubwürdige und wirksame Positionierung." },
-    { title: "Marketing & Vertriebs-Erfahrung", text: "Fundiertes Praxiswissen für kundenorientierte Vertriebs- und Marketingprozesse." },
-    { title: "KI-Automatisierung mit realem Business-Use", text: "Fokus auf rentable Prozesse, die spürbar Arbeitszeit einsparen und Umsatz hebeln." },
-    { title: "Beratung & Umsetzung aus einer Hand", text: "Strategie, Technologie und Realisierung nahtlos aus einer Hand gebündelt." },
-    { title: "Schnelle Pilotprojekte", text: "In wenigen Wochen vom Konzept zum messbar funktionierenden Piloten." },
-    { title: "Team-Workshops inklusive", text: "Praxisorientierte Schulungen zur nachhaltigen und sicheren Verankerung im Team." },
+    { id: "positionierung", title: "Persönliche Experten-Positionierung", text: "Direkte Begleitung durch Roman Tränkle für eine glaubwürdige und wirksame Positionierung." },
+    { id: "erfahrung", title: "Marketing & Vertriebs-Erfahrung", text: "Fundiertes Praxiswissen für kundenorientierte Vertriebs- und Marketingprozesse." },
+    { id: "business-use", title: "KI-Automatisierung mit realem Business-Use", text: "Fokus auf rentable Prozesse, die spürbar Arbeitszeit einsparen und Umsatz hebeln." },
+    { id: "aus-einer-hand", title: "Beratung & Umsetzung aus einer Hand", text: "Strategie, Technologie und Realisierung nahtlos aus einer Hand gebündelt." },
+    { id: "pilotprojekte", title: "Schnelle Pilotprojekte", text: "In wenigen Wochen vom Konzept zum messbar funktionierenden Piloten." },
+    { id: "workshops", title: "Team-Workshops inklusive", text: "Praxisorientierte Schulungen zur nachhaltigen und sicheren Verankerung im Team." },
   ],
 };
 
@@ -367,11 +376,12 @@ export const IMPACT = {
     metricLabel: "Prozess-Durchlaufzeit",
     metric: "−84%",
   },
+  // Each benefit's id (round 5, DE/EN) picks its photo; the shown words never do.
   benefits: [
-    { title: "Mehr Effizienz", text: "Repetitive Routineaufgaben entfallen – Ihr Team gewinnt wertvolle Zeit für Kernaufgaben." },
-    { title: "Schnellere Reaktionszeit", text: "Kundenanfragen und Leads werden in Sekundenschnelle automatisiert und verlässlich bearbeitet." },
-    { title: "Klareres Reporting", text: "Zentrale Leistungsdaten und Dashboards ermöglichen fundierte, transparente Unternehmensentscheidungen." },
-    { title: "Höhere Skalierbarkeit", text: "Automatisierte Workflows wachsen ohne zusätzliche Personalkosten flexibel mit Ihrem Geschäftsvolumen." },
+    { id: "effizienz", title: "Mehr Effizienz", text: "Repetitive Routineaufgaben entfallen – Ihr Team gewinnt wertvolle Zeit für Kernaufgaben." },
+    { id: "reaktionszeit", title: "Schnellere Reaktionszeit", text: "Kundenanfragen und Leads werden in Sekundenschnelle automatisiert und verlässlich bearbeitet." },
+    { id: "reporting", title: "Klareres Reporting", text: "Zentrale Leistungsdaten und Dashboards ermöglichen fundierte, transparente Unternehmensentscheidungen." },
+    { id: "skalierbarkeit", title: "Höhere Skalierbarkeit", text: "Automatisierte Workflows wachsen ohne zusätzliche Personalkosten flexibel mit Ihrem Geschäftsvolumen." },
   ],
   goal: {
     title: "KI, die echten",

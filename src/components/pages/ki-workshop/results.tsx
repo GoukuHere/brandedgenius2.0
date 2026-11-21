@@ -5,8 +5,7 @@ import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useT
 import { useEffect, useRef, useState } from "react";
 import { SCROLL_SPRING } from "@/components/sections/system-circuit";
 import { Container, Heading, PrimaryLink, Section } from "@/components/system/primitives";
-import { KW_RESULTS } from "@/content/pages/ki-workshop";
-import { LINKS } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 
 /*
   Ergebnisse: a course-progress composition. A large ring fills from 0 to 100% while the composition scrolls up the
@@ -18,10 +17,9 @@ import { LINKS } from "@/content/site";
   The progress is measured from the composition itself every frame (its top from 80% of the screen up to 24%, on phones
   14%), so it is complete while the whole composition is in view. Reduced motion: the ring stands full, every result
   ticked.
+  Round 5 (DE/EN): copy by language; the nodes are placed from the count of results.
 */
 
-const ITEMS = KW_RESULTS.items;
-const N = ITEMS.length;
 const pad = (n: number) => String(n).padStart(2, "0");
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
@@ -29,15 +27,23 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const C = 200;
 const R = 176;
 const DIAL = 191;
-const NODES = ITEMS.map((_, i) => {
-  const angle = ((i + 1) / N) * Math.PI * 2;
-  return { x: C + R * Math.sin(angle), y: C - R * Math.cos(angle) };
-});
+/** One node per result on the ring, the last where the ring closes at the top. */
+const nodesFor = (n: number) =>
+  Array.from({ length: n }, (_, i) => {
+    const angle = ((i + 1) / n) * Math.PI * 2;
+    return { x: C + R * Math.sin(angle), y: C - R * Math.cos(angle) };
+  });
 
-/** How many results the ring has reached at a progress (each one at its sixth of the ring). */
-const reached = (p: number) => ITEMS.filter((_, i) => p >= (i + 1) / N - 0.004).length;
+/** How many of n results the ring has reached at a progress (each one at its sixth of the ring). */
+const reached = (p: number, n: number) => Array.from({ length: n }, (_, i) => i).filter((i) => p >= (i + 1) / n - 0.004).length;
 
 export function KwResults() {
+  const copy = useCopy();
+  const { KW_RESULTS } = copy.kiWorkshop;
+  const { LINKS } = copy.site;
+  const ITEMS = KW_RESULTS.items;
+  const N = ITEMS.length;
+  const NODES = nodesFor(N);
   const stage = useRef<HTMLDivElement>(null);
   const live = useMotionValue(1);
   const [count, setCount] = useState(0);
@@ -58,7 +64,7 @@ export function KwResults() {
   // A round cap would leave a dot at the start while the arc is still empty.
   const arcOpacity = useTransform(() => (shown.get() > 0.004 ? 1 : 0));
 
-  useMotionValueEvent(shown, "change", (v) => setCount(reached(v)));
+  useMotionValueEvent(shown, "change", (v) => setCount(reached(v, N)));
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) live.set(0);

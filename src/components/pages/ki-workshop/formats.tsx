@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { KW_FORMATS, KW_MEDIA, type FormatKey } from "@/content/pages/ki-workshop";
+import type { FormatKey } from "@/content/pages/ki-workshop";
+import { useCopy } from "@/i18n/client";
 
 /*
   Formate: his four formats as a Venn diagram. Two large circles, "Vor-Ort-Workshop" and "Online-Seminar"; where they
@@ -19,9 +20,10 @@ import { KW_FORMATS, KW_MEDIA, type FormatKey } from "@/content/pages/ki-worksho
 
   The photos are Roman's: on site in a seminar room, online in his studio, both halves side by side for hybrid, and a
   tailored session with a small team.
+  Round 5 (DE/EN): copy by language; the regions and photos key on the format's key, never its name.
 */
 
-const ITEMS = KW_FORMATS.items;
+type Format = { key: FormatKey; title: string; label: string; text: string; alt: string };
 const HOVER_INTENT_MS = 90;
 
 type Point = { x: number; y: number };
@@ -127,8 +129,8 @@ function Diagram({
 }
 
 /** The photo for a format: Roman's own; for hybrid, the on-site and the online photo side by side. */
-function FormatPhoto({ index }: { index: number }) {
-  const item = ITEMS[index];
+function FormatPhoto({ item }: { item: Format }) {
+  const { KW_MEDIA } = useCopy().kiWorkshop;
   const sizes = "(min-width: 1280px) 490px, (min-width: 1024px) 38vw, calc(100vw - 40px)";
   if (item.key === "hybrid") {
     const half = "(min-width: 1280px) 245px, (min-width: 1024px) 19vw, 50vw";
@@ -148,6 +150,8 @@ function FormatPhoto({ index }: { index: number }) {
 }
 
 export function KwFormats() {
+  const { KW_FORMATS } = useCopy().kiWorkshop;
+  const ITEMS: Format[] = KW_FORMATS.items;
   const box = useRef<HTMLDivElement>(null);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const hover = useRef<number | undefined>(undefined);
@@ -277,7 +281,7 @@ export function KwFormats() {
                 className="kw-panel"
               >
                 <div className="frame relative aspect-[16/10] rounded-[22px]">
-                  <FormatPhoto index={i} />
+                  <FormatPhoto item={item} />
                 </div>
                 <h3 className="mt-6 text-[24px] leading-[1.2] font-medium tracking-[-0.015em] text-white lg:text-[26px]">{item.title}</h3>
                 <p className="mt-1.5 text-[14px] leading-snug text-sky">{item.label}</p>

@@ -3,7 +3,6 @@
 import { animate, motion, useMotionValue, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef } from "react";
 import { Tilt } from "@/components/ui/tilt";
-import { PROMISE } from "@/content/site";
 import { CountUp, RiseLetters } from "./count";
 import { PromiseArt } from "./promise-art";
 
@@ -26,10 +25,10 @@ import { PromiseArt } from "./promise-art";
   line drawing per figure (promise-art.tsx). Where the section pins, a figure's drawing draws over the first 70% of
   its own step, scroll-linked and reversible; elsewhere it draws over 1.9s each time its figure arrives. Reduced
   motion: every drawing stands complete.
+
+  Round 5 (DE/EN): the figures come in from the section (copy by language).
 */
 
-const FIGURES = PROMISE.figures;
-const STEPS = FIGURES.length;
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /** The value's full size; a value wider than the card ("3–6 Monate", "Nachhaltig") shrinks until it fits. */
@@ -43,9 +42,9 @@ const TILT_SPRING = { stiffness: 160, damping: 20, mass: 0.6 };
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
 
 /** v1's turn at a runway progress, from -1 to 1 (0 while a figure faces the reader). */
-function turnAt(progress: number) {
-  const x = Math.min(1, Math.max(0, progress)) * STEPS;
-  const step = Math.min(STEPS - 1, Math.floor(x));
+function turnAt(progress: number, steps: number) {
+  const x = Math.min(1, Math.max(0, progress)) * steps;
+  const step = Math.min(steps - 1, Math.floor(x));
   const t = x - step;
   // The side the card stands at when this step begins; the next step begins at the other side.
   const side = step % 2 === 0 ? -1 : 1;
@@ -61,11 +60,14 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const hasNumber = (value: string) => /\d/.test(value);
 
 export function PromiseCard({
+  figures,
   step,
   live,
   progress,
   scrollDriven,
 }: {
+  /** The section's figures, in the page's language. */
+  figures: readonly { value: string; label: string }[];
   step: number;
   live: boolean;
   /** The section's (smoothed) runway progress. */
@@ -73,11 +75,12 @@ export function PromiseCard({
   /** 1 where the section pins and the card turns with the scroll, 0 where it swings on its own. */
   scrollDriven: MotionValue<number>;
 }) {
+  const STEPS = figures.length;
   const valuesRef = useRef<HTMLDivElement>(null);
   const swing = useMotionValue(0);
   // Every source is read on every frame, so each stays subscribed whichever one drives the card.
   const turn = useTransform(() => {
-    const scrolled = turnAt(progress.get());
+    const scrolled = turnAt(progress.get(), STEPS);
     const timed = swing.get();
     return scrollDriven.get() ? scrolled : timed;
   });
@@ -150,14 +153,14 @@ export function PromiseCard({
           <div className="v11-promise-card relative aspect-[4/3] w-full overflow-hidden rounded-[24px] lg:aspect-[380/480] lg:w-[clamp(300px,24vw,380px)]">
             {/* The current figure's drawing in the lower half; the others wait, faded. */}
             <div className="absolute inset-x-0 bottom-0 grid h-[60%] px-7 pt-6 pb-7 sm:px-9 sm:pb-9">
-              {FIGURES.map((figure, i) => (
-                <ArtLayer key={figure.value} index={i} on={i === step} progress={progress} scrollDriven={scrollDriven} timed={timed} stepValue={stepValue} still={still} />
+              {figures.map((figure, i) => (
+                <ArtLayer key={figure.value} index={i} steps={STEPS} on={i === step} progress={progress} scrollDriven={scrollDriven} timed={timed} stepValue={stepValue} still={still} />
               ))}
             </div>
 
             {/* All four values share one cell; the current one stands, the others wait above or below, faded. */}
             <div ref={valuesRef} className="absolute inset-x-0 top-0 grid h-[40%] items-end px-7 pb-1 sm:px-9">
-              {FIGURES.map((figure, i) => {
+              {figures.map((figure, i) => {
                 const on = i === step;
                 return (
                   <motion.p
@@ -189,6 +192,7 @@ export function PromiseCard({
 
 function ArtLayer({
   index,
+  steps,
   on,
   progress,
   scrollDriven,
@@ -197,6 +201,7 @@ function ArtLayer({
   still,
 }: {
   index: number;
+  steps: number;
   on: boolean;
   progress: MotionValue<number>;
   scrollDriven: MotionValue<number>;
@@ -205,7 +210,7 @@ function ArtLayer({
   still: MotionValue<number>;
 }) {
   const draw = useTransform(() => {
-    const scrolled = clamp01((progress.get() * STEPS - index) / DRAW_SHARE);
+    const scrolled = clamp01((progress.get() * steps - index) / DRAW_SHARE);
     const current = stepValue.get();
     const arrived = index < current ? 1 : index > current ? 0 : timed.get();
     if (still.get()) return 1;

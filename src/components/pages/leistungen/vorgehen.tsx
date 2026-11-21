@@ -4,7 +4,8 @@ import { motion, useTransform, type MotionValue } from "motion/react";
 import { useRef, useSyncExternalStore, type CSSProperties } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { VORGEHEN } from "@/content/pages/leistungen";
+import type { Copy } from "@/content/copy";
+import { useCopy } from "@/i18n/client";
 import { useMedia, useReducedMotion } from "./shared";
 
 /*
@@ -15,9 +16,10 @@ import { useMedia, useReducedMotion } from "./shared";
 
   Phones: the staircase turned on its side: the phases stacked, each step reaching further out than the one before,
   so the right edge climbs out step by step; each step slides out as it scrolls in. Reduced motion: built.
+  Round 5 (DE/EN): copy by language.
 */
 
-const PHASES = VORGEHEN.phases;
+type Phase = Copy["leistungen"]["VORGEHEN"]["phases"][number];
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const easeOut = (t: number) => 1 - (1 - t) ** 3;
@@ -27,6 +29,8 @@ const subscribeNothing = () => () => {};
 const useMounted = () => useSyncExternalStore(subscribeNothing, () => true, () => false);
 
 export function VorgehenSection() {
+  const { VORGEHEN } = useCopy().leistungen;
+  const PHASES = VORGEHEN.phases;
   const stairs = useRef<HTMLOListElement>(null);
   const mounted = useMounted();
   const reduced = useReducedMotion();
@@ -65,7 +69,7 @@ function Step({
   still,
 }: {
   k: number;
-  phase: (typeof PHASES)[number];
+  phase: Phase;
   progress: MotionValue<number>;
   lg: boolean;
   /** Built and not moving: reduced motion, or the server's render. */

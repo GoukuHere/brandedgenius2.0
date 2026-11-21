@@ -9,13 +9,14 @@ import { MarketingSection } from "@/components/pages/leistungen/marketing";
 import { PotenzialSection } from "@/components/pages/leistungen/potenzial";
 import { VorgehenSection } from "@/components/pages/leistungen/vorgehen";
 import { SiteShell } from "@/components/site/site-shell";
+import { getCopy } from "@/i18n/server";
 import "@/components/pages/leistungen/leistungen.css";
 
-// The client's own page title and description from brandedgenius.de/leistungen/.
-export const metadata: Metadata = {
-  title: "KI-Leistungen & Automatisierung",
-  description: "Entdecken Sie die Leistungen von Branded Genius rund um KI-Agenten, Automatisierung, digitale Prozesse, Beratung und individuelle KI-Lösungen für Unternehmen.",
-};
+// The client's own page title and description from brandedgenius.de/leistungen/ (round 5, DE/EN: from the page's copy, by language).
+export async function generateMetadata(): Promise<Metadata> {
+  const { LEISTUNGEN_META } = (await getCopy()).leistungen;
+  return { title: LEISTUNGEN_META.title, description: LEISTUNGEN_META.description };
+}
 
 /*
   /leistungen: built 2026-11-16 from the client's own copy on brandedgenius.de/leistungen/, in sections that repeat nothing

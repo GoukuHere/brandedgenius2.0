@@ -4,7 +4,7 @@ import { motion, useMotionValue, useSpring, useTransform, type MotionValue } fro
 import { useEffect, useRef, useState } from "react";
 import { PrimaryLink } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { LINKS, WORKSHOP } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 
 /*
   v11 KI-Workshop topics, round 4b. The client found the first block "strange" (a lone label, a cycling line, every
@@ -18,9 +18,10 @@ import { LINKS, WORKSHOP } from "@/content/site";
   the pills' centres, measured (ResizeObserver, and again once the font is in), so no width is assumed.
 
   Reduced motion and no script: the line and every pill stand complete. Screen readers get the topics as a list.
+
+  Round 5 (DE/EN): copy by language (useCopy).
 */
 
-const TOPICS = WORKSHOP.topics;
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const r = (v: number) => Math.round(v * 10) / 10;
@@ -60,6 +61,8 @@ function segmentsFor(points: { x: number; y: number }[], wide: boolean) {
 }
 
 export function WorkshopTopics() {
+  const { WORKSHOP, LINKS } = useCopy().site;
+  const TOPICS = WORKSHOP.topics;
   const box = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const [geo, setGeo] = useState<Geo | null>(null);

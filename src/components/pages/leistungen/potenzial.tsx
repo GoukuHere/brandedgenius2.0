@@ -4,7 +4,7 @@ import { useMotionValueEvent } from "motion/react";
 import { useEffect, useRef, type CSSProperties } from "react";
 import { Container, Section } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { POTENZIAL } from "@/content/pages/leistungen";
+import { useCopy } from "@/i18n/client";
 import { keepCompounds, useReducedMotion } from "./shared";
 
 /*
@@ -15,13 +15,14 @@ import { keepCompounds, useReducedMotion } from "./shared";
 
   The scroll writes one number (--p, 0 to 1) on the heading; CSS turns it into each word's light (leistungen.css,
   "Potenzial"). Without script or with reduced motion the statement stands fully lit.
+  Round 5 (DE/EN): copy by language.
 */
 
-const WORDS = POTENZIAL.title.split(" ");
-/** The accent phrase takes two words' worth of the scroll to fill. */
-const UNITS = WORDS.length + 2;
-
 export function PotenzialSection() {
+  const { POTENZIAL } = useCopy().leistungen;
+  const words = POTENZIAL.title.split(" ");
+  /** The accent phrase takes two words' worth of the scroll to fill. */
+  const units = words.length + 2;
   const statement = useRef<HTMLHeadingElement>(null);
   const reduced = useReducedMotion();
   // From the statement's top at 92% of the screen until its foot passes 46%.
@@ -36,15 +37,15 @@ export function PotenzialSection() {
   return (
     <Section id="potenzial">
       <Container>
-        <h2 ref={statement} className="ls-statement ls-lit mx-auto max-w-[1180px] text-center" style={{ "--u": UNITS } as CSSProperties}>
-          {WORDS.map((word, i) => (
+        <h2 ref={statement} className="ls-statement ls-lit mx-auto max-w-[1180px] text-center" style={{ "--u": units } as CSSProperties}>
+          {words.map((word, i) => (
             <span key={`${word}-${i}`}>
               <span className="ls-lit-word" style={{ "--i": i } as CSSProperties}>
                 {word.includes("-") ? <span className="whitespace-nowrap">{word}</span> : word}
               </span>{" "}
             </span>
           ))}
-          <span className="accent ls-lit-accent" style={{ "--i": WORDS.length } as CSSProperties}>
+          <span className="accent ls-lit-accent" style={{ "--i": words.length } as CSSProperties}>
             {keepCompounds(POTENZIAL.accent)}
           </span>
         </h2>

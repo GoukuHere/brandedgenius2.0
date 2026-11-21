@@ -5,8 +5,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useId, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { PrimaryLink, SecondaryLink } from "@/components/system/primitives";
-import { UC_CASE, UC_ITEMS, type Project } from "@/content/pages/use-cases";
-import { LINKS } from "@/content/site";
+import type { Project } from "@/content/pages/use-cases";
+import { useCopy } from "@/i18n/client";
 import { caseStore } from "./case-store";
 import { CoverArt } from "./cover-art";
 
@@ -20,6 +20,7 @@ import { CoverArt } from "./cover-art";
   close it, and focus returns to the poster (or button) that opened it. The page is held while it is open: the body
   gets `overflow-hidden`, which SmoothScroll reads to stop Lenis, and the panel's own scroller is marked
   `data-lenis-prevent`. It is rendered into <body> inside a `.v11` box, so the site's v11 tokens and buttons apply.
+  Round 5 (DE/EN): copy by language (the portal keeps the page's language context).
 */
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -27,6 +28,7 @@ const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1
 const subscribeNever = () => () => {};
 
 export function CaseView() {
+  const { UC_ITEMS } = useCopy().useCases;
   const slug = useSyncExternalStore(caseStore.subscribe, caseStore.get, caseStore.getServer);
   const ready = useSyncExternalStore(subscribeNever, () => true, () => false);
   if (!ready) return null;
@@ -55,6 +57,9 @@ function keepFocus(event: KeyboardEvent, root: HTMLElement | null) {
 }
 
 function CaseDialog({ project }: { project: Project }) {
+  const copy = useCopy();
+  const { UC_CASE } = copy.useCases;
+  const { LINKS } = copy.site;
   const panel = useRef<HTMLDivElement>(null);
   const closer = useRef<HTMLButtonElement>(null);
   const titleId = useId();

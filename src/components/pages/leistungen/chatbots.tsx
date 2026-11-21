@@ -3,8 +3,8 @@
 import { ArrowUpRight, CalendarCheck, CalendarDays, CheckCheck, Headset, MessageCircle, RotateCcw, Wrench, type LucideIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Container, Section } from "@/components/system/primitives";
-import { CHATBOTS } from "@/content/pages/leistungen";
-import { LINKS } from "@/content/site";
+import type { Copy } from "@/content/copy";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { ServiceText, keepCompounds, useSeenOnce } from "./shared";
 
@@ -19,10 +19,11 @@ import { ServiceText, keepCompounds, useSeenOnce } from "./shared";
   The header carries his "Natürliche 24/7-Kundenkommunikation" as the bot's status line. No time stamps: a messenger
   sets them at 11px, under the site's 13px floor. Switching the channel or pressing reset starts the chat again (as
   his demo does).
+  Round 5 (DE/EN): copy by language.
 */
 
-const P = CHATBOTS.phone;
-type ReplyId = (typeof P.replies)[number]["id"];
+type Reply = Copy["leistungen"]["CHATBOTS"]["phone"]["replies"][number];
+type ReplyId = Reply["id"];
 
 const REPLY_ICONS: Record<ReplyId, LucideIcon> = {
   consulting: MessageCircle,
@@ -42,6 +43,7 @@ type Item =
 type Channel = 0 | 1;
 
 export function ChatbotsSection() {
+  const { CHATBOTS } = useCopy().leistungen;
   return (
     <Section id="chatbots">
       <Container>
@@ -65,6 +67,8 @@ export function ChatbotsSection() {
 }
 
 function ChatDemo() {
+  const { CHATBOTS } = useCopy().leistungen;
+  const P = CHATBOTS.phone;
   const box = useRef<HTMLDivElement>(null);
   const seen = useSeenOnce(box, 0.35);
   const timers = useRef<{ ids: number[]; next: number }>({ ids: [], next: 1 });
@@ -98,7 +102,7 @@ function ChatDemo() {
       setReplies(true);
       setBusy(false);
     }, 900);
-  }, [later, push, uid]);
+  }, [later, push, uid, P]);
 
   // The chat opens the first time the phone comes into view.
   useEffect(() => {
@@ -112,7 +116,7 @@ function ChatDemo() {
     return () => list.ids.forEach((id) => window.clearTimeout(id));
   }, []);
 
-  const choose = (reply: (typeof P.replies)[number]) => {
+  const choose = (reply: Reply) => {
     if (busy) return;
     setBusy(true);
     setReplies(false);
@@ -239,6 +243,9 @@ function Row({
   onPick: (slotsId: number, time: string) => void;
   busy: boolean;
 }) {
+  const copy = useCopy();
+  const P = copy.leistungen.CHATBOTS.phone;
+  const { LINKS } = copy.site;
   switch (item.kind) {
     case "typing":
       return (

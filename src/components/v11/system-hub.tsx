@@ -6,7 +6,8 @@ import { Container, Heading, PrimaryLink, Section } from "@/components/system/pr
 import { Reveal } from "@/components/system/reveal";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { BorderBeam } from "@/components/ui/border-beam";
-import { LINKS, SYSTEM } from "@/content/site";
+import type { SYSTEM } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import {
   DOT_R,
@@ -56,13 +57,15 @@ import {
   late". So the hub is v1's again, now only the bG mark in a square panel; the four qualities moved up beside the
   heading, filling its empty right side; and the circuit draws as the stage comes in, complete before the hub
   reaches the middle of the screen.
+
+  Round 5 (DE/EN): copy by language. The groups come from the page's copy; their count (eight, four per side) is the
+  drawing's, the same in both languages.
 */
 
 type Group = (typeof SYSTEM.nodes)[number];
 
-const NODES = SYSTEM.nodes;
-const COUNT = NODES.length;
-/** Groups per side of the hub. */
+/** Tool groups on the stage, and per side of the hub. */
+const COUNT = 8;
 const SIDE = COUNT / 2;
 
 // A no-break space before each dot keeps the dot on its tool's line when the list wraps.
@@ -103,6 +106,8 @@ const LAYERS = [
 type Layer = (typeof LAYERS)[number];
 
 export function SystemSection() {
+  const { LINKS, SYSTEM } = useCopy().site;
+  const NODES = SYSTEM.nodes;
   const diagram = useRef<HTMLDivElement>(null);
   const traces = useTraces(diagram);
   const lg = useLg();
@@ -252,6 +257,7 @@ function Hub() {
 /* The four qualities, beside the heading on lg (two by two), under it on phones and tablets. Each hangs from a short
    trace, as v1 drew them under the hub. */
 function Qualities() {
+  const { SYSTEM } = useCopy().site;
   return (
     <ul role="list" data-reveal="up" data-rd="3" className="mt-12 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:mt-0 lg:gap-y-10">
       {SYSTEM.qualities.map((quality) => (

@@ -7,7 +7,8 @@ import { Container, Section } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
 import { InView } from "@/components/ui/in-view";
 import { TextEffect } from "@/components/ui/text-effect";
-import { WHY } from "@/content/site";
+import type * as Site from "@/content/site";
+import { useCopy, useWords } from "@/i18n/client";
 import { Tile } from "./bento";
 import { Clip } from "./clip";
 import { IconWell, useIconTurns } from "./icon-well";
@@ -25,6 +26,9 @@ import type { IconName } from "./icons";
   - Marketing & Vertriebs-Erfahrung: Roman in a client meeting (his own photo).
   - Team-Workshops inklusive: Roman leading a team session (his own photo).
   Desktop: four columns, the Roman tile two rows tall, the clip two columns wide. Phones: two columns in reading order.
+
+  Round 5 (DE/EN): copy by language (useCopy, the photo's alt in WORDS); each tile's medium and place are keyed by the
+  reason's id (content/site.ts WHY.reasons), never by its words.
 */
 type ReasonMedia =
   | { kind: "photo"; src: string; position?: string }
@@ -32,29 +36,28 @@ type ReasonMedia =
   | { kind: "icon"; icon: IconName }
   | { kind: "text" };
 const REASON_MEDIA: Record<string, ReasonMedia> = {
-  "Persönliche Experten-Positionierung": { kind: "photo", src: "/media/photos/roman-standing.webp", position: "50% 20%" },
-  "Marketing & Vertriebs-Erfahrung": { kind: "photo", src: "/media/photos/roman-consult.webp", position: "50% 35%" },
-  "KI-Automatisierung mit realem Business-Use": { kind: "clip", src: "/media/v11/clips/arbeit.mp4", poster: "/media/v11/clips/arbeit-poster.webp" },
-  "Beratung & Umsetzung aus einer Hand": { kind: "text" },
-  "Schnelle Pilotprojekte": { kind: "icon", icon: "rocket" },
-  "Team-Workshops inklusive": { kind: "photo", src: "/media/photos/roman-meeting.webp", position: "50% 30%" },
+  positionierung: { kind: "photo", src: "/media/photos/roman-standing.webp", position: "50% 20%" },
+  erfahrung: { kind: "photo", src: "/media/photos/roman-consult.webp", position: "50% 35%" },
+  "business-use": { kind: "clip", src: "/media/v11/clips/arbeit.mp4", poster: "/media/v11/clips/arbeit-poster.webp" },
+  "aus-einer-hand": { kind: "text" },
+  pilotprojekte: { kind: "icon", icon: "rocket" },
+  workshops: { kind: "photo", src: "/media/photos/roman-meeting.webp", position: "50% 30%" },
 };
 /* Reading order on phones, and each tile's place in the desktop grid (four columns, two rows). */
-const REASON_ORDER = [
-  "Persönliche Experten-Positionierung",
-  "Schnelle Pilotprojekte",
-  "Beratung & Umsetzung aus einer Hand",
-  "KI-Automatisierung mit realem Business-Use",
-  "Marketing & Vertriebs-Erfahrung",
-  "Team-Workshops inklusive",
-];
+const REASON_ORDER = ["positionierung", "pilotprojekte", "aus-einer-hand", "business-use", "erfahrung", "workshops"];
 const REASON_PLACE: Record<string, string> = {
-  "Persönliche Experten-Positionierung": "row-span-2 min-h-[340px] lg:col-start-1 lg:row-start-1 lg:min-h-0",
-  "KI-Automatisierung mit realem Business-Use": "col-span-2 aspect-[16/9] lg:col-start-2 lg:col-end-4 lg:row-start-1 lg:aspect-auto",
-  "Schnelle Pilotprojekte": "min-h-[164px] lg:col-start-4 lg:row-start-1",
-  "Beratung & Umsetzung aus einer Hand": "min-h-[164px] lg:col-start-2 lg:row-start-2",
-  "Marketing & Vertriebs-Erfahrung": "aspect-[4/5] lg:col-start-3 lg:row-start-2 lg:aspect-auto",
-  "Team-Workshops inklusive": "aspect-[4/5] lg:col-start-4 lg:row-start-2 lg:aspect-auto",
+  positionierung: "row-span-2 min-h-[340px] lg:col-start-1 lg:row-start-1 lg:min-h-0",
+  "business-use": "col-span-2 aspect-[16/9] lg:col-start-2 lg:col-end-4 lg:row-start-1 lg:aspect-auto",
+  pilotprojekte: "min-h-[164px] lg:col-start-4 lg:row-start-1",
+  "aus-einer-hand": "min-h-[164px] lg:col-start-2 lg:row-start-2",
+  erfahrung: "aspect-[4/5] lg:col-start-3 lg:row-start-2 lg:aspect-auto",
+  workshops: "aspect-[4/5] lg:col-start-4 lg:row-start-2 lg:aspect-auto",
+};
+type Reason = (typeof Site.WHY.reasons)[number];
+
+const WORDS = {
+  de: { teamAlt: "Roman Tränkle und das Team von Branded Genius" },
+  en: { teamAlt: "Roman Tränkle and the Branded Genius team" },
 };
 
 /*
@@ -243,6 +246,8 @@ const STAGGER: { hidden: Variant; visible: Variant } = {
 const VIEW = { once: true, margin: "0px 0px -10% 0px" } as const;
 
 export function WhySection() {
+  const { WHY } = useCopy().site;
+  const words = useWords(WORDS);
   const runway = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const column = useRef<HTMLDivElement>(null);
@@ -322,7 +327,7 @@ export function WhySection() {
   });
   const veil = useTransform(() => VEIL * (1 - open.get()));
   const { area: iconArea, well: iconWell, trigger: iconTrigger } = useIconTurns<HTMLUListElement>(1);
-  const reasons = REASON_ORDER.map((title) => WHY.reasons.find((r) => r.title === title)).filter((r): r is (typeof WHY.reasons)[number] => Boolean(r));
+  const reasons = REASON_ORDER.map((id) => WHY.reasons.find((r) => r.id === id)).filter((r): r is Reason => Boolean(r));
 
   return (
     <Section id="ueber-uns" className="why-section">
@@ -367,7 +372,7 @@ export function WhySection() {
                     >
                       <Image
                         src="/media/photos/team.webp"
-                        alt="Roman Tränkle und das Team von Branded Genius"
+                        alt={words.teamAlt}
                         fill
                         quality={85}
                         sizes="(max-aspect-ratio: 4/3) 134vh, 100vw"
@@ -399,9 +404,9 @@ export function WhySection() {
             className="mt-12 grid grid-cols-2 gap-3 sm:gap-4 md:mt-14 lg:grid-cols-4 lg:grid-rows-[repeat(2,minmax(232px,auto))]"
           >
             {reasons.map((reason) => {
-              const media = REASON_MEDIA[reason.title] ?? { kind: "text" };
+              const media = REASON_MEDIA[reason.id] ?? { kind: "text" };
               return (
-                <motion.li key={reason.title} variants={RISE} transition={{ duration: 0.7, ease: EASE }} className={REASON_PLACE[reason.title]}>
+                <motion.li key={reason.id} variants={RISE} transition={{ duration: 0.7, ease: EASE }} className={REASON_PLACE[reason.id]}>
                   {media.kind === "icon" ? (
                     <Tile className="h-full" layout="flex h-full flex-col justify-between gap-8 p-5 sm:p-7" bind={iconTrigger(0)}>
                       <IconWell ref={iconWell(0)} name={media.icon} />

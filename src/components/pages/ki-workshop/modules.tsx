@@ -3,7 +3,7 @@
 import { Check, Plus, X } from "lucide-react";
 import { useId, useRef, useState, type MouseEvent } from "react";
 import { Container, Heading, PrimaryLink, Section } from "@/components/system/primitives";
-import { KW_MODULES } from "@/content/pages/ki-workshop";
+import { useCopy } from "@/i18n/client";
 
 /*
   Themen: a working module picker. His six topics are toggle keys (buttons with aria-pressed): a chosen key lights
@@ -14,19 +14,20 @@ import { KW_MODULES } from "@/content/pages/ki-workshop";
 
   Desktop: the keys in two columns on the left, the tray sticky on the right while the keys scroll past (inside this
   section only). Phones: one column of keys, the tray at the foot of the section.
+  Round 5 (DE/EN): copy by language; in English the subject and the module names are the English ones.
 */
 
-const ITEMS = KW_MODULES.items;
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /** The e-mail link for a choice: the subject and the module names, one per line, encoded for a mailto address. */
-function mailto(names: string[]) {
-  const { to, subject } = KW_MODULES.mail;
+function mailto({ to, subject }: { to: string; subject: string }, names: string[]) {
   if (!names.length) return `mailto:${to}`;
   return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(names.join("\r\n"))}`;
 }
 
 export function KwModules() {
+  const { KW_MODULES } = useCopy().kiWorkshop;
+  const ITEMS = KW_MODULES.items;
   const [picked, setPicked] = useState<number[]>([]);
   const keys = useRef<(HTMLButtonElement | null)[]>([]);
   const baseId = useId();
@@ -128,7 +129,7 @@ export function KwModules() {
               </div>
 
               <PrimaryLink
-                href={mailto(picked.map((i) => ITEMS[i].title))}
+                href={mailto(KW_MODULES.mail, picked.map((i) => ITEMS[i].title))}
                 className="kw-wrap-button mt-6 w-full [&_.specular-button__label]:w-full [&_.specular-button__label]:justify-between"
               >
                 {KW_MODULES.cta}

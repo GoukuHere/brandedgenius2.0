@@ -4,7 +4,7 @@ import { motion, useMotionValue, useSpring, useTransform, type MotionValue } fro
 import { useEffect, useRef, useState } from "react";
 import { Container, Heading } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { UU_MISSION } from "@/content/pages/uber-uns";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 /*
@@ -16,9 +16,9 @@ import { cn } from "@/lib/utils";
   Wide screens: the labels sit in three columns, each under its point, joined to it by a thin drop line (the higher the
   point, the longer the drop). Phones: the line runs across the top with numbered points, the three labels under it.
   The geometry is measured from the box (no width assumed). Reduced motion: the line stands complete.
+  Round 5 (DE/EN): copy by language.
 */
 
-const GOALS = UU_MISSION.goals;
 // The goals' places along the line, at the centres of three equal columns.
 const STOPS_T = [1 / 6, 1 / 2, 5 / 6];
 const SAMPLES = 72; // a multiple of 6, so each stop falls on a sample
@@ -68,6 +68,8 @@ function pointAt(geo: Geo, p: number) {
 }
 
 export function UberMission() {
+  const { UU_MISSION } = useCopy().uberUns;
+  const GOALS = UU_MISSION.goals;
   const chart = useRef<HTMLDivElement>(null);
   const plot = useRef<HTMLDivElement>(null);
   const [geo, setGeo] = useState<Geo | null>(null);

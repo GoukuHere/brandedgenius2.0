@@ -3,8 +3,8 @@
 import { Bot, MessageCircle, PhoneCall, Workflow, type LucideIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, type CSSProperties, type FocusEvent, type PointerEvent } from "react";
 import { Container, Heading, PrimaryLink, SecondaryLink } from "@/components/system/primitives";
-import { HERO, SERVICES, type ServiceId } from "@/content/pages/leistungen";
-import { LINKS } from "@/content/site";
+import type { ServiceId } from "@/content/pages/leistungen";
+import { useCopy } from "@/i18n/client";
 import { useOnScreen, useReducedMotion, useTabVisible } from "./shared";
 
 /*
@@ -22,6 +22,7 @@ import { useOnScreen, useReducedMotion, useTabVisible } from "./shared";
   two below; on phones the names on his own two lines, without the sub-lines), and the lights still run in. The
   orbit needs the width of a laptop to keep every pill clear of the core. Reduced motion: no orbit and no lights,
   the pills at their resting places.
+  Round 5 (DE/EN): copy by language.
 */
 
 const ICONS: Record<ServiceId, LucideIcon> = {
@@ -43,6 +44,9 @@ const EVERY = 3800;
 const TRAVEL = 1150;
 
 export function HeroSection() {
+  const copy = useCopy();
+  const { HERO } = copy.leistungen;
+  const { LINKS } = copy.site;
   return (
     <section id="hero" className="relative pt-[96px] pb-14 sm:pt-[124px] md:pt-[132px] md:pb-20">
       <Container>
@@ -73,6 +77,8 @@ export function HeroSection() {
 }
 
 function Engine() {
+  const { HERO, SERVICES } = useCopy().leistungen;
+  const count = SERVICES.length;
   const stage = useRef<HTMLDivElement>(null);
   const beam = useRef<HTMLSpanElement>(null);
   const spoke = useRef<HTMLSpanElement>(null);
@@ -143,7 +149,7 @@ function Engine() {
   useEffect(() => {
     if (!live) return undefined;
     const tick = () => {
-      fire(next.current % SERVICES.length);
+      fire(next.current % count);
       next.current += 1;
     };
     const first = window.setTimeout(tick, 1400);
@@ -152,7 +158,7 @@ function Engine() {
       window.clearTimeout(first);
       window.clearInterval(timer);
     };
-  }, [live, fire]);
+  }, [live, fire, count]);
 
   const onPointerEnter = (k: number) => (event: PointerEvent<HTMLAnchorElement>) => {
     if (event.pointerType === "mouse" && live) fire(k);

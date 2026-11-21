@@ -5,7 +5,7 @@ import { motion, useInView } from "motion/react";
 import Image from "next/image";
 import { useRef } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { IMPACT, LINKS } from "@/content/site";
+import { useCopy } from "@/i18n/client";
 import { Tile } from "./bento";
 import { Clip } from "./clip";
 import { CountUp } from "./count";
@@ -32,22 +32,28 @@ import { CountUp } from "./count";
   - the three principles are type alone: the word large, its "statt ..." quiet beside it, on hairlines;
   - the four benefits are photos (real Pexels photos, /media/v11/impact), each with its title on a dark foot;
   - the goal tile stays as it was (the client: fine).
+
+  Round 5 (DE/EN): copy by language (useCopy); each benefit's photo is keyed by its id, never by its title.
 */
 
 const BENEFIT_PHOTOS: Record<string, { src: string; position?: string }> = {
-  "Mehr Effizienz": { src: "/media/v11/impact/effizienz.webp" },
-  "Schnellere Reaktionszeit": { src: "/media/v11/impact/reaktionszeit.webp", position: "62% 40%" },
-  "Klareres Reporting": { src: "/media/v11/impact/reporting.webp", position: "35% 50%" },
-  "Höhere Skalierbarkeit": { src: "/media/v11/impact/skalierbarkeit.webp" },
+  effizienz: { src: "/media/v11/impact/effizienz.webp" },
+  reaktionszeit: { src: "/media/v11/impact/reaktionszeit.webp", position: "62% 40%" },
+  reporting: { src: "/media/v11/impact/reporting.webp", position: "35% 50%" },
+  skalierbarkeit: { src: "/media/v11/impact/skalierbarkeit.webp" },
 };
 const EASE = [0.16, 1, 0.3, 1] as const;
 const FILL = { duration: 1.4, delay: 0.2 };
 
-// The bar is drawn to the figure itself ("−84%" draws to 84%), so it stays honest if the figure ever changes.
-const parsed = Number.parseFloat(IMPACT.live.metric.replace(/[^\d.,]/g, "").replace(",", "."));
-const SHARE = Number.isFinite(parsed) ? Math.min(100, Math.max(0, parsed)) : null;
+/** The bar is drawn to the figure itself ("−84%" draws to 84%), so it stays honest if the figure ever changes. */
+function shareOf(metric: string) {
+  const parsed = Number.parseFloat(metric.replace(/[^\d.,]/g, "").replace(",", "."));
+  return Number.isFinite(parsed) ? Math.min(100, Math.max(0, parsed)) : null;
+}
 
 export function ImpactSection() {
+  const { IMPACT, LINKS } = useCopy().site;
+  const SHARE = shareOf(IMPACT.live.metric);
   const metric = useRef<HTMLDivElement>(null);
   const seen = useInView(metric, { once: true, margin: "0px 0px -15% 0px" });
 
@@ -93,9 +99,9 @@ export function ImpactSection() {
 
           {/* The four benefits: a photo each, the title on its dark foot. */}
           {IMPACT.benefits.map((benefit) => {
-            const photo = BENEFIT_PHOTOS[benefit.title];
+            const photo = BENEFIT_PHOTOS[benefit.id];
             return (
-              <Tile key={benefit.title} className="col-span-1 aspect-[4/5] lg:col-span-3 lg:aspect-[4/4.4]" layout="relative h-full overflow-hidden rounded-[24px]">
+              <Tile key={benefit.id} className="col-span-1 aspect-[4/5] lg:col-span-3 lg:aspect-[4/4.4]" layout="relative h-full overflow-hidden rounded-[24px]">
                 {photo && (
                   <Image
                     src={photo.src}

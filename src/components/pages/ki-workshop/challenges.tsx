@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
-import { KW_CHALLENGES } from "@/content/pages/ki-workshop";
+import { useCopy } from "@/i18n/client";
 
 /*
   Herausforderungen: his four challenges as four tiles in 3D that turn over one after another as they come into view.
@@ -14,6 +14,7 @@ import { KW_CHALLENGES } from "@/content/pages/ki-workshop";
 
   Desktop: four in a row, turning 260ms apart once the row is well in view. Phones: one column, each tile turns as it
   enters. A tile turns once and stays turned. Reduced motion: the turn is instant (the end state).
+  Round 5 (DE/EN): copy by language.
 */
 
 const STEP_MS = 260; // between two tiles
@@ -21,6 +22,7 @@ const BEAT_MS = 220; // after a tile is in view, before it turns
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export function KwChallenges() {
+  const { KW_CHALLENGES } = useCopy().kiWorkshop;
   const list = useRef<HTMLOListElement>(null);
   const [turned, setTurned] = useState<boolean[]>(() => KW_CHALLENGES.items.map(() => false));
 

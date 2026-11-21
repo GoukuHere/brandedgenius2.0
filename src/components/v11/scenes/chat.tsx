@@ -1,29 +1,57 @@
 import { Check } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
+import type { Locale } from "@/i18n/config";
 import { Comet, flash, Glyph, ink, INK, keepCompounds, Lines, Mark, NAVY, Panel, Port, rise, ROYAL, type Scene, SKY, sky, Text, Wire } from "./kit";
 
 /*
   KI-Chatbots: a chat widget qualifying a lead. The bot greets, the visitor taps a quick reply, the bot asks one
   question, the visitor taps again, the bot proposes the analysis appointment, and the qualified lead leaves the
   widget for lead qualification. On desktop the three channels the bot serves run into the widget from the left.
+
+  Round 5 (DE/EN): the conversation is scripted per language (CHAT_SCRIPT); the drawing gets the page language's.
 */
 
-/** Every word of the conversation, in one place. Drafts: the client still approves these lines. */
-export const CHAT_SCRIPT = {
-  brand: "Branded Genius",
-  greeting: "Willkommen bei Branded Genius. Worum geht es?",
-  topics: ["Website", "Support", "Kundenservice"],
-  /** The quick reply the visitor taps (an index into topics). */
-  topic: 2,
-  question: "Wie viele Anfragen erhalten Sie pro Woche?",
-  volumes: ["unter 100", "100 bis 500", "über 500"],
-  volume: 1,
-  closing: "Danke. Ich schlage Ihnen einen Termin für die KI-Potenzialanalyse vor.",
-  lead: "Lead qualifiziert",
+type Script = {
+  brand: string;
+  greeting: string;
+  topics: string[];
+  question: string;
+  volumes: string[];
+  closing: string;
+  lead: string;
   /** Where the lead goes (desktop), and the channels running in (desktop). */
-  destination: "Lead-Qualifizierung",
-  channels: ["Website", "Support", "Kundenservice"],
-} as const;
+  destination: string;
+  channels: string[];
+};
+
+/** Every word of the conversation, in one place, per language. Drafts: the client still approves these lines. */
+export const CHAT_SCRIPT: Record<Locale, Script> = {
+  de: {
+    brand: "Branded Genius",
+    greeting: "Willkommen bei Branded Genius. Worum geht es?",
+    topics: ["Website", "Support", "Kundenservice"],
+    question: "Wie viele Anfragen erhalten Sie pro Woche?",
+    volumes: ["unter 100", "100 bis 500", "über 500"],
+    closing: "Danke. Ich schlage Ihnen einen Termin für die KI-Potenzialanalyse vor.",
+    lead: "Lead qualifiziert",
+    destination: "Lead-Qualifizierung",
+    channels: ["Website", "Support", "Kundenservice"],
+  },
+  en: {
+    brand: "Branded Genius",
+    greeting: "Welcome to Branded Genius. What can we help with?",
+    topics: ["Website", "Support", "Customer care"],
+    question: "How many requests do you get each week?",
+    volumes: ["under 100", "100 to 500", "over 500"],
+    closing: "Thanks. Let me suggest a time for your AI potential analysis.",
+    lead: "Lead qualified",
+    destination: "Lead qualification",
+    channels: ["Website", "Support", "Customer care"],
+  },
+};
+/** The quick replies the visitor taps (indices into topics and volumes), the same in both languages. */
+const TOPIC = 2;
+const VOLUME = 1;
 
 const LOOP = 14;
 const B = {
@@ -140,7 +168,7 @@ function Chips({ options, pick, tap, leave, t, size }: { options: readonly strin
   );
 }
 
-function LeadCard({ size, wide }: { size: Size; wide: boolean }) {
+function LeadCard({ label, size, wide }: { label: string; size: Size; wide: boolean }) {
   const d = wide ? 22 : 18;
   return (
     <div
@@ -160,14 +188,13 @@ function LeadCard({ size, wide }: { size: Size; wide: boolean }) {
       <span className="grid place-items-center rounded-full" style={{ width: d, height: d, background: SKY }}>
         <Glyph icon={Check} size={Math.round(d * 0.62)} color={NAVY} style={{ strokeWidth: 2 }} />
       </span>
-      {CHAT_SCRIPT.lead}
+      {label}
     </div>
   );
 }
 
 /** The conversation at time t, oldest first; bottom-anchored, so new rows push the old ones up and out. */
-function conversation(t: number, size: Size, wide: boolean) {
-  const S = CHAT_SCRIPT;
+function conversation(t: number, S: Script, size: Size, wide: boolean) {
   const enter = (at: number) => rise(t, at, at + 0.45);
   const between = (from: number, to: number) => rise(t, from, from + 0.3) * (1 - rise(t, to - 0.05, to + 0.2));
   return (
@@ -178,11 +205,11 @@ function conversation(t: number, size: Size, wide: boolean) {
         </Bubble>
       </Row>
       <Row open={between(B.chips1, B.me1)} side="me" gap={size.gap}>
-        <Chips options={S.topics} pick={S.topic} tap={B.tap1} leave={B.me1} t={t} size={size} />
+        <Chips options={S.topics} pick={TOPIC} tap={B.tap1} leave={B.me1} t={t} size={size} />
       </Row>
       <Row open={enter(B.me1)} side="me" gap={size.gap}>
         <Bubble side="me" size={size}>
-          {S.topics[S.topic]}
+          {S.topics[TOPIC]}
         </Bubble>
       </Row>
       <Row open={enter(B.bot2)} side="bot" gap={size.gap}>
@@ -191,11 +218,11 @@ function conversation(t: number, size: Size, wide: boolean) {
         </Bubble>
       </Row>
       <Row open={between(B.chips2, B.me2)} side="me" gap={size.gap}>
-        <Chips options={S.volumes} pick={S.volume} tap={B.tap2} leave={B.me2} t={t} size={size} />
+        <Chips options={S.volumes} pick={VOLUME} tap={B.tap2} leave={B.me2} t={t} size={size} />
       </Row>
       <Row open={enter(B.me2)} side="me" gap={size.gap}>
         <Bubble side="me" size={size}>
-          {S.volumes[S.volume]}
+          {S.volumes[VOLUME]}
         </Bubble>
       </Row>
       <Row open={enter(B.bot3)} side="bot" gap={size.gap}>
@@ -206,7 +233,7 @@ function conversation(t: number, size: Size, wide: boolean) {
       {/* On phones the lead card closes the conversation; on desktop it leaves the widget instead. */}
       {wide ? null : (
         <Row open={enter(B.lead)} side="bot" gap={size.gap + 2}>
-          <LeadCard size={size} wide={false} />
+          <LeadCard label={S.lead} size={size} wide={false} />
         </Row>
       )}
       {/* The bot types before each of its lines; the dots sit below the newest row. */}
@@ -224,7 +251,7 @@ function conversation(t: number, size: Size, wide: boolean) {
 }
 
 /** The widget: header with the mark, the name and the online dot; the conversation under it. */
-function Widget({ x, y, w, h, t, wide }: { x: number; y: number; w: number; h: number; t: number; wide: boolean }) {
+function Widget({ x, y, w, h, t, script, wide }: { x: number; y: number; w: number; h: number; t: number; script: Script; wide: boolean }) {
   const size = wide ? WIDE_SIZE : PHONE_SIZE;
   const head = wide ? 64 : 44;
   const keep = 1 - rise(t, B.reset[0], B.reset[1]);
@@ -233,7 +260,7 @@ function Widget({ x, y, w, h, t, wide }: { x: number; y: number; w: number; h: n
       <div className="absolute inset-x-0 top-0 flex items-center" style={{ height: head, paddingInline: wide ? 20 : 14, gap: wide ? 12 : 9, boxShadow: `inset 0 -1px 0 ${ink(0.08)}` }}>
         <Mark h={wide ? 24 : 16} />
         <span className="leading-none font-medium whitespace-nowrap" style={{ fontSize: wide ? 17 : 13.5, color: ink(0.95) }}>
-          {CHAT_SCRIPT.brand}
+          {script.brand}
         </span>
         <span className="block rounded-full" style={{ width: wide ? 8 : 6, height: wide ? 8 : 6, background: SKY, boxShadow: `0 0 0 ${wide ? 3 : 2.5}px ${sky(0.18)}` }} />
       </div>
@@ -247,7 +274,7 @@ function Widget({ x, y, w, h, t, wide }: { x: number; y: number; w: number; h: n
           WebkitMaskImage: `linear-gradient(180deg, transparent 0, #000 ${wide ? 40 : 34}px)`,
         }}
       >
-        {conversation(t, size, wide)}
+        {conversation(t, script, size, wide)}
       </div>
     </Panel>
   );
@@ -262,7 +289,7 @@ const OUT = `M${W.x + W.w} 240H1196`;
 const CARD = { w: 206, from: W.x + W.w - 206, to: 964 };
 const LANDING = CARD.to + CARD.w / 2;
 
-function wide(t: number) {
+function wide(t: number, script: Script) {
   const keep = 1 - rise(t, B.reset[0], B.reset[1]);
   const go = rise(t, B.travel[0], B.travel[1]);
   const landed = rise(t, B.travel[1] - 0.1, B.travel[1] + 0.3) * keep;
@@ -271,44 +298,45 @@ function wide(t: number) {
     <>
       <Lines w={1280} h={480}>
         {IN.map((d, i) => (
-          <Wire key={d} d={d} done={i === CHAT_SCRIPT.topic ? flash(t, B.tap1 + 0.7, 0) : 0} />
+          <Wire key={d} d={d} done={i === TOPIC ? flash(t, B.tap1 + 0.7, 0) : 0} />
         ))}
         <Wire d={OUT} done={landed} />
-        <Comet d={IN[CHAT_SCRIPT.topic]} p={(t - B.tap1) / 0.8} />
+        <Comet d={IN[TOPIC]} p={(t - B.tap1) / 0.8} />
         <Comet d={OUT} p={(t - B.travel[0]) / (B.travel[1] - B.travel[0])} />
         {ROWS.map((y, i) => (
-          <Port key={y} cx={96} cy={y} r={4} on={i === CHAT_SCRIPT.topic ? flash(t, B.tap1, 0.0) : 0} />
+          <Port key={y} cx={96} cy={y} r={4} on={i === TOPIC ? flash(t, B.tap1, 0.0) : 0} />
         ))}
         <Port cx={1196} cy={240} r={4.5} on={landed} />
       </Lines>
-      {CHAT_SCRIPT.channels.map((text, i) => (
-        <Text key={text} x={96} y={ROWS[i] - 26} size={17} color={i === CHAT_SCRIPT.topic ? ink(0.6 + 0.35 * flash(t, B.tap1, 0)) : ink(0.6)}>
+      {script.channels.map((text, i) => (
+        <Text key={text} x={96} y={ROWS[i] - 26} size={17} color={i === TOPIC ? ink(0.6 + 0.35 * flash(t, B.tap1, 0)) : ink(0.6)}>
           {text}
         </Text>
       ))}
       <Text x={LANDING} y={294} size={17} align="middle" color={ink(0.6 + 0.35 * landed)}>
-        {CHAT_SCRIPT.destination}
+        {script.destination}
       </Text>
 
       {/* The lead card slides out from under the widget along the line. */}
       {lead > 0.01 ? (
         <div className="absolute" style={{ left: CARD.from + (CARD.to - CARD.from) * go, top: 240 - 24, opacity: lead }}>
-          <LeadCard size={WIDE_SIZE} wide />
+          <LeadCard label={script.lead} size={WIDE_SIZE} wide />
         </div>
       ) : null}
 
-      <Widget {...W} t={t} wide />
+      <Widget {...W} t={t} script={script} wide />
     </>
   );
 }
 
-function phone(t: number) {
-  return <Widget x={4} y={4} w={332} h={228} t={t} wide={false} />;
+function phone(t: number, script: Script) {
+  return <Widget x={4} y={4} w={332} h={228} t={t} script={script} wide={false} />;
 }
 
-export const CHAT: Scene = {
+export const CHAT: Scene<Script> = {
   loop: LOOP,
   still: 11.8,
+  words: CHAT_SCRIPT,
   wide: { w: 1280, h: 480, draw: wide },
   phone: { w: 340, h: 236, draw: phone },
 };

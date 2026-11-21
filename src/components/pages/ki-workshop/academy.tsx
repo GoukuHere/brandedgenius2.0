@@ -1,16 +1,19 @@
 import { Container, Heading, SecondaryLink, Section } from "@/components/system/primitives";
-import { KW_ACADEMY } from "@/content/pages/ki-workshop";
-import { LINKS } from "@/content/site";
+import { getCopy } from "@/i18n/server";
 
 /*
   KI-Akademie: one compact, quiet band. A single opaque navy plate with a royal light in its corner (the site's plate
   material); on large screens three parts in a row: his heading with his button at its foot, his paragraph, and his
   four advantages as a small numbered set. Phones: the same parts stacked, the button last. No photo and no motion of
   its own beyond the site's gentle rise: it is the pause between the trainer and the questions.
+  Round 5 (DE/EN): copy by language.
 */
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export function KwAcademy() {
+export async function KwAcademy() {
+  const copy = await getCopy();
+  const { KW_ACADEMY } = copy.kiWorkshop;
+  const { LINKS } = copy.site;
   return (
     <Section id="akademie">
       <Container>

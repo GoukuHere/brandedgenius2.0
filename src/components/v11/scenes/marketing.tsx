@@ -1,4 +1,5 @@
 import { Globe, Mail, MessageCircle, Send, type LucideIcon } from "lucide-react";
+import type { Locale } from "@/i18n/config";
 import { CheckBadge, easeInOut, Glyph, ink, lerp, Lines, prog, rise, type Scene, SKY, sky, Text, tint } from "./kit";
 
 /*
@@ -6,17 +7,29 @@ import { CheckBadge, easeInOut, Glyph, ink, lerp, Lines, prog, rise, type Scene,
   enter Leadgenerierung and move on alone, all in step, one to a column: at Kommunikation a message goes out (a small
   send mark), at Follow-ups the follow-up is done (a check), and they land at the top of CRM, whose count goes up by
   one. Under the board, Conversion steps up each time a lead lands.
+
+  Round 5 (DE/EN): the words on the board come from WORDS, in the page's language.
 */
 
+type Words = { columns: string[]; sources: string[]; conversion: string };
+
+/** Every word on the board, per language: the four columns, where each lead came from, the line's label. */
+const WORDS: Record<Locale, Words> = {
+  de: {
+    columns: ["Leadgenerierung", "Kommunikation", "Follow-ups", "CRM"],
+    sources: ["Website", "E-Mail", "WhatsApp", "Website", "E-Mail"],
+    conversion: "Conversion",
+  },
+  en: {
+    columns: ["Lead generation", "Outreach", "Follow-ups", "CRM"],
+    sources: ["Website", "Email", "WhatsApp", "Website", "Email"],
+    conversion: "Conversion",
+  },
+};
+
 const LOOP = 12;
-const COLUMNS = ["Leadgenerierung", "Kommunikation", "Follow-ups", "CRM"];
-const SOURCES: { name: string; icon: LucideIcon }[] = [
-  { name: "Website", icon: Globe },
-  { name: "E-Mail", icon: Mail },
-  { name: "WhatsApp", icon: MessageCircle },
-  { name: "Website", icon: Globe },
-  { name: "E-Mail", icon: Mail },
-];
+/** The leads' sources, by glyph (their names are in WORDS). */
+const SOURCES: { icon: LucideIcon }[] = [{ icon: Globe }, { icon: Mail }, { icon: MessageCircle }, { icon: Globe }, { icon: Mail }];
 /**
  * The board moves in steps, every `step` seconds from `first`: each lead moves on a column, all at once, and a new
  * lead enters Leadgenerierung just after the one before has left it.
@@ -110,7 +123,7 @@ function Card({ name, icon, send, check, lit, size }: { name: string; icon: Luci
 }
 
 /** The board: four columns with their counts and the leads on it, shifted left by `pan` stage pixels (phones). */
-function Board({ t, size, pan = 0, width }: { t: number; size: Size; pan?: number; width: number }) {
+function Board({ t, words, size, pan = 0, width }: { t: number; words: Words; size: Size; pan?: number; width: number }) {
   const keep = 1 - rise(t, B.reset[0], B.reset[1]);
   // The counts leave with the leads in the reset and come back (at zero) as the next story starts.
   const shown = Math.max(keep, t < B.reset[0] ? rise(t, 0, 0.3) : 0);
@@ -130,7 +143,7 @@ function Board({ t, size, pan = 0, width }: { t: number; size: Size; pan?: numbe
 
   return (
     <div className="absolute top-0 left-0 overflow-hidden" style={{ width, height: size.y0 + size.colH + 1 }}>
-      {COLUMNS.map((name, c) => {
+      {words.columns.map((name, c) => {
         const lit = c === 3 ? crmLit : 0;
         return (
           <div
@@ -179,7 +192,7 @@ function Board({ t, size, pan = 0, width }: { t: number; size: Size; pan?: numbe
         const fresh = 1 - prog(t, enterAt(i), enterAt(i) + 1);
         return (
           <div key={i} className="absolute" style={{ left: x, top: y, opacity: l.seen * keep, zIndex: l.moving ? 2 : 1 }}>
-            <Card name={SOURCES[i].name} icon={SOURCES[i].icon} send={l.send} check={l.check} lit={l.moving ? 1 : 0.6 * fresh} size={size} />
+            <Card name={words.sources[i]} icon={SOURCES[i].icon} send={l.send} check={l.check} lit={l.moving ? 1 : 0.6 * fresh} size={size} />
           </div>
         );
       })}
@@ -187,7 +200,7 @@ function Board({ t, size, pan = 0, width }: { t: number; size: Size; pan?: numbe
         const slot = k + makeRoom;
         return (
           <div key={`crm-${i}`} className="absolute" style={{ left: colX(3) + size.pad, top: slotY(slot), opacity: keep * (1 - prog(slot, slots - 1, slots - 0.4)) }}>
-            <Card name={SOURCES[i].name} icon={SOURCES[i].icon} send={1} check={1} lit={0.8 * (1 - prog(t, landedAt(i), landedAt(i) + 1.2))} size={size} />
+            <Card name={words.sources[i]} icon={SOURCES[i].icon} send={1} check={1} lit={0.8 * (1 - prog(t, landedAt(i), landedAt(i) + 1.2))} size={size} />
           </div>
         );
       })}
@@ -196,7 +209,7 @@ function Board({ t, size, pan = 0, width }: { t: number; size: Size; pan?: numbe
 }
 
 /** Conversion: a thin line drawn along the story's time, a step up each time a lead lands; its head is sky. */
-function Conversion({ t, x0, x1, base, step, labelX, labelY, font, w, h }: { t: number; x0: number; x1: number; base: number; step: number; labelX: number; labelY: number; font: number; w: number; h: number }) {
+function Conversion({ t, label, x0, x1, base, step, labelX, labelY, font, w, h }: { t: number; label: string; x0: number; x1: number; base: number; step: number; labelX: number; labelY: number; font: number; w: number; h: number }) {
   const keep = 1 - rise(t, B.reset[0], B.reset[1]);
   const end = B.reset[0];
   const xAt = (time: number) => x0 + (x1 - x0) * Math.min(1, time / end);
@@ -211,7 +224,7 @@ function Conversion({ t, x0, x1, base, step, labelX, labelY, font, w, h }: { t: 
   return (
     <>
       <Text x={labelX} y={labelY} size={font} color={ink(0.62)}>
-        Conversion
+        {label}
       </Text>
       <Lines w={w} h={h}>
         <path d={`M${x0} ${base}H${x1}`} fill="none" stroke={ink(0.16)} strokeWidth={1} strokeDasharray="2 5" />
@@ -224,11 +237,11 @@ function Conversion({ t, x0, x1, base, step, labelX, labelY, font, w, h }: { t: 
 
 const WIDE_SIZE: Size = { colW: 278, gap: 18, x0: 57, y0: 16, colH: 264, head: 60, cardH: 56, cardGap: 10, font: 17, head2: 17, count: 17, well: 32, glyph: 17, r: 18, pad: 12, badge: 26 };
 
-function wide(t: number) {
+function wide(t: number, words: Words) {
   return (
     <>
-      <Board t={t} size={WIDE_SIZE} width={1280} />
-      <Conversion t={t} x0={57} x1={1223} base={456} step={22} labelX={57} labelY={322} font={17} w={1280} h={480} />
+      <Board t={t} words={words} size={WIDE_SIZE} width={1280} />
+      <Conversion t={t} label={words.conversion} x0={57} x1={1223} base={456} step={22} labelX={57} labelY={322} font={17} w={1280} h={480} />
     </>
   );
 }
@@ -237,19 +250,20 @@ function wide(t: number) {
 const PHONE_SIZE: Size = { colW: 158, gap: 12, x0: 6, y0: 2, colH: 120, head: 34, cardH: 36, cardGap: 6, font: 13, head2: 12.5, count: 12, well: 24, glyph: 14, r: 14, pad: 8, badge: 19 };
 const PAN = PHONE_SIZE.colW + PHONE_SIZE.gap;
 
-function phone(t: number) {
+function phone(t: number, words: Words) {
   const step = (c: number) => easeInOut(prog(t, moveAt(0, c), moveAt(0, c) + B.move));
   const pan = (step(1) + step(2)) * (1 - easeInOut(prog(t, B.reset[0], B.reset[1] + 0.3)));
   return (
     <>
-      <Board t={t} size={PHONE_SIZE} pan={pan * PAN} width={340} />
-      <Conversion t={t} x0={98} x1={332} base={160} step={4} labelX={6} labelY={148} font={12.5} w={340} h={166} />
+      <Board t={t} words={words} size={PHONE_SIZE} pan={pan * PAN} width={340} />
+      <Conversion t={t} label={words.conversion} x0={98} x1={332} base={160} step={4} labelX={6} labelY={148} font={12.5} w={340} h={166} />
     </>
   );
 }
 
-export const MARKETING: Scene = {
+export const MARKETING: Scene<Words> = {
   loop: LOOP,
+  words: WORDS,
   // Every column holds a lead, the first has landed in CRM, and no card is moving.
   still: 4.9,
   wide: { w: 1280, h: 480, draw: wide },

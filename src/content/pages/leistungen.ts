@@ -7,6 +7,12 @@
 // The only strings that are not his: the weekday abbreviations and times of the chat's slot picker (the brief allows
 // weekdays and times there). Every accessible name is one of his own lines too.
 
+// Round 5 (DE/EN): the page's title and description, his own from brandedgenius.de/leistungen/ (moved here from the page).
+export const LEISTUNGEN_META = {
+  title: "KI-Leistungen & Automatisierung",
+  description: "Entdecken Sie die Leistungen von Branded Genius rund um KI-Agenten, Automatisierung, digitale Prozesse, Beratung und individuelle KI-Lösungen für Unternehmen.",
+};
+
 export const HERO = {
   title: "KI-Systeme, die natürlich kommunizieren und für",
   accent: "Ihr Unternehmen arbeiten",
@@ -216,6 +222,9 @@ export const ECOSYSTEM = {
     { name: "Vertriebsteam", platforms: [0, 9] },
   ],
   closing: "Statt isolierter Einzellösungen entsteht ein vernetztes, intelligent kommunizierendes Gesamtsystem.",
+  // Round 5 (DE/EN): the word of `closing` where its white-to-sky half starts (his line break), as an index, so the
+  // code keys on no text.
+  closingAccentAt: 5,
 };
 
 export const VORGEHEN = {
