@@ -42,6 +42,9 @@ const nextConfig: NextConfig = {
         { source: "/", destination: "/de" },
         { source: `/:page(${DE_PAGES.join("|")})`, destination: "/de/:page" },
         ...Object.entries(EN_SLUGS).map(([en, folder]) => ({ source: `/en/${en}`, destination: `/en/${folder}` })),
+        // Any other one-segment address would be taken for a language by app/[lang] and end in a blank error page:
+        // send it to an address no route matches, so app/global-not-found.tsx answers with its 404.
+        { source: "/:slug((?!de$|en$)[^/.]+)", destination: "/404/not-found" },
       ],
       afterFiles: [],
       fallback: [],

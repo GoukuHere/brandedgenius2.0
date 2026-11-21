@@ -70,12 +70,20 @@
 }
 
 /* ---------- The form panel: his LeadConnector form and our panel as one surface ---------- */
-/* The panel takes his form card's own colour (rgb 6 24 39), so the embedded card disappears into it. */
+/*
+  Round 5 (the client's Loom of 2026-11-18, V4 1:52: "instead of black, maybe ... transparent or something which is
+  fitting with the background"). The panel is glass now: a faint white veil and a hairline over the page. His form's
+  own card is dark (#061827, set in his LeadConnector builder, which this page cannot style), so the frame is blended
+  onto the panel with "lighten" (.kt-form-crop): each pixel shows whichever is lighter, his card or the page behind
+  it. The dark card gives way to the glass, while his white fields, white labels, blue button and dark field text
+  keep their own colours (all lighter than the glass, or drawn on his white fields).
+*/
 .kt-form-panel {
-  background: #061827;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.03));
   box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.1),
-    0 40px 90px -40px rgb(0 0 0 / 0.7);
+    inset 0 0 0 1px rgb(255 255 255 / 0.12),
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    0 40px 90px -40px rgb(0 0 0 / 0.6);
 }
 /* His card (#_builder-form inside the frame) draws a 1px white frame with 8px corners and a soft drop shadow. The crop
    hides them: 4px off both sides and, in his phone style, off the top (see the container query below), and 20px off the foot, where the frame and its shadow end (his button
@@ -84,6 +92,7 @@
 .kt-form-crop {
   overflow: hidden;
   container-type: inline-size;
+  mix-blend-mode: lighten;
 }
 .kt-form-frame {
   display: block;

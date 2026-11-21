@@ -515,6 +515,12 @@ body:has(.v11) {
   stroke-dasharray: 3 6;
   stroke-linecap: round;
 }
+/* The classic way's stations (round 5): hollow, grey, as quiet as its dashed line. */
+.v11-knot-node {
+  fill: #05112c;
+  stroke: rgb(150 149 149 / 0.85);
+  stroke-width: 1.5;
+}
 .v11-knot-x {
   fill: none;
   stroke: rgb(241 241 238 / 0.7);
@@ -643,6 +649,12 @@ body:has(.v11) {
 }
 
 /* The Problem photos fill the right of the panel and dissolve into its light towards the text (v2's). */
+/* The Problem photos fill the right of the panel and dissolve into its light towards the text (v2's). */
+.v11-photo-fade {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+}
+
 /* A story bar: fills over the reason's time on screen, then the next reason follows. */
 @keyframes v11-fill {
   from {
@@ -879,41 +891,13 @@ body:has(.v11) {
 /* ---------- Die Realität on the scroll (reasons.tsx, PIN) ---------- */
 
 /*
-  Round 5 (Roman: the heading should stay in the middle while the slides come up one after another). The heading and
-  the bars stand at the top of the stage; under them a window shows one slide, the next coming up from below as the
-  current one moves up and out (reasons.tsx moves them). The window clips them and softens its top and bottom edge.
-  Without the held stage (short windows) the window has a set height and the slides take turns on their own.
+  Round 5 (2026-11-21): a centred heading with the slides moving up through a window (Roman's Loom) was tried and
+  taken back on the developer's word ("it was good with the previous scrolling effect"); this is the previous block.
 */
-.v11-reasons-window {
-  height: 400px;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 5%, #000 95%, transparent 100%);
-  mask-image: linear-gradient(180deg, transparent 0, #000 5%, #000 95%, transparent 100%);
-}
-/* Phones: the picture above the text, taking what the text leaves. */
-.v11-slide {
-  grid-template-rows: minmax(0, 1fr) auto;
-  row-gap: 16px;
-  /* Clear of the window's soft edges (5% each), so a resting slide is never faded. */
-  padding: 14px 0 26px;
-}
-.v11-slide-photo {
-  min-height: 0;
-}
-@media (min-width: 768px) {
-  .v11-reasons-window {
-    height: 440px;
-  }
-  .v11-slide {
-    grid-template-rows: none;
-    padding: 6% 0;
-  }
-}
 
 /*
   Round 4 (the client: "step by step before it's going to the next section"): v2's held chapter. A runway with a
   one-screen sticky stage; the six reasons step with the scroll (about 40svh each). Same screens as the Versprechen.
-  Round 5: the stage is a column (heading, bars, window), and the window takes the height that is left.
 */
 @media (min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px) {
   .v11-reasons {
@@ -925,24 +909,22 @@ body:has(.v11) {
     position: sticky;
     top: 0;
     display: flex;
+    align-items: center;
     height: 100svh;
     padding-top: 72px;
   }
-  .v11-reasons-inner {
-    height: 100%;
-    padding-top: 36px;
-    padding-bottom: 36px;
-  }
-  .v11-reasons-window {
-    flex: 1 1 auto;
-    height: auto;
-    min-height: 0;
-  }
 }
-/* Phones on the stage: tighter gaps, so heading, bars and the slide fit a 667px screen. */
+/* Phones on the stage: a flatter photo and tighter gaps, so heading, photo, bars and reason fit a 667px screen. */
 @media (max-width: 767px) and (min-height: 600px) {
-  .v11-reasons-inner {
-    padding-top: 20px;
-    padding-bottom: 16px;
+  .v11-reasons-frame {
+    aspect-ratio: 16 / 9;
+    margin-top: 20px;
+  }
+  .v11-reasons-steps {
+    margin-top: 16px;
+  }
+  /* Room for the longest reason (two-line title, two-line text), so the stage never re-centres between reasons. */
+  .v11-reasons-steps > div:last-child {
+    min-height: 176px;
   }
 }

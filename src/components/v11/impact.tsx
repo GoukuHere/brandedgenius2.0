@@ -7,7 +7,6 @@ import { useRef } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { useCopy } from "@/i18n/client";
 import { Tile } from "./bento";
-import { Clip } from "./clip";
 import { CountUp } from "./count";
 
 /*
@@ -68,9 +67,13 @@ export function ImpactSection() {
         </div>
 
         <div data-reveal-group className="mt-12 grid grid-cols-2 gap-3 sm:gap-4 md:mt-16 lg:grid-cols-12">
-          {/* The worked example, over a live dashboard. */}
+          {/*
+            The worked example, over a dashboard. Round 5 (the client's Loom of 2026-11-18: "take a normal picture so
+            we are not to have too many videos ... the speed will be better"): a still picture in place of the clip
+            (the clip's own poster frame, until the picture made for this card replaces it).
+          */}
           <Tile featured className="col-span-2 min-h-[380px] lg:col-span-7 lg:row-span-2" layout="relative flex h-full flex-col justify-between gap-12 overflow-hidden rounded-[24px] p-7 sm:p-9 lg:p-10">
-            <Clip src="/media/v11/clips/reporting.mp4" poster="/media/v11/clips/reporting-poster.webp" className="opacity-60" />
+            <Image src="/media/v11/clips/reporting-poster.webp" alt="" fill sizes="(min-width: 1024px) 760px, 100vw" className="object-cover opacity-60" />
             <span aria-hidden className="absolute inset-0 bg-[linear-gradient(90deg,rgb(7_22_52/0.94)_0%,rgb(7_22_52/0.72)_55%,rgb(7_22_52/0.35)_100%),linear-gradient(0deg,rgb(7_22_52/0.85)_0%,rgb(7_22_52/0)_55%)]" />
             <div className="relative">
               <h3 className="t-h3">{IMPACT.live.title}</h3>

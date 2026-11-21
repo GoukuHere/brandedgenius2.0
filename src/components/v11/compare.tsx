@@ -37,7 +37,11 @@ type Layout = {
   w: number;
   h: number;
   start: Pt;
-  knot: Pt[];
+  /** The classic way's path, its stations (desktop) and the point where it breaks off with its X. */
+  classic: string;
+  classicNodes: Pt[];
+  classicPoints: Label[];
+  classicEnd: Pt;
   way: string;
   nodes: Pt[];
   end: Pt;
@@ -50,12 +54,13 @@ type Layout = {
 };
 
 /*
-  Desktop, round 5 (Roman, 2026-11-18: the bottom line is good; the classic way should match it, "maybe in the same
-  line ... it's not like looking equal"). The two ways now mirror each other around the shared start point: the
-  classic way rises as far (112) as the Branded Genius way falls, runs to the same end x and breaks off there with its
-  X; each way's name sits 22 above its own line at the same x (200), and each result sits 22 above its line,
-  right-aligned to the end (1170), with its mark. The tangle keeps clear of the two labels above it: it only leaves
-  its line upwards (to 52) between them.
+  Desktop, round 5 (Roman, 2026-11-18, V2 1:34: "the line below looks good ... on the up, the classic way ... make it
+  equal somehow, maybe in the same line ... same position, same space"; the developer: he liked the straight bottom
+  line, not the tangle). The two ways are twins around the shared start point: the classic way rises as far (112) as
+  the Branded Genius way falls, by the same curve, then runs straight to the same end x, through five stations at the
+  same x as the sky way's, each labelled with one of the classic way's points under its line; it ends in its X. Each
+  way's name sits 22 above its line at the same x (200), each result 22 above its line, right-aligned to the end
+  (1170), with its mark. What tells them apart: grey and dashed against sky and solid, an X against an arrival.
 */
 const START_Y = 174;
 const TOP_Y = START_Y - 112;
@@ -65,15 +70,10 @@ const DESK: Layout = {
   w: 1200,
   h: 352,
   start: [24, START_Y],
-  // A scribble, not a pattern: it climbs to its line, then loops of different sizes (two running back over it), a
-  // zigzag, one wide loop and a messy tail to the break.
-  knot: [
-    [24, 174], [60, 172], [92, 160], [116, 130], [140, 92], [164, 68], [200, 62], [250, 64], [290, 80], [312, 112],
-    [296, 138], [262, 134], [250, 106], [276, 82], [320, 70], [370, 64], [410, 74], [430, 100], [414, 122], [388, 116],
-    [384, 92], [408, 72], [452, 62], [490, 70], [516, 56], [540, 80], [566, 52], [592, 82], [618, 58], [646, 72],
-    [690, 64], [730, 84], [748, 120], [726, 150], [690, 144], [680, 112], [706, 86], [752, 70], [800, 64], [850, 70],
-    [880, 92], [902, 74], [930, 96], [956, 72], [990, 84], [1030, 66], [1070, 72], [1110, 60], [1140, 66], [1170, 62],
-  ],
+  classic: `M24 ${START_Y} C84 ${START_Y} 100 ${TOP_Y} 180 ${TOP_Y} L1170 ${TOP_Y}`,
+  classicNodes: [300, 490, 680, 870, 1060].map((x) => [x, TOP_Y] as Pt),
+  classicPoints: [300, 490, 680, 870, 1060].map((x) => ({ x, y: TOP_Y + 20, ax: "middle" as const, w: 172 })),
+  classicEnd: [1170, TOP_Y],
   way: `M24 ${START_Y} C84 ${START_Y} 100 ${BOT_Y} 180 ${BOT_Y} L1170 ${BOT_Y}`,
   nodes: [300, 490, 680, 870, 1060].map((x) => [x, BOT_Y] as Pt),
   end: [1170, BOT_Y],
@@ -85,35 +85,37 @@ const DESK: Layout = {
   points: [300, 490, 680, 870, 1060].map((x) => ({ x, y: BOT_Y + 20, ax: "middle" as const, w: 172 })),
 };
 
+/* Phones: from the shared start the classic way runs straight to the right and breaks off with its X, its result
+   under it; the Branded Genius way runs down the left through its points to its result (round 5: a straight dashed
+   line in place of the knot, as on desktop). */
 const PHONE: Layout = {
   w: 340,
-  h: 786,
+  h: 698,
   start: [10, 64],
-  knot: [
-    [10, 64], [40, 66], [74, 80], [96, 106], [90, 134], [66, 128], [72, 100], [108, 86], [150, 92], [172, 122],
-    [160, 156], [124, 158], [112, 128], [140, 100], [188, 84], [222, 96], [230, 122], [208, 134], [198, 110], [226, 88],
-    [262, 92], [278, 114], [292, 86], [306, 110], [322, 98],
-  ],
-  way: "M10 64 L10 748",
+  classic: "M10 64 L322 64",
+  classicNodes: [],
+  classicPoints: [],
+  classicEnd: [322, 64],
+  way: "M10 64 L10 660",
   nodes: [
-    [10, 336],
-    [10, 416],
-    [10, 496],
-    [10, 576],
-    [10, 656],
+    [10, 248],
+    [10, 328],
+    [10, 408],
+    [10, 488],
+    [10, 568],
   ],
-  end: [10, 748],
+  end: [10, 660],
   along: "y",
-  classicTitle: { x: 0, y: 0 },
-  classicResult: { x: 34, y: 186, w: 290 },
-  oursTitle: { x: 34, y: 268, ay: "middle" },
-  oursResult: { x: 34, y: 748, ay: "middle", w: 296 },
-  points: [336, 416, 496, 576, 656].map((y) => ({ x: 34, y, ay: "middle" as const, w: 296 })),
+  classicTitle: { x: 0, y: 42, ay: "bottom" },
+  classicResult: { x: 34, y: 88, w: 290 },
+  oursTitle: { x: 34, y: 180, ay: "middle" },
+  oursResult: { x: 34, y: 660, ay: "middle", w: 296 },
+  points: [248, 328, 408, 488, 568].map((y) => ({ x: 34, y, ay: "middle" as const, w: 296 })),
 };
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const WAY_DRAW = 2.2; // s, eased out (fast, then settling)
-const KNOT_DRAW = 3; // s
+const KNOT_DRAW = 2.2; // s, the same as the sky way: the twins draw side by side
 const PERIOD = 3.8; // s, one run of the light along the sky way (it runs for RUN of it, then rests)
 const RUN = 0.72;
 const DASH = 0.12; // the light's length, as a share of the way
@@ -124,20 +126,6 @@ const easeOutQuad = (t: number) => 1 - (1 - t) * (1 - t);
 const drawTime = (share: number) => WAY_DRAW * (1 - Math.sqrt(Math.max(0, 1 - share)));
 /** When the running light's head reaches a share of the way, within one period. */
 const lightTime = (share: number) => (share * RUN * PERIOD) / (1 + DASH);
-
-/** A smooth line through the points (Catmull-Rom, as cubic Béziers). */
-function smooth(points: Pt[]) {
-  const r = (v: number) => Math.round(v * 10) / 10;
-  let d = `M${points[0][0]} ${points[0][1]}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[Math.max(0, i - 1)];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[Math.min(points.length - 1, i + 2)];
-    d += ` C${r(p1[0] + (p2[0] - p0[0]) / 6)} ${r(p1[1] + (p2[1] - p0[1]) / 6)} ${r(p2[0] - (p3[0] - p1[0]) / 6)} ${r(p2[1] - (p3[1] - p1[1]) / 6)} ${p2[0]} ${p2[1]}`;
-  }
-  return d;
-}
 
 export function CompareSection() {
   const { COMPARE } = useCopy().site;
@@ -232,8 +220,8 @@ function Ways({ layout }: { layout: Layout }) {
 
   const show = drawn || !!reduced;
   const instant = !!reduced;
-  const knot = smooth(layout.knot);
-  const [ex, ey] = layout.knot[layout.knot.length - 1];
+  const knot = layout.classic;
+  const [ex, ey] = layout.classicEnd;
   const fill = { transformBox: "fill-box", transformOrigin: "center" } as const;
   const after = (delay: number) => ({ duration: instant ? 0 : 0.6, delay: instant ? 0 : delay, ease: EASE });
 
@@ -256,7 +244,7 @@ function Ways({ layout }: { layout: Layout }) {
               strokeLinecap="round"
               initial={{ pathLength: 0 }}
               animate={{ pathLength: show ? 1 : 0 }}
-              transition={{ duration: instant ? 0 : KNOT_DRAW, ease: "easeInOut" }}
+              transition={{ duration: instant ? 0 : KNOT_DRAW, ease: easeOutQuad }}
             />
           </mask>
         </defs>
@@ -272,6 +260,20 @@ function Ways({ layout }: { layout: Layout }) {
           animate={show ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.4 }}
           transition={after(KNOT_DRAW)}
         />
+        {/* Its stations: hollow and grey, at the same places as the sky way's (the twin paths share their timing). */}
+        {layout.classicNodes.map(([x, y], i) => (
+          <motion.circle
+            key={`c-${x}-${y}`}
+            cx={x}
+            cy={y}
+            r={5}
+            className="v11-knot-node"
+            style={fill}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={show ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+            transition={after(drawTime(shares[i] ?? 0))}
+          />
+        ))}
 
         {/* The Branded Genius way: a soft glow under a solid sky line, then the running light. */}
         <path ref={measure} d={layout.way} fill="none" stroke="none" />
@@ -334,6 +336,11 @@ function Ways({ layout }: { layout: Layout }) {
           {COMPARE.classic.result}
         </p>
       </Place>
+      {layout.classicPoints.map((point, i) => (
+        <Place key={COMPARE.classic.points[i]} at={point} layout={layout} show={show} transition={after(drawTime(shares[i] ?? 0) + 0.1)}>
+          <p className="text-center text-[15px] leading-snug text-balance text-silver">{COMPARE.classic.points[i]}</p>
+        </Place>
+      ))}
       <Place at={layout.oursTitle} layout={layout} show={show} transition={after(0.25)}>
         <p className="flex items-center gap-2.5 text-[15px] font-medium whitespace-nowrap text-white">
           <Check aria-hidden strokeWidth={2} className="size-4 text-sky" />

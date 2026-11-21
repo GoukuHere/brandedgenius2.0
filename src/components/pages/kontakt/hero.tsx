@@ -6,8 +6,9 @@ import { getCopy } from "@/i18n/server";
 
 /*
   Kontakt, first screen: his headline and line, and beside them the real thing, his own contact form (his
-  LeadConnector form, the one every "Anfrage" button on the site opens). The panel takes the form card's own colour
-  and the frame hides the card's white edge, so form and panel read as one surface (kontakt.css). His form keeps its
+  LeadConnector form, the one every "Anfrage" button on the site opens). The panel is glass and the frame is blended
+  onto it ("lighten"), so his dark card gives way to the glass, and the frame hides the card's white edge: form and
+  panel read as one surface (kontakt.css, round 5). His form keeps its
   white labels only in a frame at least 500px wide; under that it falls back to dark grey labels, on his own site too.
   The provider's embed script sizes the frame to the form, so it is never cut off.
 
