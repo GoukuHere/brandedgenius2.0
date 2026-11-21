@@ -75,12 +75,12 @@ export const REALITY = {
   // each a concrete moment in one or two short sentences. The pictures are still the old ones until the new ones,
   // made for each step, are in.
   items: [
-    { title: "Kein Fahrplan für KI", heading: { title: "Kein Fahrplan", accent: "für KI." }, text: "Jedes Team testet eigene Tools. Niemand legt fest, was zuerst kommt.", img: "/media/reality/roadmap.webp" },
-    { title: "Tools ohne Verbindung", heading: { title: "Tools ohne", accent: "Verbindung." }, text: "Ihr Team kopiert Daten von Hand zwischen CRM, E-Mail und Tabellen.", img: "/media/reality/tool-chaos.webp" },
-    { title: "Routinearbeit kostet Zeit", heading: { title: "Routinearbeit", accent: "kostet Zeit." }, text: "Ihr Team tippt Angebote, Rechnungen und Termine immer noch von Hand ein.", img: "/media/reality/manuell.webp" },
-    { title: "Das Team ist unsicher", heading: { title: "Das Team", accent: "ist unsicher." }, text: "Niemand weiß, welche Tools erlaubt sind. Also bleibt die KI liegen.", img: "/media/reality/unsicher.webp" },
-    { title: "Datenschutz kommt zu spät", heading: { title: "Datenschutz", accent: "kommt zu spät." }, text: "Kurz vor dem Start prüft jemand die Regeln. Dann steht das Projekt still.", img: "/media/reality/datenschutz.webp" },
-    { title: "Niemand misst den Nutzen", heading: { title: "Niemand misst", accent: "den Nutzen." }, text: "Die KI läuft. Wie viel Zeit und Geld sie spart, weiß niemand.", img: "/media/reality/kpis.webp" },
+    { title: "Kein Fahrplan für KI", heading: { title: "Kein Fahrplan", accent: "für KI." }, text: "Jedes Team testet eigene Tools. Niemand legt fest, was zuerst kommt.", img: "/media/reality/r5-fahrplan.webp" },
+    { title: "Tools ohne Verbindung", heading: { title: "Tools ohne", accent: "Verbindung." }, text: "Ihr Team kopiert Daten von Hand zwischen CRM, E-Mail und Tabellen.", img: "/media/reality/r5-tools.webp" },
+    { title: "Routinearbeit kostet Zeit", heading: { title: "Routinearbeit", accent: "kostet Zeit." }, text: "Ihr Team tippt Angebote, Rechnungen und Termine immer noch von Hand ein.", img: "/media/reality/r5-routine.webp" },
+    { title: "Das Team ist unsicher", heading: { title: "Das Team", accent: "ist unsicher." }, text: "Niemand weiß, welche Tools erlaubt sind. Also bleibt die KI liegen.", img: "/media/reality/r5-unsicher.webp" },
+    { title: "Datenschutz kommt zu spät", heading: { title: "Datenschutz", accent: "kommt zu spät." }, text: "Kurz vor dem Start prüft jemand die Regeln. Dann steht das Projekt still.", img: "/media/reality/r5-datenschutz.webp" },
+    { title: "Niemand misst den Nutzen", heading: { title: "Niemand misst", accent: "den Nutzen." }, text: "Die KI läuft. Wie viel Zeit und Geld sie spart, weiß niemand.", img: "/media/reality/r5-nutzen.webp" },
   ],
 };
 

@@ -63,12 +63,12 @@ export const REALITY: Shape<typeof DE.REALITY> = {
   accent: "never go live.",
   text: "Many companies invest in AI tools. Without a clear strategy and structure, the potential goes unused and the results never come.",
   items: [
-    { title: "No plan for AI", heading: { title: "No plan", accent: "for AI." }, text: "Every team tests its own tools. Nobody decides what comes first.", img: "/media/reality/roadmap.webp" },
-    { title: "Disconnected tools", heading: { title: "Disconnected", accent: "tools." }, text: "Your team copies data by hand between the CRM, email and spreadsheets.", img: "/media/reality/tool-chaos.webp" },
-    { title: "Routine work costs time", heading: { title: "Routine work", accent: "costs time." }, text: "Your team still enters quotes, invoices and appointments by hand.", img: "/media/reality/manuell.webp" },
-    { title: "The team is unsure", heading: { title: "The team", accent: "is unsure." }, text: "Nobody knows which tools are allowed. So the AI sits unused.", img: "/media/reality/unsicher.webp" },
-    { title: "Data protection comes too late", heading: { title: "Data protection", accent: "comes too late." }, text: "Just before launch, someone checks the rules. Then the project stops.", img: "/media/reality/datenschutz.webp" },
-    { title: "Nobody measures the value", heading: { title: "Nobody measures", accent: "the value." }, text: "The AI is running. Nobody knows how much time and money it saves.", img: "/media/reality/kpis.webp" },
+    { title: "No plan for AI", heading: { title: "No plan", accent: "for AI." }, text: "Every team tests its own tools. Nobody decides what comes first.", img: "/media/reality/r5-fahrplan.webp" },
+    { title: "Disconnected tools", heading: { title: "Disconnected", accent: "tools." }, text: "Your team copies data by hand between the CRM, email and spreadsheets.", img: "/media/reality/r5-tools.webp" },
+    { title: "Routine work costs time", heading: { title: "Routine work", accent: "costs time." }, text: "Your team still enters quotes, invoices and appointments by hand.", img: "/media/reality/r5-routine.webp" },
+    { title: "The team is unsure", heading: { title: "The team", accent: "is unsure." }, text: "Nobody knows which tools are allowed. So the AI sits unused.", img: "/media/reality/r5-unsicher.webp" },
+    { title: "Data protection comes too late", heading: { title: "Data protection", accent: "comes too late." }, text: "Just before launch, someone checks the rules. Then the project stops.", img: "/media/reality/r5-datenschutz.webp" },
+    { title: "Nobody measures the value", heading: { title: "Nobody measures", accent: "the value." }, text: "The AI is running. Nobody knows how much time and money it saves.", img: "/media/reality/r5-nutzen.webp" },
   ],
 };
 
