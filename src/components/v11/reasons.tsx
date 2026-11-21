@@ -34,7 +34,9 @@ import { cn } from "@/lib/utils";
 const DWELL = 5200;
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 // Keep in step with v11.css (.v11-reasons) and the Versprechen's PIN.
-const PIN = "(min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px)";
+// Round 5 (2026-11-22): held from 600px of window height on every screen (desktop laptops at 600 to 719px showed a
+// static strip that changed on a timer). Keep in step with v11.css (.v11-reasons).
+const PIN = "(min-height: 600px)";
 const stepAt = (progress: number, count: number) => Math.min(count - 1, Math.max(0, Math.floor(progress * count)));
 
 /* The section's own words (round 5, DE/EN); the reasons come from the page's copy. */
@@ -167,14 +169,15 @@ export function ReasonsSection() {
             <h2 className="sr-only">
               {REALITY.title} {REALITY.accent}
             </h2>
-            <div aria-hidden className="v11-reasons-swap v11-reasons-swap-end grid">
+            <div aria-hidden className="v11-reasons-swap grid">
               <div data-on={step === 0 || undefined}>
                 <Heading as="p" title={REALITY.title} accent={REALITY.accent} />
               </div>
               {REASONS.map((r, i) => (
                 <div key={r.title} data-on={step === i + 1 || undefined}>
+                  {/* Two lines, the title in white over its phrase in the gradient, as the opening heading. */}
                   <p className="t-h2">
-                    {r.heading.title} <span className="accent">{r.heading.accent}</span>
+                    {r.heading.title} <span className="accent block">{r.heading.accent}</span>
                   </p>
                 </div>
               ))}
