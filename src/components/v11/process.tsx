@@ -33,14 +33,18 @@ type Step = (typeof Site.PROCESS.steps)[number];
   being done, each a real Pexels photo from its original, sharper than before (the old 01 was a soft video still):
   01 analyse 7691673, 02 filtern 6592357, 03 roadmap 4623466, 04 pilot 7653460, 05 implementierung 3861958,
   07 skalierung 4910951. 06 stays Roman's own training photo. v1 keeps its photos (they live in /media/process).
+  Round 5 (the client's Loom of 2026-11-18: 02 "looks like stock", 03 "should be an AI roadmap", 04 "not the two Asian
+  men", 05 "needs AI in it", 07 "looks like a stock market, needs scaling with AI"): every step except 06 has a
+  generated picture made for its heading (Figma AI, Gemini image model, 1200x896); 01 keeps the lower right calm for
+  the KI-Potenzial-Check card.
 */
 const V11_IMG: Partial<Record<string, string>> = {
-  "/media/process/analyse.webp": "/media/v11/process/analyse.webp",
-  "/media/process/filtern.webp": "/media/v11/process/filtern.webp",
-  "/media/process/roadmap.webp": "/media/v11/process/roadmap.webp",
-  "/media/process/pilot.webp": "/media/v11/process/pilot.webp",
-  "/media/process/implementierung.webp": "/media/v11/process/implementierung.webp",
-  "/media/process/skalierung.webp": "/media/v11/process/skalierung.webp",
+  "/media/process/analyse.webp": "/media/v11/process/r5-analyse.webp",
+  "/media/process/filtern.webp": "/media/v11/process/r5-filtern.webp",
+  "/media/process/roadmap.webp": "/media/v11/process/r5-roadmap.webp",
+  "/media/process/pilot.webp": "/media/v11/process/r5-pilot.webp",
+  "/media/process/implementierung.webp": "/media/v11/process/r5-implementierung.webp",
+  "/media/process/skalierung.webp": "/media/v11/process/r5-skalierung.webp",
 };
 
 /* Every photo crops well to 4:3 from its centre except two wide ones: "filtern", whose person stands at the right edge, and "analyse", whose left consultant sits at the left edge. */

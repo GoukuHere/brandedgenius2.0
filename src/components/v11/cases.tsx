@@ -121,7 +121,8 @@ function geoFor(): Geo {
   band between the label and the case. Telefonie keeps a picture (a person on a call, half human, half machine).
 */
 const PHOTOS: Record<string, { src: string; position?: string }> = {
-  telefonie: { src: "/media/v11/cases/telefonie.webp" },
+  // Generated for this card (Figma AI, Gemini image model): one half of the caller's face human, the other machine.
+  telefonie: { src: "/media/v11/cases/r5-telefonie.webp" },
 };
 
 /** A result's figure as a share (0 to 1) and whether it is a cut ("−62%") or a gain ("+43%"). */
