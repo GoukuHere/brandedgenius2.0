@@ -32,7 +32,9 @@ const WORDS = {
 const HOVER_INTENT_MS = 80; // sweeping the pointer across the row does not flick every panel open
 
 // Where each photo's subject sits, so the narrow collapsed panels still show the person, not the wall.
-const FOCUS = ["43% 50%", "50% 50%", "45% 50%", "68% 50%"];
+// Round 5: 02 and 04 are the new pictures of Roman (online seminar: he sits left of the camera; training: he stands
+// left of the screen).
+const FOCUS = ["43% 50%", "32% 50%", "45% 50%", "30% 50%"];
 
 // The open panel is 2.4 / 5.4 of the row: about 520px inside the 1280px container.
 const PANEL_SIZES = "(min-width: 1280px) 520px, 44vw";

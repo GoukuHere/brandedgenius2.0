@@ -404,9 +404,9 @@ export const WORKSHOP = {
   formatsLabel: "Unsere Workshop-Formate",
   formats: [
     { title: "Vor-Ort Workshops", text: "Interaktive Hands-on-Workshops direkt in Ihrem Unternehmen vor Ort.", img: "/media/workshop/vor-ort.webp" },
-    { title: "Online Seminare", text: "Kompakte Live-Online-Trainings mit praxisnahen Übungen und individuellem Austausch.", img: "/media/workshop/online-roman.webp" },
+    { title: "Online Seminare", text: "Kompakte Live-Online-Trainings mit praxisnahen Übungen und individuellem Austausch.", img: "/media/workshop/r5-online-roman.webp" },
     { title: "Leadership Workshops", text: "Strategische Entscheidungskompetenz und Zukunftssicherheit für Führungskräfte und Vorstände.", img: "/media/workshop/leadership.webp" },
-    { title: "Individuelle Trainings", text: "Maßgeschneiderte Schulungsinhalte für spezifische Fachabteilungen und konkrete Anwendungsfälle.", img: "/media/workshop/individuell-roman.webp" },
+    { title: "Individuelle Trainings", text: "Maßgeschneiderte Schulungsinhalte für spezifische Fachabteilungen und konkrete Anwendungsfälle.", img: "/media/workshop/r5-individuell-roman.webp" },
   ],
   topicsLabel: "Themenbeispiele",
   topics: [

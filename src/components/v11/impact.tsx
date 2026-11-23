@@ -35,13 +35,13 @@ import { CountUp } from "./count";
   Round 5 (DE/EN): copy by language (useCopy); each benefit's photo is keyed by its id, never by its title.
 */
 
-/* Round 5 (the client's Loom: a fitting picture for every heading): generated pictures (Figma AI, Gemini image model,
-   928x1152, the tile's own shape) replace the Pexels photos one by one; reporting and skalierbarkeit follow. */
+/* Round 5 (the client's Loom: a fitting picture for every heading): each tile has a picture generated for its title
+   (Figma AI, Gemini image model, 928x1152, the tile's own shape), the subject centred. */
 const BENEFIT_PHOTOS: Record<string, { src: string; position?: string }> = {
   effizienz: { src: "/media/v11/impact/r5-effizienz.webp" },
   reaktionszeit: { src: "/media/v11/impact/r5-reaktionszeit.webp" },
-  reporting: { src: "/media/v11/impact/reporting.webp", position: "35% 50%" },
-  skalierbarkeit: { src: "/media/v11/impact/skalierbarkeit.webp" },
+  reporting: { src: "/media/v11/impact/r5-reporting.webp" },
+  skalierbarkeit: { src: "/media/v11/impact/r5-skalierbarkeit.webp" },
 };
 const EASE = [0.16, 1, 0.3, 1] as const;
 const FILL = { duration: 1.4, delay: 0.2 };

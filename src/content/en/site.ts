@@ -364,9 +364,9 @@ export const WORKSHOP: Shape<typeof DE.WORKSHOP> = {
   formatsLabel: "Our workshop formats",
   formats: [
     { title: "On-site workshops", text: "Interactive hands-on workshops, held right at your company.", img: "/media/workshop/vor-ort.webp" },
-    { title: "Online seminars", text: "Compact live online training with practical exercises and personal exchange.", img: "/media/workshop/online-roman.webp" },
+    { title: "Online seminars", text: "Compact live online training with practical exercises and personal exchange.", img: "/media/workshop/r5-online-roman.webp" },
     { title: "Leadership workshops", text: "Strategic decision skills and future readiness for managers and boards.", img: "/media/workshop/leadership.webp" },
-    { title: "Custom training", text: "Tailored training content for specific departments and concrete use cases.", img: "/media/workshop/individuell-roman.webp" },
+    { title: "Custom training", text: "Tailored training content for specific departments and concrete use cases.", img: "/media/workshop/r5-individuell-roman.webp" },
   ],
   topicsLabel: "Example topics",
   topics: [
