@@ -1258,6 +1258,42 @@
 .ls-transcript {
   min-height: 3em;
 }
+/*
+  Round 5: the demo plays a real call. The waveform settles towards its middle while nobody speaks (between turns,
+  the ring tone, the transfer beeps); every line of the calls stands in one cell, so the screen keeps one height; the
+  speaker's name leads the line; before the first play the call's first line shows as a quiet preview.
+*/
+.ls-wave {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ls-wave[data-quiet] {
+  transform: scaleY(0.3);
+}
+.ls-transcript-stack {
+  display: grid;
+}
+.ls-transcript-stack > * {
+  grid-area: 1 / 1;
+}
+.ls-transcript[data-preview] {
+  opacity: 0.5;
+}
+.ls-speaker {
+  color: #69bff8;
+  font-weight: 500;
+}
+.ls-voice-credit {
+  margin-top: 16px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgb(241 241 238 / 0.4);
+}
+.ls-voice-credit a {
+  transition: color 0.2s ease;
+}
+.ls-voice-credit a:hover {
+  color: rgb(241 241 238 / 0.75);
+}
 .ls-caret {
   display: inline-block;
   width: 2px;

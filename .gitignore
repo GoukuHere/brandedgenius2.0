@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# the ElevenLabs voice demo output (scripts/voice-demo.mjs)
+/voice-demo/

@@ -138,7 +138,10 @@ export const CALLBOTS = {
     resume: "Fortsetzen",
     restart: "Neu starten",
     transcriptLabel: "Live-Transkription (Voice-to-Text)",
-    transcript: "„Guten Tag. Willkommen bei Branded Genius. Wie kann ich Sie heute unterstützen?“",
+    // Round 5: the demo calls are real audio now (src/content/voice-demo.json); the transcript names who speaks.
+    speakers: { agent: "KI-Assistent", inbound: "Anrufer", outbound: "Herr Weber" },
+    // The voices are made on a free ElevenLabs plan for the client's review, which asks for this credit.
+    credit: "Stimmen von ElevenLabs",
     modes: [
       {
         id: "inbound",

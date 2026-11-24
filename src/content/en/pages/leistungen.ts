@@ -126,7 +126,8 @@ export const CALLBOTS: Shape<typeof DE.CALLBOTS> = {
     resume: "Resume",
     restart: "Restart",
     transcriptLabel: "Live transcription (voice to text)",
-    transcript: "\"Hello. Welcome to Branded Genius. How can I help you today?\"",
+    speakers: { agent: "AI assistant", inbound: "Caller", outbound: "Mr. Weber" },
+    credit: "Voices by ElevenLabs",
     modes: [
       {
         id: "inbound",

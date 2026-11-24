@@ -3,26 +3,50 @@
 import { Check, Pause, Play, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Section } from "@/components/system/primitives";
-import { useCopy } from "@/i18n/client";
+import VOICE from "@/content/voice-demo.json";
+import { useCopy, useLocale } from "@/i18n/client";
+import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
-import { DemoButton, ServiceText, useReducedMotion, useSeenOnce, useTabVisible } from "./shared";
+import { DemoButton, ServiceText, useReducedMotion } from "./shared";
 
 /*
   KI-Callbots: his text on the left, his "Branded Genius Voice Engine" on the right as a device: a status line, a
   screen with a live waveform and his live transcription, his play and restart buttons, and his Inbound / Outbound
-  switch with the two lines his page gives each. While the demo call plays (silently: no audio), the waveform moves,
-  his transcript types out as his own demo types it, and the five topics of the chosen direction light up one by one
-  like topics the engine detects. It plays once by itself when it first comes into view; pause, resume and restart
-  are his own buttons. Reduced motion: no waveform motion; the transcript and topics appear complete.
-  Round 5 (DE/EN): copy by language (the English transcript types out within the same call length).
+  switch with the two lines his page gives each.
+  Round 5 (the client's Loom of 2026-11-18, V3 2:57: "a realistic German voice sample"): the demo plays a real call
+  now, one per direction and language (scripts/voice-demo.mjs, ElevenLabs voices). The audio is the clock: play,
+  pause, resume and restart drive it, and the file loads on the first play. The transcript shows the line being
+  spoken, word by word as it is said, with who speaks; each topic lights when its line starts (a topic the call never
+  reaches stays dark); the waveform moves while someone speaks and settles in the pauses (data-quiet). It no longer
+  starts by itself: a call with sound waits for the play button. Reduced motion: no waveform motion, whole lines.
+  The whole call is also there as text for screen readers.
 */
 
-/** His demo types one character every 62ms. */
-const TYPE_MS = 62;
-/** The call: the topics light at these seconds, and the call ends at the last. */
-const TOPIC_AT = [1.2, 2.4, 3.6, 4.8, 6.0];
-const CALL_S = 7.2;
-const TICK_MS = 62;
+type Direction = "inbound" | "outbound";
+type Line = { who: string; topic: string | null; start: number; end: number; words: [string, number, number][] };
+type Call = { src: string; duration: number; lines: Line[] };
+const CALLS = VOICE as unknown as Record<Locale, Record<Direction, Call>>;
+
+/** Where a call is at a moment: the line on (-1 before the first), its words said so far, the second, and whether someone speaks. */
+type Pos = { line: number; word: number; sec: number; speaking: boolean };
+const START: Pos = { line: -1, word: 0, sec: 0, speaking: false };
+
+function posAt(call: Call, t: number): Pos {
+  let line = -1;
+  call.lines.forEach((l, i) => {
+    if (l.start <= t) line = i;
+  });
+  if (line < 0) return { ...START, sec: Math.floor(t) };
+  const on = call.lines[line];
+  return { line, word: on.words.filter((w) => w[1] <= t).length, sec: Math.floor(t), speaking: t < on.end };
+}
+
+const sameTime = (a: Pos, b: Pos) => a.line === b.line && a.word === b.word && a.sec === b.sec && a.speaking === b.speaking;
+const lineText = (line: Line, from = 0, to = line.words.length) =>
+  line.words
+    .slice(from, to)
+    .map((w) => w[0])
+    .join(" ");
 
 /**
  * The waveform: 44 bars, taller in the middle, each with its own speed and phase. Integer arithmetic only, so the
@@ -54,78 +78,103 @@ export function CallbotsSection() {
 
 function VoiceEngine() {
   const E = useCopy().leistungen.CALLBOTS.engine;
-  const TEXT = E.transcript;
-  const box = useRef<HTMLDivElement>(null);
-  const seen = useSeenOnce(box, 0.5);
+  const locale = useLocale();
   const reduced = useReducedMotion();
-  const visible = useTabVisible();
+  const audio = useRef<HTMLAudioElement>(null);
 
   const [phase, setPhase] = useState<Phase>("ready");
   const [mode, setMode] = useState(0);
-  /** Milliseconds into the call. */
-  const [ms, setMs] = useState(0);
+  const [pos, setPos] = useState<Pos>(START);
 
-  const playing = phase === "playing";
+  const callFor = useCallback((m: number) => CALLS[locale][E.modes[m].id as Direction], [locale, E.modes]);
+  const call = callFor(mode);
+  const direction = E.modes[mode].id as Direction;
+  const speaker = (line: Line) => E.speakers[line.who === "agent" ? "agent" : direction];
 
-  // The call's clock: runs only while playing in a visible tab.
+  // While the call plays, the audio's own clock moves the screen (read every frame; only a change re-renders).
   useEffect(() => {
-    if (!playing || !visible) return undefined;
-    const id = window.setInterval(() => {
-      setMs((t) => {
-        const next = t + TICK_MS;
-        return next >= CALL_S * 1000 ? CALL_S * 1000 : next;
-      });
-    }, TICK_MS);
-    return () => window.clearInterval(id);
-  }, [playing, visible]);
+    if (phase !== "playing") return undefined;
+    let frame = 0;
+    const tick = () => {
+      const a = audio.current;
+      if (a) {
+        const next = posAt(call, a.currentTime);
+        setPos((p) => (sameTime(p, next) ? p : next));
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [phase, call]);
 
-  // The call ends by itself (outside the clock's updater, so the phase change is its own update).
-  const over = ms >= CALL_S * 1000;
+  // The audio's events set the phase, so the end of the call and the system's media keys agree with the buttons.
   useEffect(() => {
-    if (!playing || !over) return undefined;
-    const id = window.setTimeout(() => setPhase("ended"), 0);
-    return () => window.clearTimeout(id);
-  }, [playing, over]);
+    const a = audio.current;
+    if (!a) return undefined;
+    const onPlay = () => setPhase("playing");
+    const onPause = () => setPhase((p) => (p !== "playing" ? p : a.ended ? "ended" : "paused"));
+    const onEnded = () => {
+      setPos(posAt(call, call.duration));
+      setPhase("ended");
+    };
+    a.addEventListener("play", onPlay);
+    a.addEventListener("pause", onPause);
+    a.addEventListener("ended", onEnded);
+    return () => {
+      a.removeEventListener("play", onPlay);
+      a.removeEventListener("pause", onPause);
+      a.removeEventListener("ended", onEnded);
+    };
+  }, [call]);
 
-  const play = useCallback(() => {
-    setMs(0);
-    setPhase("playing");
-  }, []);
-
-  // Once, when the engine first comes well into view.
-  const autoRan = useRef(false);
-  useEffect(() => {
-    if (!seen || autoRan.current || reduced) return undefined;
-    autoRan.current = true;
-    const id = window.setTimeout(play, 500);
-    return () => window.clearTimeout(id);
-  }, [seen, reduced, play]);
+  /** A call from its start; its file is only fetched now. */
+  const start = useCallback(
+    (m: number) => {
+      const a = audio.current;
+      if (!a) return;
+      const src = callFor(m).src;
+      if (a.getAttribute("src") !== src) a.setAttribute("src", src);
+      a.currentTime = 0;
+      setPos(START);
+      a.play().catch(() => setPhase("ready"));
+    },
+    [callFor]
+  );
 
   const onPlay = () => {
-    if (phase === "playing") setPhase("paused");
-    else if (phase === "paused") setPhase("playing");
-    else play();
+    const a = audio.current;
+    if (phase === "playing") a?.pause();
+    else if (phase === "paused") a?.play().catch(() => setPhase("paused"));
+    else start(mode);
   };
   const onMode = (next: number) => {
     if (next === mode) return;
     setMode(next);
-    // A different direction is a different call: it starts again if one was running.
-    if (phase === "playing" || phase === "paused") play();
+    // A different direction is a different call: it starts again if one was running, else it waits for play.
+    if (phase === "playing" || phase === "paused") start(next);
+    else {
+      setPos(START);
+      setPhase("ready");
+    }
   };
 
-  // Reduced motion and nothing pressed: the finished call.
-  const idleFull = reduced && phase === "ready";
-  const t = idleFull || phase === "ended" ? CALL_S * 1000 : ms;
-  const typed = phase === "ready" && !idleFull ? 0 : Math.min(TEXT.length, Math.floor(t / TYPE_MS));
-  const lit = phase === "ready" && !idleFull ? 0 : TOPIC_AT.filter((s) => t >= s * 1000).length;
+  const live = phase === "playing" || phase === "paused";
+  // Ready: the call's first line as a quiet preview. Live: the line on (its speaker alone before its first word).
+  // Ended: the last line, whole.
+  const shown = phase === "ready" ? call.lines[0] : call.lines[Math.max(0, pos.line)];
+  const said = phase === "ready" ? shown.words.length : phase === "ended" || reduced ? shown.words.length : pos.line < 0 ? 0 : pos.word;
+  const reached = phase === "ended" ? call.lines.length : live ? pos.line + 1 : 0;
+  const lit = new Set(call.lines.slice(0, reached).map((l) => l.topic));
   const status = phase === "playing" ? E.playing : phase === "paused" ? E.paused : E.ready;
   const playLabel = phase === "playing" ? E.pause : phase === "paused" ? E.resume : E.play;
-  const seconds = Math.floor(t / 1000);
-  const time = `00:${String(seconds).padStart(2, "0")}`;
+  const time = `00:${String(pos.sec).padStart(2, "0")}`;
   const current = E.modes[mode];
+  // Every line of both calls in this language, laid out invisibly in one cell: the screen keeps one height.
+  const sizers = [...CALLS[locale].inbound.lines, ...CALLS[locale].outbound.lines];
 
   return (
-    <div ref={box} data-reveal="up" className="ls-voice" data-phase={phase}>
+    <div data-reveal="up" className="ls-voice" data-phase={phase}>
+      <audio ref={audio} preload="none" />
       <div className="ls-voice-head">
         <span className="flex min-w-0 items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element -- a small static vector mark; next/image adds nothing */}
@@ -140,19 +189,45 @@ function VoiceEngine() {
       </div>
 
       <div className="ls-voice-screen">
-        <div aria-hidden className="ls-wave" data-on={(playing || phase === "paused") && !reduced ? "" : undefined}>
+        <div
+          aria-hidden
+          className="ls-wave"
+          data-on={live && !reduced ? "" : undefined}
+          data-quiet={live && !pos.speaking ? "" : undefined}
+        >
           {BARS.map((bar, i) => (
             <span key={i} style={{ "--h": bar.h, "--d": `${bar.d}ms`, "--o": `${bar.o}ms` } as CSSProperties} />
           ))}
         </div>
         <div className="mt-5 border-t border-white/[0.07] pt-4">
           <p className="text-[13px] leading-snug text-white/50">{E.transcriptLabel}</p>
-          <p className="ls-transcript mt-2 text-[17px] leading-[1.5] text-white/90">
-            <span>{TEXT.slice(0, typed)}</span>
-            {phase === "playing" && typed < TEXT.length ? <span aria-hidden className="ls-caret" /> : null}
-            {/* The whole line stays laid out (invisible), so the screen never grows while it types. */}
-            <span aria-hidden className="invisible">{TEXT.slice(typed)}</span>
-          </p>
+          <div aria-hidden className="ls-transcript-stack mt-2 text-[17px] leading-[1.5]">
+            {sizers.map((line, i) => (
+              <p key={i} className="ls-transcript invisible">
+                <span className="ls-speaker">{E.speakers.agent}</span> {lineText(line)}
+              </p>
+            ))}
+            <p className="ls-transcript text-white/90" data-preview={phase === "ready" ? "" : undefined}>
+              <span className="ls-speaker">{speaker(shown)}</span> <span>{lineText(shown, 0, said)}</span>
+              {phase === "playing" && said < shown.words.length ? <span className="ls-caret" /> : null}
+              {/* The rest of the line stays laid out (invisible), so the words never reflow while they appear. */}
+              <span className="invisible">
+                {said > 0 ? " " : ""}
+                {lineText(shown, said)}
+              </span>
+            </p>
+          </div>
+          {/* The whole call as text for screen readers (the moving transcript above is hidden from them). */}
+          <div className="sr-only">
+            <p>{current.title}</p>
+            <ol>
+              {call.lines.map((line, i) => (
+                <li key={i}>
+                  {speaker(line)}: {lineText(line)}
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </div>
 
@@ -161,7 +236,7 @@ function VoiceEngine() {
           <DemoButton tone="primary" icon={phase === "playing" ? Pause : Play} onClick={onPlay} className="min-w-[132px]">
             {playLabel}
           </DemoButton>
-          <DemoButton icon={RotateCcw} onClick={play}>
+          <DemoButton icon={RotateCcw} onClick={() => start(mode)}>
             {E.restart}
           </DemoButton>
         </div>
@@ -177,13 +252,18 @@ function VoiceEngine() {
       <div className="ls-voice-topics">
         <h3 className="text-[16px] leading-snug font-medium text-white">{current.title}</h3>
         <ul role="list" className="mt-3 flex flex-wrap gap-2">
-          {current.topics.map((topic, i) => (
-            <li key={topic} className={cn("ls-topic", i < lit && "ls-topic-on")}>
+          {current.topics.map((topic) => (
+            <li key={topic} className={cn("ls-topic", lit.has(topic) && "ls-topic-on")}>
               <Check aria-hidden strokeWidth={2.25} className="ls-topic-check" />
               {topic}
             </li>
           ))}
         </ul>
+        <p className="ls-voice-credit">
+          <a href="https://elevenlabs.io" target="_blank" rel="noopener noreferrer">
+            {E.credit}
+          </a>
+        </p>
       </div>
     </div>
   );
