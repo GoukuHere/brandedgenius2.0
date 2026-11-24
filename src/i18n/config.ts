@@ -25,9 +25,14 @@ export const PAGES = {
 } as const satisfies Record<string, Record<Locale, string>>;
 export type PageKey = keyof typeof PAGES;
 
-/** A page's public address in a language, with an optional #section. */
+/**
+ * A page's public address in a language, with an optional #section. 2026-11-24: with the trailing slash every address
+ * on the site has (the client's WordPress addresses all had one; next.config.ts trailingSlash), so a link never
+ * passes through a redirect. PAGES itself stays without it, for matching.
+ */
 export function pathFor(locale: Locale, page: PageKey, hash?: string) {
-  return PAGES[page][locale] + (hash ? `#${hash}` : "");
+  const path = PAGES[page][locale];
+  return (path === "/" ? path : `${path}/`) + (hash ? `#${hash}` : "");
 }
 
 /*

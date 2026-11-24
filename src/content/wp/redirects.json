@@ -1,0 +1,2816 @@
+[
+ {
+  "source": "/category/uncategorized/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "WordPress category"
+ },
+ {
+  "source": "/category/wikipedia/",
+  "destination": "/wikipedia/",
+  "permanent": true,
+  "why": "WordPress category"
+ },
+ {
+  "source": "/category/uncategorized/page/:n/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "WordPress pagination"
+ },
+ {
+  "source": "/category/wikipedia/page/:n/",
+  "destination": "/wikipedia/",
+  "permanent": true,
+  "why": "WordPress pagination"
+ },
+ {
+  "source": "/uncategorized/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "WordPress category base"
+ },
+ {
+  "source": "/blog/page/:n/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "WordPress pagination"
+ },
+ {
+  "source": "/wikipedia/page/:n/",
+  "destination": "/wikipedia/",
+  "permanent": true,
+  "why": "WordPress pagination"
+ },
+ {
+  "source": "/feed/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "WordPress feed"
+ },
+ {
+  "source": "/comments/feed/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "WordPress feed"
+ },
+ {
+  "source": "/:cat(uncategorized|wikipedia)/:slug/feed/",
+  "destination": "/:cat/:slug/",
+  "permanent": true,
+  "why": "WordPress feed"
+ },
+ {
+  "source": "/:cat(uncategorized|wikipedia)/:slug/attachment/:name/",
+  "destination": "/:cat/:slug/",
+  "permanent": true,
+  "why": "WordPress attachment page"
+ },
+ {
+  "source": "/author/:name/",
+  "destination": "/uber-uns/",
+  "permanent": true,
+  "why": "WordPress author archive"
+ },
+ {
+  "source": "/ki-akademie/",
+  "destination": "/ki-workshop/#akademie",
+  "permanent": true,
+  "why": "empty WordPress page"
+ },
+ {
+  "source": "/ressourcen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "empty WordPress page"
+ },
+ {
+  "source": "/about/",
+  "destination": "/uber-uns/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/agb/ki-agentur-neuenbuerg/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ai-marketing-berlin/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/all-blogs/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/automatisierte-leadgenerierung/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/berlin/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/blog/5-alltaegliche-geschaeftsaufgaben-mit-ki-automatisieren/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ai-agency-wie-ki-agenturen-ihr-unternehmen-transformieren/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/beste-ki-marketingkampagnen-top-marken/",
+  "destination": "/uncategorized/beste-ki-marketingkampagnen-top-marken/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/branding-fehler-vermeiden-tipps/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/dental-seo-strategien/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/highlevels-ai-mitarbeiter/",
+  "destination": "/uncategorized/highlevels-ai-mitarbeiter/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-adoption-skalierung-intelligenter/",
+  "destination": "/uncategorized/ki-adoption-skalierung-intelligenter/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-agentur-deutschland-automatisierung/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-agentur-erfolgreiche-ki-implementierung/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-agentur-intelligente-digitale-strategien/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-automatisierung-fuer-wachstum-und-effizienz-im-unternehmen/",
+  "destination": "/uncategorized/ki-automatisierung-fuer-wachstum-und-effizienz-im-unternehmen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-automatisierung-kleine-unternehmen-effizient-wachsen/",
+  "destination": "/uncategorized/ki-automatisierung-kleine-unternehmen-effizient-wachsen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-automatisierung-produktivitaet-und-effizienz-steigern/",
+  "destination": "/uncategorized/ki-automatisierung-produktivitaet-und-effizienz-steigern/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-berater-ihr-partner-fur-mabgeschneiderte-ki-losunge/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-berater-kuenstliche-intelligenz/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-beratung-unternehmen-transformieren/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-beratungsdienste-fur-business-branded-genius/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-branding-automatisierung-f%C3%BCr-kleine-unternehmen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-branding-automatisierung-für-kleine-unternehmen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor (decoded)"
+ },
+ {
+  "source": "/blog/ki-chatbots-integrieren-kundeninteraktion/",
+  "destination": "/uncategorized/ki-chatbots-integrieren-kundeninteraktion/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-consulting-beratung-fuer-unternehmen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-content-erstellung-effizienz-kreativitaet/",
+  "destination": "/uncategorized/ki-content-erstellung-effizienz-kreativitaet/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-content-konstanz-geheimnis/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-e-mail-agent/",
+  "destination": "/uncategorized/ki-e-mail-agent/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-echtzeit-marktdynamik/",
+  "destination": "/uncategorized/ki-echtzeit-marktdynamik/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-ethische-standards-marketing-transparenz/",
+  "destination": "/uncategorized/ki-ethische-standards-marketing-transparenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-experte-deutschland/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-experte-zukunft-gestalten/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-experten-mabgeschneiderte-ki-losungen-fur-ihr-unternehmen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-experten-unternehmen-revolutionieren/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-f%C3%BCr-ergebnisse/",
+  "destination": "/uncategorized/ki-fur-ergebnisse/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-für-ergebnisse/",
+  "destination": "/uncategorized/ki-fur-ergebnisse/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/blog/ki-fortbildung-die-beste-weiterbildung-fur-kunstliche-intelligenz/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-fuer-unternehmen-marketing-transformation/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-gestuetzte-systeme-fuer-skalierung-und-automatisierung/",
+  "destination": "/uncategorized/ki-gestuetzte-systeme-fuer-skalierung-und-automatisierung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-im-gesundheitswesen/",
+  "destination": "/uncategorized/ki-im-gesundheitswesen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-im-influencer-marketing/",
+  "destination": "/uncategorized/ki-im-influencer-marketing/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-im-kundenerlebnis/",
+  "destination": "/uncategorized/ki-im-kundenerlebnis/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-im-marketing/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-im-marketing-vs-traditionell-was-bringt-mehr-roi/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-im-modernen-marketing-game-changer-f%C3%BCr-marken/",
+  "destination": "/uncategorized/ki-im-modernen-marketing-game-changer-fur-marken/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-im-modernen-marketing-game-changer-für-marken/",
+  "destination": "/uncategorized/ki-im-modernen-marketing-game-changer-fur-marken/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/blog/ki-im-social-media-marketing/",
+  "destination": "/uncategorized/ki-im-social-media-marketing/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-in-der-bildung/",
+  "destination": "/uncategorized/ki-in-der-bildung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-influencer-marketing-neuer-ansatz/",
+  "destination": "/uncategorized/ki-influencer-marketing-neuer-ansatz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-inhaltspersonalisierung/",
+  "destination": "/uncategorized/ki-inhaltspersonalisierung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-integration-gesch%C3%A4ftserfolg/",
+  "destination": "/uncategorized/ki-integration-geschaftserfolg/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-integration-geschäftserfolg/",
+  "destination": "/uncategorized/ki-integration-geschaftserfolg/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/blog/ki-kurse-ihr-einstieg-in-die-welt-der-kunstlichen-intelligenz/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-kurse-online-weiterbildung-in-kunstlicher-intelligenz/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-lead-generierung-schnellster-weg/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-marketing-2025-intelligentes-branding/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-marketing-agentur-die-zukunft-des-digitalen-marketings/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-marketing-branded-genius-zukunft/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-marketing-ethik/",
+  "destination": "/uncategorized/ki-marketing-ethik/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-marketing-kundenansprache/",
+  "destination": "/uncategorized/ki-marketing-kundenansprache/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-marketing-revolution/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-marketing-strategie-richtig-planen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-marketing-tools-2025/",
+  "destination": "/uncategorized/ki-marketing-tools-2025/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-marketing-vs-traditionelles-marketing-2025/",
+  "destination": "/uncategorized/ki-marketing-vs-traditionelles-marketing-2025/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-marketing-zukunft-verstaendlich-machen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-marketingstrategie-die-funktioniert/",
+  "destination": "/uncategorized/ki-marketingstrategie-die-funktioniert/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-optimierung-werbekampagnen/",
+  "destination": "/uncategorized/ki-optimierung-werbekampagnen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-schulung-fuer-unternehmen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-social-media-zukunft-marketing/",
+  "destination": "/uncategorized/ki-im-social-media-marketing/",
+  "permanent": true,
+  "why": "Framer post, near 0.75"
+ },
+ {
+  "source": "/blog/ki-spezialist-experte-ai/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-storytelling-die-zukunft-des-markenaufbaus/",
+  "destination": "/uncategorized/ki-storytelling-die-zukunft-des-markenaufbaus/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-strategie-beratung-mabgeschneiderte-ki-losungen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-strategien/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-transformation-von-content-produktionsmedien/",
+  "destination": "/uncategorized/ki-transformation-von-content-produktionsmedien/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-und-beschaeftigung-wie-kuenstliche-intelligenz-arbeitsplaetze-veraendert/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/ki-verbraucherverhalten-verbrauchertrends-marketing/",
+  "destination": "/uncategorized/ki-verbraucherverhalten-verbrauchertrends-marketing/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/ki-video-marketing-skaliertes-videocontent/",
+  "destination": "/uncategorized/ki-video-marketing-skaliertes-videocontent/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/kreativitaet-trifft-ki-neue-aera-des-marketings/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/kuenstliche-intelligenz-agentur/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/kunstliche-intelligenz-marketing/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/kunstliche-intelligenz-marketing-die-zukunft-des-digitalen-marketings/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/lokales-marketing-ki-marketing-local-seo-strategien/",
+  "destination": "/uncategorized/lokales-marketing-ki-marketing-local-seo-strategien/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/magie-von-ki-im-branding/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/markenwahrnehmung-ki-marketing/",
+  "destination": "/uncategorized/markenwahrnehmung-ki-marketing/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/marketing-automation-branded-genius/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/marketing-automation-die-zukunft-des-digitalen-marketings/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/marketing-automatisierung-mythen-wachstum/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/marketing-ki-assistenten-team/",
+  "destination": "/uncategorized/marketing-ki-assistenten-team/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/marktforschung-ki-insights-kuenstliche-intelligenz-datenanalyse/",
+  "destination": "/uncategorized/marktforschung-ki-insights-kuenstliche-intelligenz-datenanalyse/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/maschinelles-lernen-beratung-automatisierte-marketingloesungen-ki-agentur-muenchen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/maximierung-der-kraft-von-ki-strategien-im-modernen-marketing/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/mit-ki-die-zielgruppe-gezielt-ansprechen-und-gewinnen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/monetarisierungs-ki-strategien/",
+  "destination": "/uncategorized/monetarisierungs-ki-strategien/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/og-ai-marketing/",
+  "destination": "/uncategorized/og-ai-marketing/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/personalisierter-content-ki-marketing-trends-2025/",
+  "destination": "/uncategorized/personalisierter-content-ki-marketing-trends-2025/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/revolutioniere-dein-marketing-mit-ki/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/seo-f%C3%BCr-startups/",
+  "destination": "/uncategorized/seo-fur-startups/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/seo-für-startups/",
+  "destination": "/uncategorized/seo-fur-startups/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/blog/seo-taktiken-f%C3%BCr-das-ranking-von-unternehmen/",
+  "destination": "/uncategorized/seo-taktiken-fur-das-ranking-von-unternehmen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/seo-taktiken-für-das-ranking-von-unternehmen/",
+  "destination": "/uncategorized/seo-taktiken-fur-das-ranking-von-unternehmen/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/blog/sprachsuche-ki-marketingstrategie/",
+  "destination": "/uncategorized/sprachsuche-ki-marketingstrategie/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/steigern-sie-ihre-karrierechancen-mit-ki-weiterbildung/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/top-ai-kurse-in-deutschland-erweitern-sie-ihre-fahigkeiten/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/verborgene-ki-tipps-die-deine-marke-auf-das-naechste-level-heben/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/von-manuell-zu-magisch-arbeitsabl%C3%A4ufe-mit-ki-automatisierung-transformieren/",
+  "destination": "/uncategorized/von-manuell-zu-magisch-arbeitsablaufe-mit-ki-automatisierung-transformieren/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/von-manuell-zu-magisch-arbeitsabläufe-mit-ki-automatisierung-transformieren/",
+  "destination": "/uncategorized/von-manuell-zu-magisch-arbeitsablaufe-mit-ki-automatisierung-transformieren/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/blog/warum-jedes-unternehmen-2025-eine-ki-strategie-braucht/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/warum-ki-der-gamechanger-fuer-deine-marketingstrategie/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/warum-ki-im-marketing-ihr-unternehmen-voranbringt/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/warum-ki-kraftpakete-der-schl%C3%BCssel-zum-wachstum-sind/",
+  "destination": "/uncategorized/warum-ki-kraftpakete-der-schlussel-zum-wachstum-sind/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/warum-ki-kraftpakete-der-schlüssel-zum-wachstum-sind/",
+  "destination": "/uncategorized/warum-ki-kraftpakete-der-schlussel-zum-wachstum-sind/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/blog/warum-starke-marken-heute-wichtiger-denn-je-sind/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/website-migration-seo-leitfaden/",
+  "destination": "/uncategorized/website-migration-seo-leitfaden/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/wie-eine-ki-marketing-agentur-ihren-umsatz-steigert/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/blog/wie-ki-das-marketing-revolutioniert-die-zukunft-des-marketings-ist-digital/",
+  "destination": "/uncategorized/wie-ki-das-marketing-revolutioniert-die-zukunft-des-marketings-ist-digital/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/blog/zukunft-der-ki-echtzeitdaten/",
+  "destination": "/uncategorized/zukunft-der-ki-echtzeitdaten/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/buche-jetzt-deinen-termin/",
+  "destination": "/kontakt/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/contact/",
+  "destination": "/kontakt/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/agb/",
+  "destination": "/agb/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/agb/ki-agentur-neuenbuerg/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ai-marketing-berlin/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/all-blogs/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/automatisierte-leadgenerierung/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/berlin/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/blog/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/blog/5-alltaegliche-geschaeftsaufgaben-mit-ki-automatisieren/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ai-agency-wie-ki-agenturen-ihr-unternehmen-transformieren/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/beste-ki-marketingkampagnen-top-marken/",
+  "destination": "/uncategorized/beste-ki-marketingkampagnen-top-marken/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/branding-fehler-vermeiden-tipps/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/dental-seo-strategien/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/highlevels-ai-mitarbeiter/",
+  "destination": "/uncategorized/highlevels-ai-mitarbeiter/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-adoption-skalierung-intelligenter/",
+  "destination": "/uncategorized/ki-adoption-skalierung-intelligenter/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-agentur-deutschland-automatisierung/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-agentur-erfolgreiche-ki-implementierung/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-agentur-intelligente-digitale-strategien/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-automatisierung-fuer-wachstum-und-effizienz-im-unternehmen/",
+  "destination": "/uncategorized/ki-automatisierung-fuer-wachstum-und-effizienz-im-unternehmen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-automatisierung-kleine-unternehmen-effizient-wachsen/",
+  "destination": "/uncategorized/ki-automatisierung-kleine-unternehmen-effizient-wachsen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-automatisierung-produktivitaet-und-effizienz-steigern/",
+  "destination": "/uncategorized/ki-automatisierung-produktivitaet-und-effizienz-steigern/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-berater-ihr-partner-fur-mabgeschneiderte-ki-losunge/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-berater-kuenstliche-intelligenz/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-beratung-unternehmen-transformieren/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-beratungsdienste-fur-business-branded-genius/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-branding-automatisierung-f%C3%BCr-kleine-unternehmen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-branding-automatisierung-für-kleine-unternehmen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor (decoded)"
+ },
+ {
+  "source": "/en/blog/ki-chatbots-integrieren-kundeninteraktion/",
+  "destination": "/uncategorized/ki-chatbots-integrieren-kundeninteraktion/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-consulting-beratung-fuer-unternehmen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-content-creation-efficiency-creativity/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-content-konstanz-geheimnis/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-e-mail-agent/",
+  "destination": "/uncategorized/ki-e-mail-agent/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-echtzeit-marktdynamik/",
+  "destination": "/uncategorized/ki-echtzeit-marktdynamik/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-ethische-standards-marketing-transparenz/",
+  "destination": "/uncategorized/ki-ethische-standards-marketing-transparenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-experte-deutschland/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-experte-zukunft-gestalten/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-experten-mabgeschneiderte-ki-losungen-fur-ihr-unternehmen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-experten-unternehmen-revolutionieren/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-f%C3%BCr-ergebnisse/",
+  "destination": "/uncategorized/ki-fur-ergebnisse/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-für-ergebnisse/",
+  "destination": "/uncategorized/ki-fur-ergebnisse/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/blog/ki-fortbildung-die-beste-weiterbildung-fur-kunstliche-intelligenz/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-fuer-unternehmen-marketing-transformation/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-gestuetzte-systeme-fuer-skalierung-und-automatisierung/",
+  "destination": "/uncategorized/ki-gestuetzte-systeme-fuer-skalierung-und-automatisierung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-im-gesundheitswesen/",
+  "destination": "/uncategorized/ki-im-gesundheitswesen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-im-influencer-marketing/",
+  "destination": "/uncategorized/ki-im-influencer-marketing/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-im-kundenerlebnis/",
+  "destination": "/uncategorized/ki-im-kundenerlebnis/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-im-marketing/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-im-marketing-vs-traditionell-was-bringt-mehr-roi/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-im-modernen-marketing-game-changer-f%C3%BCr-marken/",
+  "destination": "/uncategorized/ki-im-modernen-marketing-game-changer-fur-marken/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-im-modernen-marketing-game-changer-für-marken/",
+  "destination": "/uncategorized/ki-im-modernen-marketing-game-changer-fur-marken/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/blog/ki-im-social-media-marketing/",
+  "destination": "/uncategorized/ki-im-social-media-marketing/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-in-der-bildung/",
+  "destination": "/uncategorized/ki-in-der-bildung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-influencer-marketing-neuer-ansatz/",
+  "destination": "/uncategorized/ki-influencer-marketing-neuer-ansatz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-inhaltspersonalisierung/",
+  "destination": "/uncategorized/ki-inhaltspersonalisierung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-integration-gesch%C3%A4ftserfolg/",
+  "destination": "/uncategorized/ki-integration-geschaftserfolg/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-integration-geschäftserfolg/",
+  "destination": "/uncategorized/ki-integration-geschaftserfolg/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/blog/ki-kurse-ihr-einstieg-in-die-welt-der-kunstlichen-intelligenz/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-kurse-online-weiterbildung-in-kunstlicher-intelligenz/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-lead-generierung-schnellster-weg/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-marketing-2025-intelligentes-branding/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-marketing-agentur-die-zukunft-des-digitalen-marketings/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-marketing-branded-genius-zukunft/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-marketing-ethik/",
+  "destination": "/uncategorized/ki-marketing-ethik/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-marketing-kundenansprache/",
+  "destination": "/uncategorized/ki-marketing-kundenansprache/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-marketing-revolution/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-marketing-strategie-richtig-planen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-marketing-tools-2025/",
+  "destination": "/uncategorized/ki-marketing-tools-2025/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-marketing-vs-traditionelles-marketing-2025/",
+  "destination": "/uncategorized/ki-marketing-vs-traditionelles-marketing-2025/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-marketing-zukunft-verstaendlich-machen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-marketingstrategie-die-funktioniert/",
+  "destination": "/uncategorized/ki-marketingstrategie-die-funktioniert/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-optimierung-werbekampagnen/",
+  "destination": "/uncategorized/ki-optimierung-werbekampagnen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-schulung-fuer-unternehmen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-social-media-zukunft-marketing/",
+  "destination": "/uncategorized/ki-im-social-media-marketing/",
+  "permanent": true,
+  "why": "Framer post, near 0.75"
+ },
+ {
+  "source": "/en/blog/ki-spezialist-experte-ai/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-storytelling-die-zukunft-des-markenaufbaus/",
+  "destination": "/uncategorized/ki-storytelling-die-zukunft-des-markenaufbaus/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-strategie-beratung-mabgeschneiderte-ki-losungen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-strategien/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-transformation-von-content-produktionsmedien/",
+  "destination": "/uncategorized/ki-transformation-von-content-produktionsmedien/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-und-beschaeftigung-wie-kuenstliche-intelligenz-arbeitsplaetze-veraendert/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/ki-verbraucherverhalten-verbrauchertrends-marketing/",
+  "destination": "/uncategorized/ki-verbraucherverhalten-verbrauchertrends-marketing/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/ki-video-marketing-skaliertes-videocontent/",
+  "destination": "/uncategorized/ki-video-marketing-skaliertes-videocontent/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/kreativitaet-trifft-ki-neue-aera-des-marketings/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/kuenstliche-intelligenz-agentur/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/kunstliche-intelligenz-marketing/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/kunstliche-intelligenz-marketing-die-zukunft-des-digitalen-marketings/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/lokales-marketing-ki-marketing-local-seo-strategien/",
+  "destination": "/uncategorized/lokales-marketing-ki-marketing-local-seo-strategien/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/magie-von-ki-im-branding/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/markenwahrnehmung-ki-marketing/",
+  "destination": "/uncategorized/markenwahrnehmung-ki-marketing/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/marketing-automation-branded-genius/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/marketing-automation-die-zukunft-des-digitalen-marketings/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/marketing-automatisierung-mythen-wachstum/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/marketing-ki-assistenten-team/",
+  "destination": "/uncategorized/marketing-ki-assistenten-team/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/marktforschung-ki-insights-kuenstliche-intelligenz-datenanalyse/",
+  "destination": "/uncategorized/marktforschung-ki-insights-kuenstliche-intelligenz-datenanalyse/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/maschinelles-lernen-beratung-automatisierte-marketingloesungen-ki-agentur-muenchen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/maximierung-der-kraft-von-ki-strategien-im-modernen-marketing/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/mit-ki-die-zielgruppe-gezielt-ansprechen-und-gewinnen/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/monetarisierungs-ki-strategien/",
+  "destination": "/uncategorized/monetarisierungs-ki-strategien/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/og-ai-marketing/",
+  "destination": "/uncategorized/og-ai-marketing/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/personalisierter-content-ki-marketing-trends-2025/",
+  "destination": "/uncategorized/personalisierter-content-ki-marketing-trends-2025/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/revolutioniere-dein-marketing-mit-ki/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/seo-f%C3%BCr-startups/",
+  "destination": "/uncategorized/seo-fur-startups/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/seo-für-startups/",
+  "destination": "/uncategorized/seo-fur-startups/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/blog/seo-taktiken-f%C3%BCr-das-ranking-von-unternehmen/",
+  "destination": "/uncategorized/seo-taktiken-fur-das-ranking-von-unternehmen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/seo-taktiken-für-das-ranking-von-unternehmen/",
+  "destination": "/uncategorized/seo-taktiken-fur-das-ranking-von-unternehmen/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/blog/sprachsuche-ki-marketingstrategie/",
+  "destination": "/uncategorized/sprachsuche-ki-marketingstrategie/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/steigern-sie-ihre-karrierechancen-mit-ki-weiterbildung/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/top-ai-kurse-in-deutschland-erweitern-sie-ihre-fahigkeiten/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/verborgene-ki-tipps-die-deine-marke-auf-das-naechste-level-heben/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/von-manuell-zu-magisch-arbeitsabl%C3%A4ufe-mit-ki-automatisierung-transformieren/",
+  "destination": "/uncategorized/von-manuell-zu-magisch-arbeitsablaufe-mit-ki-automatisierung-transformieren/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/von-manuell-zu-magisch-arbeitsabläufe-mit-ki-automatisierung-transformieren/",
+  "destination": "/uncategorized/von-manuell-zu-magisch-arbeitsablaufe-mit-ki-automatisierung-transformieren/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/blog/warum-jedes-unternehmen-2025-eine-ki-strategie-braucht/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/warum-ki-der-gamechanger-fuer-deine-marketingstrategie/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/warum-ki-im-marketing-ihr-unternehmen-voranbringt/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/warum-ki-kraftpakete-der-schl%C3%BCssel-zum-wachstum-sind/",
+  "destination": "/uncategorized/warum-ki-kraftpakete-der-schlussel-zum-wachstum-sind/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/warum-ki-kraftpakete-der-schlüssel-zum-wachstum-sind/",
+  "destination": "/uncategorized/warum-ki-kraftpakete-der-schlussel-zum-wachstum-sind/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/blog/warum-starke-marken-heute-wichtiger-denn-je-sind/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/website-migration-seo-leitfaden/",
+  "destination": "/uncategorized/website-migration-seo-leitfaden/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/wie-eine-ki-marketing-agentur-ihren-umsatz-steigert/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/blog/wie-ki-das-marketing-revolutioniert-die-zukunft-des-marketings-ist-digital/",
+  "destination": "/uncategorized/wie-ki-das-marketing-revolutioniert-die-zukunft-des-marketings-ist-digital/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/blog/zukunft-der-ki-echtzeitdaten/",
+  "destination": "/uncategorized/zukunft-der-ki-echtzeitdaten/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/buche-jetzt-deinen-termin/",
+  "destination": "/en/contact/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/datenschutzerklarung/",
+  "destination": "/datenschutzerklarung/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/home-black/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/impressum/",
+  "destination": "/impressum/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-agentur-birkenfeld/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-agentur-muehlacker/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-agentur-neuenbuerg/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-agentur-pforzheim/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-anbieter-checkliste/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-anbieter-checkliste-2/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-callbot/",
+  "destination": "/en/services/#callbots",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-content-produktion/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-agentur-services-birkenfeld/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-agentur-services-muehlacker-2/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-agentur-services-pforzheim/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-beratung-birkenfeld/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-beratung-muehlacker/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-beratung-pforzheim/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-birkenfeld/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-dienstleistungen-birkenfeld/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-dienstleistungen-muehlacker/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-dienstleistungen-pforzheim/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-muehlacker/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-neuenbuerg/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketing-pforzheim/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketingagentur-birkenfeld/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketingagentur-muehlacker/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-marketingagentur-pforzheim/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-performance-marketing/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-potenzialanalyse/",
+  "destination": "/en/contact/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-seo/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/ki-seo-agentur/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/kostenlose-reports/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/landingpage-erstellen/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/portfolio-single/elysium-agency/",
+  "destination": "/en/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/portfolio-single/k-m-electronik/",
+  "destination": "/en/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/portfolio-single/kryptotransfair/",
+  "destination": "/en/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/portfolio-single/ledbow-germany/",
+  "destination": "/en/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/portfolio-single/life-n-style-asia/",
+  "destination": "/en/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/portfolio-single/martin-wildt-immostanding/",
+  "destination": "/en/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/portfolio-single/mega-screen/",
+  "destination": "/en/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/portfolio-single/wrapwerk-akademie/",
+  "destination": "/en/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/privacy-policy/",
+  "destination": "/datenschutzerklarung/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/roman1/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/roman2/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/roman3/",
+  "destination": "/en/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/terms-conditions/",
+  "destination": "/agb/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/website-erstellen/",
+  "destination": "/en/services/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/wikipedia/",
+  "destination": "/wikipedia/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/en/wikipedia/acceleratoren-technologie-revolutioniert-ki/",
+  "destination": "/wikipedia/acceleratoren-die-technologie-die-ki-revolutioniert/",
+  "permanent": true,
+  "why": "Framer post, near 0.75"
+ },
+ {
+  "source": "/en/wikipedia/actionable-intelligence-daten-entscheidungen/",
+  "destination": "/wikipedia/actionable-intelligence-daten-entscheidungen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/agenten-grundlage-intelligente-systeme/",
+  "destination": "/wikipedia/agenten-grundlage-intelligente-systeme/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/ai-verlustfunktion/",
+  "destination": "/wikipedia/ai-verlustfunktion/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/alignment-ki-menschliche-werte/",
+  "destination": "/wikipedia/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/wikipedia/anaphern-sprachliche-verweise-ki/",
+  "destination": "/wikipedia/anaphern-sprachliche-verweise-ki/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/annotierung-ki-training/",
+  "destination": "/wikipedia/annotierung-ki-training/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/attention-schluesseltechnologie-ki/",
+  "destination": "/wikipedia/attention-schluesseltechnologie-ki/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/automatische-klassifizierung-ki/",
+  "destination": "/wikipedia/automatische-klassifizierung-ki/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/autovervollstaendigung-intelligente-hilfe/",
+  "destination": "/wikipedia/autovervollstaendigung-intelligente-hilfe/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/backpropagation-ki-modelle-lernen/",
+  "destination": "/wikipedia/backpropagation-ki-modelle-lernen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/bedeutung-von-daten-in-der-k%C3%BCnstlichen-intelligenz/",
+  "destination": "/wikipedia/bedeutung-von-daten-in-der-kunstlichen-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/bedeutung-von-daten-in-der-künstlichen-intelligenz/",
+  "destination": "/wikipedia/bedeutung-von-daten-in-der-kunstlichen-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/wikipedia/begrenztes-gedachtnis-in-ki-limited-memory-und-seine-relevanz/",
+  "destination": "/wikipedia/begrenztes-gedachtnis-in-ki-limited-memory-und-seine-relevanz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/bert-meilenstein-sprachverarbeitung/",
+  "destination": "/wikipedia/bert-meilenstein-sprachverarbeitung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/big-data-revolution-datenanalyse/",
+  "destination": "/wikipedia/big-data-revolution-datenanalyse/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/chain-of-thought-denkprozess-ki/",
+  "destination": "/wikipedia/chain-of-thought-denkprozess-ki/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/chatbots-digitale-assistenten/",
+  "destination": "/wikipedia/chatbots-digitale-assistenten/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/clip-ki-sprache-bilder/",
+  "destination": "/wikipedia/clip-ki-sprache-bilder/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/computer-vision-maschinen-sehen/",
+  "destination": "/wikipedia/computer-vision-maschinen-sehen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/data-augmentation-mehr-daten-ki/",
+  "destination": "/wikipedia/data-augmentation-mehr-daten-ki/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/data-mining-schluessel-erkenntnisse/",
+  "destination": "/wikipedia/data-mining-schluessel-erkenntnisse/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/data-science-wissenschaft-innovation/",
+  "destination": "/wikipedia/data-science-wissenschaft-innovation/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/deep-learning-neuronale-netzwerke-ki/",
+  "destination": "/wikipedia/deep-learning-neuronale-netzwerke-ki/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/diffusion-generative-ki-modelle/",
+  "destination": "/wikipedia/diffusion-generative-ki-modelle/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/double-descent-daten-modelle/",
+  "destination": "/wikipedia/double-descent-daten-modelle/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/edge-modelle-ki-netzwerk/",
+  "destination": "/wikipedia/edge-modelle-ki-netzwerk/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/einbettungen-ki-beziehungen-daten/",
+  "destination": "/wikipedia/einbettungen-ki-beziehungen-daten/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/eine-technik-des-maschinellen-lernens-bei-der-mehrere-spezialisierte-teilmodelle-trainiert-werden/",
+  "destination": "/wikipedia/eine-technik-des-maschinellen-lernens-bei-der-mehrere-spezialisierte-teilmodelle-trainiert-werden/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/emergentes-verhalten-von-ki-systemen/",
+  "destination": "/wikipedia/emergentes-verhalten-von-ki-systemen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/ganzheitlicher-ansatz-k%C3%BCnstliche-intelligenz/",
+  "destination": "/wikipedia/ganzheitlicher-ansatz-kunstliche-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/ganzheitlicher-ansatz-künstliche-intelligenz/",
+  "destination": "/wikipedia/ganzheitlicher-ansatz-kunstliche-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/wikipedia/gpu-treibende-kraft-hinter-der-ki-revolution/",
+  "destination": "/wikipedia/gpu-treibende-kraft-hinter-der-ki-revolution/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/halluzinationen-in-der-ki/",
+  "destination": "/wikipedia/halluzinationen-in-der-ki/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/hpost-heading-it-is/",
+  "destination": "/wikipedia/hpost-heading-it-is/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/hyperparameter-optimieren-ki-modelle/",
+  "destination": "/wikipedia/hyperparameter-optimieren-ki-modelle/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/ki-expertensysteme/",
+  "destination": "/wikipedia/ki-expertensysteme/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/ki-lernen-mit-minimalen-daten/",
+  "destination": "/wikipedia/ki-lernen-mit-minimalen-daten/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/ki-modelliert-bestimmte-aufgaben/",
+  "destination": "/wikipedia/ki-modelliert-bestimmte-aufgaben/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/ki-optimierung-mit-anleitung/",
+  "destination": "/wikipedia/ki-optimierung-mit-anleitung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/ki-sicherheitsmabnahmen/",
+  "destination": "/wikipedia/ki-sicherheitsmabnahmen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/kognitives-computing-die-nachste-generation-kunstlicher-intelligenz/",
+  "destination": "/wikipedia/kognitives-computing-die-nachste-generation-kunstlicher-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/kunst-der-ki-gestutzten-vorhersage/",
+  "destination": "/wikipedia/kunst-der-ki-gestutzten-vorhersage/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/large-language-models-\\(lms\\)-die-revolution-der-sprach-ki/",
+  "destination": "/wikipedia/large-language-models-lms-die-revolution-der-sprach-ki/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/latent-space-der-verborgene-raum-der-datenreprasentation/",
+  "destination": "/wikipedia/latent-space-der-verborgene-raum-der-datenreprasentation/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/leitfaden-zur-bewertung-von-ki-modellen/",
+  "destination": "/wikipedia/leitfaden-zur-bewertung-von-ki-modellen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/metakontext-und-meta-prompt-die-kunst-ki-gezielt-zu-steuern/",
+  "destination": "/wikipedia/metakontext-und-meta-prompt-die-kunst-ki-gezielt-zu-steuern/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/modell-drift-eine-herausforderung-fur-die-langfristige-leistung-von-ki-systemen/",
+  "destination": "/wikipedia/modell-drift-eine-herausforderung-fur-die-langfristige-leistung-von-ki-systemen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/moderne-ki-innovationen/",
+  "destination": "/wikipedia/moderne-ki-innovationen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/multimodale-modelle-die-nachste-stufe-der-ki-integration/",
+  "destination": "/wikipedia/multimodale-modelle-die-nachste-stufe-der-ki-integration/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/mustererkennung-wie-ki-verborgene-muster-entschlusselt/",
+  "destination": "/wikipedia/mustererkennung-wie-ki-verborgene-muster-entschlusselt/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/natural-language-processing-\\(nlp\\)-die-revolution-der-sprachverarbeitung/",
+  "destination": "/wikipedia/natural-language-processing-nlp-die-revolution-der-sprachverarbeitung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/nerf-die-revolution-der-3d-darstellung/",
+  "destination": "/wikipedia/nerf-die-revolution-der-3d-darstellung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/neuronale-netzwerke-grundlagen-und-anwendungen/",
+  "destination": "/wikipedia/neuronale-netzwerke-grundlagen-und-anwendungen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/optimierung-von-ki-modellen/",
+  "destination": "/wikipedia/optimierung-von-ki-modellen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/overfitting-die-herausforderung-im-maschinellen-lernen/",
+  "destination": "/wikipedia/overfitting-die-herausforderung-im-maschinellen-lernen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/praezision-genauigkeit-ki-erfolg/",
+  "destination": "/wikipedia/praezision-genauigkeit-ki-erfolg/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/prognose-analytik-die-zukunft-durch-daten-vorhersagen/",
+  "destination": "/wikipedia/prognose-analytik-die-zukunft-durch-daten-vorhersagen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/quantum-computing-die-nachste-technologische-revolution/",
+  "destination": "/wikipedia/quantum-computing-die-nachste-technologische-revolution/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/regularisierung-wie-sie-ki-modelle-optimiert/",
+  "destination": "/wikipedia/regularisierung-wie-sie-ki-modelle-optimiert/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/reinforcement-learning-lernen-durch-interaktion-und-belohnung/",
+  "destination": "/wikipedia/reinforcement-learning-lernen-durch-interaktion-und-belohnung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/retrieval-augmented-generation-wenn-ki-auf-externe-wissensquellen-zugreift/",
+  "destination": "/wikipedia/retrieval-augmented-generation-wenn-ki-auf-externe-wissensquellen-zugreift/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/revolution-k%C3%BCnstliche-intelligenz/",
+  "destination": "/wikipedia/revolution-kunstliche-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/revolution-künstliche-intelligenz/",
+  "destination": "/wikipedia/revolution-kunstliche-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/wikipedia/rlhf-verstarkendes-lernen-mit-menschlichem-feedback/",
+  "destination": "/wikipedia/rlhf-verstarkendes-lernen-mit-menschlichem-feedback/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/schl%C3%BCssel-zur-verbesserung-von-ki-modellen/",
+  "destination": "/wikipedia/schlussel-zur-verbesserung-von-ki-modellen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/schlüssel-zur-verbesserung-von-ki-modellen/",
+  "destination": "/wikipedia/schlussel-zur-verbesserung-von-ki-modellen/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/en/wikipedia/schlusselkomponente-neuronaler-netze/",
+  "destination": "/wikipedia/schlusselkomponente-neuronaler-netze/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/sentiment-analyse-wie-ki-emotionen-entschlusselt/",
+  "destination": "/wikipedia/sentiment-analyse-wie-ki-emotionen-entschlusselt/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/singularitat-der-wendepunkt-der-kunstlichen-intelligenz/",
+  "destination": "/wikipedia/singularitat-der-wendepunkt-der-kunstlichen-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/spracherkennung-wie-ki-sprache-versteht-und-verarbeitet/",
+  "destination": "/wikipedia/spracherkennung-wie-ki-sprache-versteht-und-verarbeitet/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/strukturierte-daten-die-basis-fur-prazise-datenanalysen/",
+  "destination": "/wikipedia/strukturierte-daten-die-basis-fur-prazise-datenanalysen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/symbolische-ki-die-ursprunge-der-kunstlichen-intelligenz/",
+  "destination": "/wikipedia/symbolische-ki-die-ursprunge-der-kunstlichen-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/tensor-flow-die-plattform-fur-modernes-maschinelles-lernen/",
+  "destination": "/wikipedia/tensor-flow-die-plattform-fur-modernes-maschinelles-lernen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/tensor-flow-die-vielseitige-plattform-fur-maschinelles-lernen/",
+  "destination": "/wikipedia/tensor-flow-die-vielseitige-plattform-fur-maschinelles-lernen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/token-in-der-ki-die-grundbausteine-moderner-sprachmodelle/",
+  "destination": "/wikipedia/token-in-der-ki-die-grundbausteine-moderner-sprachmodelle/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/tpu-der-schlussel-zu-leistungsstarker-ki-berechnung/",
+  "destination": "/wikipedia/tpu-der-schlussel-zu-leistungsstarker-ki-berechnung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/trainingsdaten-die-grundlage-fur-erfolgreiche-ki-modelle/",
+  "destination": "/wikipedia/trainingsdaten-die-grundlage-fur-erfolgreiche-ki-modelle/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/transfer-learning-effizientes-training-von-ki-modellen/",
+  "destination": "/wikipedia/transfer-learning-effizientes-training-von-ki-modellen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/transformer-die-revolution-moderner-ki-technologie/",
+  "destination": "/wikipedia/transformer-die-revolution-moderner-ki-technologie/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/transparenz-und-vertrauen-intelligente-systeme/",
+  "destination": "/wikipedia/transparenz-und-vertrauen-intelligente-systeme/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/turing-test-der-klassiker-zur-bewertung-von-kunstlicher-intelligenz/",
+  "destination": "/wikipedia/turing-test-der-klassiker-zur-bewertung-von-kunstlicher-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/uberwachtes-lernen-die-basis-moderner-ki-anwendungen/",
+  "destination": "/wikipedia/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/en/wikipedia/underfitting-verstehen-wie-du-schwache-ki-modelle-vermeidest/",
+  "destination": "/wikipedia/underfitting-verstehen-wie-du-schwache-ki-modelle-vermeidest/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/unstrukturierte-daten-ki-nutzung/",
+  "destination": "/wikipedia/unstrukturierte-daten-ki-nutzung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/unuberwachtes-lernen-wie-ki-eigenstandig-zusammenhange-erkennt/",
+  "destination": "/wikipedia/unuberwachtes-lernen-wie-ki-eigenstandig-zusammenhange-erkennt/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/validierungsdaten-der-schlussel-zur-zuverlassigen-ki-entwicklung/",
+  "destination": "/wikipedia/validierungsdaten-der-schlussel-zur-zuverlassigen-ki-entwicklung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/verantwortung-und-herausforderungen-der-ki-ethik/",
+  "destination": "/wikipedia/verantwortung-und-herausforderungen-der-ki-ethik/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/verantwortung-und-herausforderungen-in-der-kunstlichen-intelligenz/",
+  "destination": "/wikipedia/verantwortung-und-herausforderungen-in-der-kunstlichen-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/verlustfunktion-warum-sie-essentiell-fur-das-modelltraining-ist/",
+  "destination": "/wikipedia/verlustfunktion-warum-sie-essentiell-fur-das-modelltraining-ist/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/vortraining-das-fundament-moderner-ki-modelle/",
+  "destination": "/wikipedia/vortraining-das-fundament-moderner-ki-modelle/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/vorurteile-in-ki-algorithmen/",
+  "destination": "/wikipedia/vorurteile-in-ki-algorithmen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/was-ist-ki-und-wie-verandert-sie-sich/",
+  "destination": "/wikipedia/was-ist-ki-und-wie-verandert-sie-sich/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/weg-menschenaehnliche-intelligenz/",
+  "destination": "/wikipedia/weg-menschenaehnliche-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/zero-shot-extraktion-informationen-gewinnen-ohne-training/",
+  "destination": "/wikipedia/zero-shot-extraktion-informationen-gewinnen-ohne-training/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/zero-shot-learning-wiki-neue-aufgaben-ohne-vorheriges-training-meistert/",
+  "destination": "/wikipedia/zero-shot-learning-wiki-neue-aufgaben-ohne-vorheriges-training-meistert/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/en/wikipedia/zielfunktion-\\(objective-function\\)-das-herzstuck-des-maschinellen-lernens/",
+  "destination": "/wikipedia/zielfunktion-objective-function-das-herzstuck-des-maschinellen-lernens/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/home-black/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-agentur-birkenfeld/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-agentur-muehlacker/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-agentur-neuenbuerg/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-agentur-pforzheim/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-anbieter-checkliste/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-anbieter-checkliste-2/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-callbot/",
+  "destination": "/leistungen/#callbots",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-content-produktion/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-agentur-services-birkenfeld/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-agentur-services-muehlacker-2/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-agentur-services-pforzheim/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-beratung-birkenfeld/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-beratung-muehlacker/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-beratung-pforzheim/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-birkenfeld/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-dienstleistungen-birkenfeld/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-dienstleistungen-muehlacker/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-dienstleistungen-pforzheim/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-muehlacker/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-neuenbuerg/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketing-pforzheim/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketingagentur-birkenfeld/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketingagentur-muehlacker/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-marketingagentur-pforzheim/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-performance-marketing/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-potenzialanalyse/",
+  "destination": "/kontakt/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-seo/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/ki-seo-agentur/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/kostenlose-reports/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/landingpage-erstellen/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/old-home/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/portfolio-single/elysium-agency/",
+  "destination": "/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/portfolio-single/k-m-electronik/",
+  "destination": "/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/portfolio-single/kryptotransfair/",
+  "destination": "/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/portfolio-single/ledbow-germany/",
+  "destination": "/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/portfolio-single/life-n-style-asia/",
+  "destination": "/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/portfolio-single/martin-wildt-immostanding/",
+  "destination": "/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/portfolio-single/mega-screen/",
+  "destination": "/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/portfolio-single/wrapwerk-akademie/",
+  "destination": "/use-cases/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/privacy-policy/",
+  "destination": "/datenschutzerklarung/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/roman1/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/roman2/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/roman3/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/terms-conditions/",
+  "destination": "/agb/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/var\\(--variable-reference-ZjH0fKMJQ-jcen1uDcK/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/website-erstellen/",
+  "destination": "/leistungen/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/wikipedia/acceleratoren-technologie-revolutioniert-ki/",
+  "destination": "/wikipedia/acceleratoren-die-technologie-die-ki-revolutioniert/",
+  "permanent": true,
+  "why": "Framer post, near 0.75"
+ },
+ {
+  "source": "/wikipedia/alignment-ki-menschliche-werte/",
+  "destination": "/wikipedia/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/wikipedia/bedeutung-von-daten-in-der-k%C3%BCnstlichen-intelligenz/",
+  "destination": "/wikipedia/bedeutung-von-daten-in-der-kunstlichen-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/wikipedia/bedeutung-von-daten-in-der-künstlichen-intelligenz/",
+  "destination": "/wikipedia/bedeutung-von-daten-in-der-kunstlichen-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/wikipedia/ganzheitlicher-ansatz-k%C3%BCnstliche-intelligenz/",
+  "destination": "/wikipedia/ganzheitlicher-ansatz-kunstliche-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/wikipedia/ganzheitlicher-ansatz-künstliche-intelligenz/",
+  "destination": "/wikipedia/ganzheitlicher-ansatz-kunstliche-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/wikipedia/large-language-models-\\(lms\\)-die-revolution-der-sprach-ki/",
+  "destination": "/wikipedia/large-language-models-lms-die-revolution-der-sprach-ki/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/wikipedia/natural-language-processing-\\(nlp\\)-die-revolution-der-sprachverarbeitung/",
+  "destination": "/wikipedia/natural-language-processing-nlp-die-revolution-der-sprachverarbeitung/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/wikipedia/revolution-k%C3%BCnstliche-intelligenz/",
+  "destination": "/wikipedia/revolution-kunstliche-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/wikipedia/revolution-künstliche-intelligenz/",
+  "destination": "/wikipedia/revolution-kunstliche-intelligenz/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/wikipedia/schl%C3%BCssel-zur-verbesserung-von-ki-modellen/",
+  "destination": "/wikipedia/schlussel-zur-verbesserung-von-ki-modellen/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/wikipedia/schlüssel-zur-verbesserung-von-ki-modellen/",
+  "destination": "/wikipedia/schlussel-zur-verbesserung-von-ki-modellen/",
+  "permanent": true,
+  "why": "Framer post, slug (decoded)"
+ },
+ {
+  "source": "/wikipedia/uberwachtes-lernen-die-basis-moderner-ki-anwendungen/",
+  "destination": "/wikipedia/",
+  "permanent": true,
+  "why": "Framer post, no successor"
+ },
+ {
+  "source": "/wikipedia/zielfunktion-\\(objective-function\\)-das-herzstuck-des-maschinellen-lernens/",
+  "destination": "/wikipedia/zielfunktion-objective-function-das-herzstuck-des-maschinellen-lernens/",
+  "permanent": true,
+  "why": "Framer post, slug"
+ },
+ {
+  "source": "/meetings/roman-traenkle/",
+  "destination": "/",
+  "permanent": true,
+  "why": "Framer page"
+ },
+ {
+  "source": "/blog/:slug/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, catch-all"
+ },
+ {
+  "source": "/en/blog/:slug/",
+  "destination": "/blog/",
+  "permanent": true,
+  "why": "Framer post, catch-all"
+ },
+ {
+  "source": "/en/wikipedia/:slug/",
+  "destination": "/wikipedia/",
+  "permanent": true,
+  "why": "Framer post, catch-all"
+ },
+ {
+  "source": "/sitemap_index.xml",
+  "destination": "/sitemap.xml",
+  "permanent": true,
+  "why": "old sitemap"
+ },
+ {
+  "source": "/post-sitemap.xml",
+  "destination": "/sitemap.xml",
+  "permanent": true,
+  "why": "old sitemap"
+ },
+ {
+  "source": "/page-sitemap.xml",
+  "destination": "/sitemap.xml",
+  "permanent": true,
+  "why": "old sitemap"
+ },
+ {
+  "source": "/category-sitemap.xml",
+  "destination": "/sitemap.xml",
+  "permanent": true,
+  "why": "old sitemap"
+ },
+ {
+  "source": "/wp-sitemap.xml",
+  "destination": "/sitemap.xml",
+  "permanent": true,
+  "why": "old sitemap"
+ }
+]

@@ -39,7 +39,7 @@ export default function GlobalNotFound() {
               Zur Startseite
             </Link>
             <Link
-              href="/en"
+              href="/en/"
               lang="en"
               className="inline-flex h-12 items-center rounded-[12px] border border-white/15 px-6 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-white/[0.08]"
             >

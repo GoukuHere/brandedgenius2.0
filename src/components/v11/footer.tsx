@@ -106,7 +106,8 @@ export async function Footer() {
           <p className="t-small">{FOOTER.copyright}</p>
           <nav aria-label={words.legal} className="flex gap-6">
             {FOOTER.legal.map((l) => (
-              <a key={l.href} href={l.href} target="_blank" rel="noopener" className="text-[14px] text-ink/60 transition-colors duration-200 hover:text-white">
+              // 2026-11-24: the legal pages are this site's own now, so they open in the same tab.
+              <a key={l.href} href={l.href} {...(l.href.startsWith("http") ? { target: "_blank", rel: "noopener" } : {})} className="text-[14px] text-ink/60 transition-colors duration-200 hover:text-white">
                 {l.label}
               </a>
             ))}

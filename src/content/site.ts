@@ -7,11 +7,13 @@ export const LINKS = {
   // The client's hosted contact form: the original opens it from "Jetzt Kontakt aufnehmen", "Send Message",
   // "Leistungen entdecken", the service cards and the Lösung button.
   contact: "https://api.brandedgenius.net/widget/form/JemoFrrJQ5D665FZaVM0",
-  imprint: "https://brandedgenius.de/impressum/",
-  privacy: "https://brandedgenius.de/datenschutzerklarung/",
-  terms: "https://brandedgenius.de/agb/",
-  blog: "https://brandedgenius.de/blog/",
-  wiki: "https://brandedgenius.de/wikipedia/",
+  // 2026-11-24: the legal pages, the blog and the glossary are pages of this site now (from his WordPress site, at
+  // the same addresses), no longer links to the old one.
+  imprint: "/impressum/",
+  privacy: "/datenschutzerklarung/",
+  terms: "/agb/",
+  blog: "/blog/",
+  wiki: "/wikipedia/",
 };
 
 export const MEDIA = {
@@ -22,11 +24,11 @@ export const MEDIA = {
 // The site's pages (2026-11-16), at the same addresses as the client's own site (brandedgenius.de/leistungen/ ...).
 export const NAV = [
   { label: "Startseite", href: "/" },
-  { label: "Leistungen", href: "/leistungen" },
-  { label: "Use Cases", href: "/use-cases" },
-  { label: "KI-Workshop", href: "/ki-workshop" },
-  { label: "Über uns", href: "/uber-uns" },
-  { label: "Kontakt", href: "/kontakt" },
+  { label: "Leistungen", href: "/leistungen/" },
+  { label: "Use Cases", href: "/use-cases/" },
+  { label: "KI-Workshop", href: "/ki-workshop/" },
+  { label: "Über uns", href: "/uber-uns/" },
+  { label: "Kontakt", href: "/kontakt/" },
 ];
 
 export const HEADER = {

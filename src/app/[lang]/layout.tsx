@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { lang } from "next/root-params";
 import { MotionProvider } from "@/components/system/motion-provider";
 import { isLocale, LOCALES } from "@/i18n/config";
+import { ldJson, ROBOTS, SHARE_IMAGE, SITE_NAME, SITE_URL, siteGraph } from "@/lib/seo";
 import "../globals.css";
 
 /*
@@ -20,33 +21,18 @@ const brand = localFont({
 });
 
 /*
-  2026-11-16: v11 is the only version (the client approved it); the site gains the subpages. The whole preview stays
-  out of search engines: the client's live site is brandedgenius.de, and the same copy indexed on vercel.app would
-  compete with it.
+  2026-11-24 (the move from the client's WordPress site, "he didn't want to lose the SEO"): the site is made to be
+  indexed at brandedgenius.de. Every address and share card resolves against the live domain (metadataBase), the
+  robots line is the old site's, and each page sets its own title, description and canonical (lib/seo.ts). The
+  preview on vercel.app stays out of search through an X-Robots-Tag header on that host (next.config.ts), so the two
+  never compete.
 */
-const SITE_META = {
-  de: {
-    title: "KI-Automatisierung, die Ergebnisse schafft | Branded Genius",
-    description:
-      "Branded Genius entwickelt KI-Agenten, Automatisierungen und intelligente Workflows für Marketing, Vertrieb, Kundenservice und interne Prozesse – von der Potenzialanalyse bis zur Umsetzung.",
-  },
-  // Round 5 (DE/EN): the English title and description, written to the copy standard.
-  en: {
-    title: "AI automation that delivers results | Branded Genius",
-    description:
-      "Branded Genius builds AI agents, automations and smart workflows for marketing, sales, customer service and internal processes. From the potential analysis to the finished system.",
-  },
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  robots: ROBOTS,
+  openGraph: { siteName: SITE_NAME, images: [SHARE_IMAGE] },
+  twitter: { card: "summary_large_image" },
 };
-
-export async function generateMetadata(): Promise<Metadata> {
-  const value = await lang();
-  const meta = SITE_META[isLocale(value) ? value : "de"];
-  return {
-    title: { default: meta.title, template: "%s | Branded Genius" },
-    robots: { index: false, follow: false },
-    description: meta.description,
-  };
-}
 
 export const viewport: Viewport = {
   themeColor: "#05112c",
@@ -69,6 +55,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang={locale} className={`dark ${brand.variable}`}>
       <body>
         <MotionProvider>{children}</MotionProvider>
+        {/* The business, its founder and the website, for search engines (lib/seo.ts). */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson(siteGraph(locale)) }} />
       </body>
     </html>
   );

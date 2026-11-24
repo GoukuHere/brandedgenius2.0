@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { KontaktHero } from "@/components/pages/kontakt/hero";
 import { SiteShell } from "@/components/site/site-shell";
-import { getCopy } from "@/i18n/server";
+import { getCopy, getLocale } from "@/i18n/server";
+import { pageMetadata } from "@/lib/seo";
 import "@/components/pages/kontakt/kontakt.css";
 
 // The client's own page title and description from brandedgenius.de/kontakt/, by language (round 5: KONTAKT_META).
 export async function generateMetadata(): Promise<Metadata> {
+  // 2026-11-24: one title per page (the German word for word as the old site served it), the canonical and the
+  // language pair (lib/seo.ts).
   const { KONTAKT_META } = (await getCopy()).kontakt;
-  return { title: KONTAKT_META.title, description: KONTAKT_META.description };
+  return pageMetadata("kontakt", await getLocale(), KONTAKT_META);
 }
 
 /*

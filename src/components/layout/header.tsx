@@ -33,7 +33,12 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 function useCurrentPage(nav: { href: string }[]) {
   // The public address (while prerendering, the router reports the internal /de/... route).
   const path = publicPath(usePathname() ?? "/");
-  const hit = nav.find((item) => (item.href === "/" || item.href === "/en" ? path === item.href : path === item.href || path.startsWith(`${item.href}/`)));
+  // The nav's addresses end in a slash (2026-11-24), the matched path does not.
+  const bare = (href: string) => href.replace(/\/+$/, "") || "/";
+  const hit = nav.find((item) => {
+    const href = bare(item.href);
+    return href === "/" || href === "/en" ? path === href : path === href || path.startsWith(`${href}/`);
+  });
   return hit ? hit.href : null;
 }
 
@@ -65,7 +70,7 @@ function LanguageSwitch({ className, onPick }: { className?: string; onPick?: ()
           // the router's prefetch of it from this layout is answered with a 404.
           <a
             key={l.locale}
-            href={on ? path : switchPath(path, l.locale)}
+            href={on ? (path === "/" ? path : `${path}/`) : switchPath(path, l.locale)}
             hrefLang={l.locale}
             lang={l.locale}
             aria-label={l.name}

@@ -7,13 +7,16 @@ import { UberMission } from "@/components/pages/uber-uns/mission";
 import { UberProcess } from "@/components/pages/uber-uns/process-dial";
 import { UberTrust } from "@/components/pages/uber-uns/trust";
 import { SiteShell } from "@/components/site/site-shell";
-import { getCopy } from "@/i18n/server";
+import { getCopy, getLocale } from "@/i18n/server";
+import { pageMetadata } from "@/lib/seo";
 import "@/components/pages/uber-uns/uber-uns.css";
 
 // The client's own page title and description from brandedgenius.de/uber-uns/, by language (round 5: UU_META).
 export async function generateMetadata(): Promise<Metadata> {
+  // 2026-11-24: one title per page (the German word for word as the old site served it), the canonical and the
+  // language pair (lib/seo.ts).
   const { UU_META } = (await getCopy()).uberUns;
-  return { title: UU_META.title, description: UU_META.description };
+  return pageMetadata("uberUns", await getLocale(), UU_META);
 }
 
 /*

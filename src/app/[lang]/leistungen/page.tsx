@@ -9,13 +9,16 @@ import { MarketingSection } from "@/components/pages/leistungen/marketing";
 import { PotenzialSection } from "@/components/pages/leistungen/potenzial";
 import { VorgehenSection } from "@/components/pages/leistungen/vorgehen";
 import { SiteShell } from "@/components/site/site-shell";
-import { getCopy } from "@/i18n/server";
+import { getCopy, getLocale } from "@/i18n/server";
+import { pageMetadata } from "@/lib/seo";
 import "@/components/pages/leistungen/leistungen.css";
 
 // The client's own page title and description from brandedgenius.de/leistungen/ (round 5, DE/EN: from the page's copy, by language).
 export async function generateMetadata(): Promise<Metadata> {
+  // 2026-11-24: one title per page (the German word for word as the old site served it), the canonical and the
+  // language pair (lib/seo.ts).
   const { LEISTUNGEN_META } = (await getCopy()).leistungen;
-  return { title: LEISTUNGEN_META.title, description: LEISTUNGEN_META.description };
+  return pageMetadata("leistungen", await getLocale(), LEISTUNGEN_META);
 }
 
 /*

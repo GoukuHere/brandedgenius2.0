@@ -10,13 +10,16 @@ import { KwResults } from "@/components/pages/ki-workshop/results";
 import { KwSteps } from "@/components/pages/ki-workshop/steps";
 import { KwTrainer } from "@/components/pages/ki-workshop/trainer";
 import { SiteShell } from "@/components/site/site-shell";
-import { getCopy } from "@/i18n/server";
+import { getCopy, getLocale } from "@/i18n/server";
+import { pageMetadata } from "@/lib/seo";
 import "@/components/pages/ki-workshop/ki-workshop.css";
 
 // The page title and description in the page's language (round 5: the German is the client's own, now in the copy module).
 export async function generateMetadata(): Promise<Metadata> {
+  // 2026-11-24: one title per page (the German word for word as the old site served it), the canonical and the
+  // language pair (lib/seo.ts).
   const { KW_META } = (await getCopy()).kiWorkshop;
-  return { title: KW_META.title, description: KW_META.description };
+  return pageMetadata("kiWorkshop", await getLocale(), KW_META);
 }
 
 /*

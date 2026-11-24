@@ -13,12 +13,12 @@ import { LINKS } from "../site";
 export { LINKS } from "../site";
 
 export const NAV: Shape<typeof DE.NAV> = [
-  { label: "Home", href: "/en" },
-  { label: "Services", href: "/en/services" },
-  { label: "Use Cases", href: "/en/use-cases" },
-  { label: "AI Workshop", href: "/en/ai-workshop" },
-  { label: "About", href: "/en/about" },
-  { label: "Contact", href: "/en/contact" },
+  { label: "Home", href: "/en/" },
+  { label: "Services", href: "/en/services/" },
+  { label: "Use Cases", href: "/en/use-cases/" },
+  { label: "AI Workshop", href: "/en/ai-workshop/" },
+  { label: "About", href: "/en/about/" },
+  { label: "Contact", href: "/en/contact/" },
 ];
 
 export const HEADER: Shape<typeof DE.HEADER> = {

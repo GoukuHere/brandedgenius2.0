@@ -4,13 +4,16 @@ import { ClosingSection } from "@/components/pages/use-cases/closing";
 import { UseCasesHero } from "@/components/pages/use-cases/hero";
 import { ProjectsSection } from "@/components/pages/use-cases/projects";
 import { SiteShell } from "@/components/site/site-shell";
-import { getCopy } from "@/i18n/server";
+import { getCopy, getLocale } from "@/i18n/server";
+import { pageMetadata } from "@/lib/seo";
 import "@/components/pages/use-cases/use-cases.css";
 
 // The client's own page title and description from brandedgenius.de/use-cases/ (round 5: per language, in the page's copy).
 export async function generateMetadata(): Promise<Metadata> {
+  // 2026-11-24: one title per page (the German word for word as the old site served it), the canonical and the
+  // language pair (lib/seo.ts).
   const { UC_META } = (await getCopy()).useCases;
-  return { title: UC_META.title, description: UC_META.description };
+  return pageMetadata("useCases", await getLocale(), UC_META);
 }
 
 /*
