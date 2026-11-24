@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { useCopy } from "@/i18n/client";
@@ -15,6 +16,9 @@ import { useCopy } from "@/i18n/client";
   Desktop: four in a row, turning 260ms apart once the row is well in view. Phones: one column, each tile turns as it
   enters. A tile turns once and stays turned. Reduced motion: the turn is instant (the end state).
   Round 5 (DE/EN): copy by language.
+  Round 5 (the client's Loom of 2026-11-18, 3:39: "cool AI pictures in their backgrounds"): the back of each tile
+  carries a picture made for its challenge across its top, fading into the tile's navy above the line, so the text
+  stays on a dark base. The turn reveals it; the front keeps the number and the title alone.
 */
 
 const STEP_MS = 260; // between two tiles
@@ -81,6 +85,9 @@ export function KwChallenges() {
                   <h3 className="kw-flip-title">{item.title}</h3>
                 </div>
                 <div className="kw-face kw-face-back">
+                  <span aria-hidden className="kw-flip-photo">
+                    <Image src={item.img} alt="" fill sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw" className="object-cover" />
+                  </span>
                   <p aria-hidden className="kw-flip-mini">
                     <span className="num text-sky">{pad(i + 1)}</span>
                     {item.title}

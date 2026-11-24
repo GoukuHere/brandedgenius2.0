@@ -36,10 +36,10 @@ export const KW_CHALLENGES = {
   accent: "aber noch ohne klare Struktur.",
   text: "KI-Tools sind verfügbar, doch häufig fehlt das Wissen, wie sie sicher, produktiv und einheitlich im Unternehmen eingesetzt werden können.",
   items: [
-    { title: "Unsicherheit im Team", text: "Mitarbeiter wissen nicht, welche KI-Tools sie nutzen dürfen und wie sie richtig damit arbeiten." },
-    { title: "Tool-Chaos", text: "Verschiedene Anwendungen werden getestet, aber nicht sinnvoll in bestehende Prozesse integriert." },
-    { title: "Fehlende Richtlinien", text: "Datenschutz, Freigaben und interne Regeln sind noch nicht eindeutig definiert." },
-    { title: "Zu wenig Praxis", text: "Viele Schulungen erklären nur die Theorie und schaffen keine Veränderung im Arbeitsalltag." },
+    { title: "Unsicherheit im Team", text: "Mitarbeiter wissen nicht, welche KI-Tools sie nutzen dürfen und wie sie richtig damit arbeiten.", img: "/media/pages/ki-workshop/r5-problem-team.webp" },
+    { title: "Tool-Chaos", text: "Verschiedene Anwendungen werden getestet, aber nicht sinnvoll in bestehende Prozesse integriert.", img: "/media/pages/ki-workshop/r5-problem-tools.webp" },
+    { title: "Fehlende Richtlinien", text: "Datenschutz, Freigaben und interne Regeln sind noch nicht eindeutig definiert.", img: "/media/pages/ki-workshop/r5-problem-regeln.webp" },
+    { title: "Zu wenig Praxis", text: "Viele Schulungen erklären nur die Theorie und schaffen keine Veränderung im Arbeitsalltag.", img: "/media/pages/ki-workshop/r5-problem-praxis.webp" },
   ],
 };
 
