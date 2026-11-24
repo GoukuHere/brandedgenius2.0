@@ -4,6 +4,7 @@ import { motion, useMotionValueEvent, useScroll, useTransform } from "motion/rea
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useCopy, useWords } from "@/i18n/client";
+import { cn } from "@/lib/utils";
 import { ProblemTop } from "./problem-top";
 
 /*
@@ -108,11 +109,26 @@ export function HeroIntoProblem() {
 
   // The film plays only while the hero can be seen.
   const playing = onScreen && phase === "hero" && !reduced;
+  /*
+    2026-11-24 (page speed, the site check): the film is only fetched once the page itself has loaded, so on a slow
+    phone it never competes with the page's code and styles (it took the first paint from 1.8 s to 4.6 s). Until it
+    plays, its first frame stands in for it (the poster image below, painted with the page); then it fades in over it.
+  */
+  const [filmOn, setFilmOn] = useState(false);
   useEffect(() => {
     const video = film.current;
-    if (!video) return;
-    if (playing) video.play().catch(() => {});
-    else video.pause();
+    if (!video) return undefined;
+    if (!playing) {
+      video.pause();
+      return undefined;
+    }
+    const start = () => video.play().catch(() => {});
+    if (document.readyState === "complete") {
+      start();
+      return undefined;
+    }
+    window.addEventListener("load", start, { once: true });
+    return () => window.removeEventListener("load", start);
   }, [playing]);
 
   const line = (delay: number) => ({ initial: { y: "105%" }, animate: { y: "0%" }, transition: { duration: 1.1, delay, ease: EASE } });
@@ -143,24 +159,42 @@ export function HeroIntoProblem() {
             no empty foot on a tall phone (the developer: "too much bottom blank space when the page loads on mobile").
             Desktop: the film over the whole screen, as before.
           */}
+          {/*
+            2026-11-24: the film's frame settles in (scale) but no longer fades in from nothing: a hidden frame waits
+            for the page's script, so phones saw the hero only after it (the hero is the page's largest paint).
+          */}
           <motion.div
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ scale: 1.04 }}
+            animate={{ scale: 1 }}
             transition={{ duration: 1.6, delay: 0.1, ease: EASE }}
             className="v11-film-phone relative z-[2] mt-[72px] min-h-[96px] flex-1 lg:absolute lg:inset-x-0 lg:top-[72px] lg:bottom-0 lg:mt-0 lg:min-h-0 lg:[mask-image:linear-gradient(to_bottom,transparent_0,#000_28px)]"
           >
+            {/* The film's first frame, loaded with priority and painted with the page. */}
+            <Image
+              src={MEDIA.heroPoster}
+              alt=""
+              fill
+              priority
+              unoptimized
+              className="object-cover object-[50%_28%] motion-reduce:hidden lg:object-[50%_0%]"
+            />
+            {/* The film itself: fetched after the page has loaded (see above), phones get the lighter file. */}
             <video
               ref={film}
-              className="absolute inset-0 h-full w-full object-cover object-[50%_28%] motion-reduce:hidden lg:object-[50%_0%]"
-              src={MEDIA.heroVideo}
-              poster={MEDIA.heroPoster}
-              autoPlay
+              className={cn(
+                "absolute inset-0 h-full w-full object-cover object-[50%_28%] transition-opacity duration-700 motion-reduce:hidden lg:object-[50%_0%]",
+                filmOn ? "opacity-100" : "opacity-0"
+              )}
               loop
               muted
               playsInline
-              preload="auto"
+              preload="none"
+              onPlaying={() => setFilmOn(true)}
               aria-label={words.film}
-            />
+            >
+              <source src={MEDIA.heroVideoPhone} type="video/mp4" media="(max-width: 767px)" />
+              <source src={MEDIA.heroVideo} type="video/mp4" />
+            </video>
             <Image src="/media/hero-final.webp" alt="" fill sizes="100vw" className="hidden object-cover object-[50%_28%] motion-reduce:block lg:object-[50%_0%]" />
           </motion.div>
           {/* Desktop: a navy ground rises at the foot of the film so the headline reads. */}

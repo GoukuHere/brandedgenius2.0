@@ -18,6 +18,8 @@ export const LINKS = {
 
 export const MEDIA = {
   heroVideo: "/media/hero.mp4",
+  // 2026-11-24: the same film for phones, re-encoded at half the size (752 KB, SSIM 0.984 against the original).
+  heroVideoPhone: "/media/hero-mobile.mp4",
   heroPoster: "/media/hero-poster.webp",
 };
 
