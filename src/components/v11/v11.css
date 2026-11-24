@@ -919,6 +919,25 @@ body:has(.v11) {
     translate: none;
   }
 }
+/*
+  2026-11-24 (the developer: "too much space between left header and slides lines"): the reasons' two-line headings
+  stood at the top of a cell as tall as the three-line question, so an empty line sat between them and the bars.
+  Every heading now stands on the bars, its last line the same distance above them. On the held stage the cell is
+  only as tall as the reasons' headings, so they sit centred, and the question grows upward from the same line.
+  Without the hold the question stays in the cell (it would otherwise reach into the section above).
+*/
+.v11-reasons-heads > * {
+  align-self: end;
+}
+@media (min-height: 600px) {
+  .v11-reasons-heads {
+    position: relative;
+  }
+  .v11-reasons-heads > .v11-reasons-question {
+    position: absolute;
+    inset: auto 0 0;
+  }
+}
 
 /* ---------- Die Realität on the scroll (reasons.tsx, PIN) ---------- */
 

@@ -164,13 +164,15 @@ export function ReasonsSection() {
             {/*
               Round 5 (the developer, 2026-11-22: "the heading on left should also change with slide"): the big heading
               is the section's question first, then each reason's title, changing with the step. All of them stand in
-              one cell (the tallest sets the height), so the bars and the line below never move.
+              one cell, so the bars and the line below never move. 2026-11-24 (the developer: "too much space between
+              left header and slides lines"): each one stands on the bars at the same distance; the reasons set the
+              cell's height and the longer question grows upward from the same line (v11.css, .v11-reasons-heads).
             */}
             <h2 className="sr-only">
               {REALITY.title} {REALITY.accent}
             </h2>
-            <div aria-hidden className="v11-reasons-swap grid">
-              <div data-on={step === 0 || undefined}>
+            <div aria-hidden className="v11-reasons-swap v11-reasons-heads grid">
+              <div data-on={step === 0 || undefined} className="v11-reasons-question">
                 <Heading as="p" title={REALITY.title} accent={REALITY.accent} />
               </div>
               {REASONS.map((r, i) => (
