@@ -150,7 +150,8 @@ export function PromiseCard({
     <div className="[perspective:1200px]">
       <motion.div style={{ rotateX, rotateY }} className="will-change-transform motion-reduce:transform-none!">
         <Tilt rotationFactor={8} springOptions={TILT_SPRING} className="motion-reduce:transform-none! [@media(hover:none)]:transform-none!">
-          <div className="v11-promise-card relative aspect-[4/3] w-full overflow-hidden rounded-[24px] lg:aspect-[380/480] lg:w-[clamp(300px,24vw,380px)]">
+          {/* Desktop: never taller than the window leaves under the header (round 6: the stage pins from 600px). */}
+          <div className="v11-promise-card relative aspect-[4/3] w-full overflow-hidden rounded-[24px] lg:aspect-[380/480] lg:w-[min(clamp(300px,24vw,380px),calc((100svh-140px)*0.79))]">
             {/* The current figure's drawing in the lower half; the others wait, faded. */}
             <div className="absolute inset-x-0 bottom-0 grid h-[60%] px-7 pt-6 pb-7 sm:px-9 sm:pb-9">
               {figures.map((figure, i) => (

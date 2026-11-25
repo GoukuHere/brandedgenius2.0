@@ -32,9 +32,10 @@ const WORDS = {
 const HOVER_INTENT_MS = 80; // sweeping the pointer across the row does not flick every panel open
 
 // Where each photo's subject sits, so the narrow collapsed panels still show the person, not the wall.
-// Round 5: 02 and 04 are the new pictures of Roman (online seminar: he sits left of the camera; training: he stands
-// left of the screen).
-const FOCUS = ["43% 50%", "32% 50%", "45% 50%", "30% 50%"];
+// Round 6 (the client's Loom of 2026-11-24: of the two generated pictures of him, "this is not me ... remove that"):
+// 02 and 04 show the format without him until his own photos come (online seminar: the shared slide and a
+// participant; training: a sales team at work on its own AI process, the speaker left of the screen).
+const FOCUS = ["43% 50%", "62% 50%", "45% 50%", "40% 50%"];
 
 // The open panel is 2.4 / 5.4 of the row: about 520px inside the 1280px container.
 const PANEL_SIZES = "(min-width: 1280px) 520px, 44vw";

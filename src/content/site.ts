@@ -76,15 +76,16 @@ export const REALITY = {
   // Round 5 (the developer, 2026-11-22: "the heading on left should also change with slide"): each reason's title is
   // also its big heading on the slider (heading.title in white, heading.accent in the gradient, as every heading).
   // Round 5 (Roman, 2026-11-18: the steps should fit the heading): the six reasons rewritten to the copy standard,
-  // each a concrete moment in one or two short sentences. The pictures are still the old ones until the new ones,
-  // made for each step, are in.
+  // each a concrete moment in one or two short sentences.
+  // Round 6 (Roman, 2026-11-24: "create for the section an amazing fitting graphic"): each reason has its own picture
+  // (GPT Image 2.5, 1536x1024) showing that moment, the people and screens near the middle for the square crop.
   items: [
-    { title: "Kein Fahrplan für KI", heading: { title: "Kein Fahrplan", accent: "für KI." }, text: "Jedes Team testet eigene Tools. Niemand legt fest, was zuerst kommt.", img: "/media/reality/r5-fahrplan.webp" },
-    { title: "Tools ohne Verbindung", heading: { title: "Tools ohne", accent: "Verbindung." }, text: "Ihr Team kopiert Daten von Hand zwischen CRM, E-Mail und Tabellen.", img: "/media/reality/r5-tools.webp" },
-    { title: "Routinearbeit kostet Zeit", heading: { title: "Routinearbeit", accent: "kostet Zeit." }, text: "Ihr Team tippt Angebote, Rechnungen und Termine immer noch von Hand ein.", img: "/media/reality/r5-routine.webp" },
-    { title: "Das Team ist unsicher", heading: { title: "Das Team", accent: "ist unsicher." }, text: "Niemand weiß, welche Tools erlaubt sind. Also bleibt die KI liegen.", img: "/media/reality/r5-unsicher.webp" },
-    { title: "Datenschutz kommt zu spät", heading: { title: "Datenschutz", accent: "kommt zu spät." }, text: "Kurz vor dem Start prüft jemand die Regeln. Dann steht das Projekt still.", img: "/media/reality/r5-datenschutz.webp" },
-    { title: "Niemand misst den Nutzen", heading: { title: "Niemand misst", accent: "den Nutzen." }, text: "Die KI läuft. Wie viel Zeit und Geld sie spart, weiß niemand.", img: "/media/reality/r5-nutzen.webp" },
+    { title: "Kein Fahrplan für KI", heading: { title: "Kein Fahrplan", accent: "für KI." }, text: "Jedes Team testet eigene Tools. Niemand legt fest, was zuerst kommt.", img: "/media/reality/r6-fahrplan.webp" },
+    { title: "Tools ohne Verbindung", heading: { title: "Tools ohne", accent: "Verbindung." }, text: "Ihr Team kopiert Daten von Hand zwischen CRM, E-Mail und Tabellen.", img: "/media/reality/r6-tools.webp" },
+    { title: "Routinearbeit kostet Zeit", heading: { title: "Routinearbeit", accent: "kostet Zeit." }, text: "Ihr Team tippt Angebote, Rechnungen und Termine immer noch von Hand ein.", img: "/media/reality/r6-routine.webp" },
+    { title: "Das Team ist unsicher", heading: { title: "Das Team", accent: "ist unsicher." }, text: "Niemand weiß, welche Tools erlaubt sind. Also bleibt die KI liegen.", img: "/media/reality/r6-unsicher.webp" },
+    { title: "Datenschutz kommt zu spät", heading: { title: "Datenschutz", accent: "kommt zu spät." }, text: "Kurz vor dem Start prüft jemand die Regeln. Dann steht das Projekt still.", img: "/media/reality/r6-datenschutz.webp" },
+    { title: "Niemand misst den Nutzen", heading: { title: "Niemand misst", accent: "den Nutzen." }, text: "Die KI läuft. Wie viel Zeit und Geld sie spart, weiß niemand.", img: "/media/reality/r6-nutzen.webp" },
   ],
 };
 
@@ -408,9 +409,9 @@ export const WORKSHOP = {
   formatsLabel: "Unsere Workshop-Formate",
   formats: [
     { title: "Vor-Ort Workshops", text: "Interaktive Hands-on-Workshops direkt in Ihrem Unternehmen vor Ort.", img: "/media/workshop/vor-ort.webp" },
-    { title: "Online Seminare", text: "Kompakte Live-Online-Trainings mit praxisnahen Übungen und individuellem Austausch.", img: "/media/workshop/r5-online-roman.webp" },
+    { title: "Online Seminare", text: "Kompakte Live-Online-Trainings mit praxisnahen Übungen und individuellem Austausch.", img: "/media/workshop/r6-online.webp" },
     { title: "Leadership Workshops", text: "Strategische Entscheidungskompetenz und Zukunftssicherheit für Führungskräfte und Vorstände.", img: "/media/workshop/leadership.webp" },
-    { title: "Individuelle Trainings", text: "Maßgeschneiderte Schulungsinhalte für spezifische Fachabteilungen und konkrete Anwendungsfälle.", img: "/media/workshop/r5-individuell-roman.webp" },
+    { title: "Individuelle Trainings", text: "Maßgeschneiderte Schulungsinhalte für spezifische Fachabteilungen und konkrete Anwendungsfälle.", img: "/media/workshop/r6-individuell.webp" },
   ],
   topicsLabel: "Themenbeispiele",
   topics: [

@@ -2,12 +2,11 @@
 
 import { motion, useMotionValue, useMotionValueEvent, useSpring, type MotionValue } from "motion/react";
 import Image from "next/image";
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { useSectionProgress } from "@/components/system/use-section-progress";
-import { ArrowUpRight, Check } from "lucide-react";
 import type * as Site from "@/content/site";
-import { useCopy, useWords } from "@/i18n/client";
+import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 /*
@@ -22,7 +21,7 @@ import { cn } from "@/lib/utils";
   horizontal axis per step. Phones: the line moves to the left edge and every step stacks to its right (node, number
   and title, text, photo).
 
-  Round 5 (DE/EN): copy by language (useCopy; the check card's words in WORDS below).
+  Round 5 (DE/EN): copy by language (useCopy).
 */
 
 type Step = (typeof Site.PROCESS.steps)[number];
@@ -35,16 +34,21 @@ type Step = (typeof Site.PROCESS.steps)[number];
   07 skalierung 4910951. 06 stays Roman's own training photo. v1 keeps its photos (they live in /media/process).
   Round 5 (the client's Loom of 2026-11-18: 02 "looks like stock", 03 "should be an AI roadmap", 04 "not the two Asian
   men", 05 "needs AI in it", 07 "looks like a stock market, needs scaling with AI"): every step except 06 has a
-  generated picture made for its heading (Figma AI, Gemini image model, 1200x896); 01 keeps the lower right calm for
-  the KI-Potenzial-Check card.
+  generated picture made for its heading (Figma AI, Gemini image model, 1200x896).
+  Round 6 (the client's Loom of 2026-11-24: 02 "empty things on the wall", 03 "symbols very cheap, it should be about
+  AI", 04 "what are they putting on the laptop, useless", 07 "Tetris in the background, everything should be
+  realistic"; 05 "looks useful", kept): 02, 03, 04 and 07 are new pictures made with GPT Image 2.5 (Figma AI,
+  1280x960), every screen and wall in them showing real German content. 01 keeps its picture, and the
+  KI-Potenzial-Check card that sat on it is gone ("the idea is good ... remove that ... that picture is completely
+  enough").
 */
 const V11_IMG: Partial<Record<string, string>> = {
   "/media/process/analyse.webp": "/media/v11/process/r5-analyse.webp",
-  "/media/process/filtern.webp": "/media/v11/process/r5-filtern.webp",
-  "/media/process/roadmap.webp": "/media/v11/process/r5-roadmap.webp",
-  "/media/process/pilot.webp": "/media/v11/process/r5-pilot.webp",
+  "/media/process/filtern.webp": "/media/v11/process/r6-filtern.webp",
+  "/media/process/roadmap.webp": "/media/v11/process/r6-roadmap.webp",
+  "/media/process/pilot.webp": "/media/v11/process/r6-pilot.webp",
   "/media/process/implementierung.webp": "/media/v11/process/r5-implementierung.webp",
-  "/media/process/skalierung.webp": "/media/v11/process/r5-skalierung.webp",
+  "/media/process/skalierung.webp": "/media/v11/process/r6-skalierung.webp",
 };
 
 /* Every photo crops well to 4:3 from its centre except two wide ones: "filtern", whose person stands at the right edge, and "analyse", whose left consultant sits at the left edge. */
@@ -63,7 +67,7 @@ function countReached(marks: number[], value: number) {
 type Focus = { reached: number; active: number };
 
 export function ProcessSection() {
-  const { PROCESS, LINKS } = useCopy().site;
+  const { PROCESS } = useCopy().site;
   // Memoised, so the memo'd steps below keep their props and only re-render when their focus changes.
   const STEPS = useMemo(() => PROCESS.steps.map((step) => ({ ...step, img: V11_IMG[step.img] ?? step.img })), [PROCESS]);
   const listRef = useRef<HTMLDivElement>(null);
@@ -149,7 +153,6 @@ export function ProcessSection() {
                 index={index}
                 reached={index < focus.reached}
                 active={index === focus.active}
-                analysis={LINKS.analysis}
               />
             ))}
           </ol>
@@ -189,7 +192,6 @@ const ProcessStep = memo(function ProcessStep({
   index,
   reached,
   active,
-  analysis,
 }: {
   step: Step;
   index: number;
@@ -197,8 +199,6 @@ const ProcessStep = memo(function ProcessStep({
   reached: boolean;
   /** The fill's tip is in this step's row. */
   active: boolean;
-  /** The client's KI-Potenzial-Check (his survey), opened from step 01's card. */
-  analysis: string;
 }) {
   // Desktop alternates: even steps put the photo left of the line, odd steps put it right.
   const photoLeft = index % 2 === 0;
@@ -271,67 +271,7 @@ const ProcessStep = memo(function ProcessStep({
           sizes="(min-width:1024px) 520px, 100vw"
           className={cn("object-cover transition-opacity duration-300 ease-out", FOCUS[step.img], active ? "opacity-100" : "opacity-70")}
         />
-        {index === 0 && <AnalysisCard active={active} href={analysis} />}
       </div>
     </li>
   );
 });
-
-/*
-  Round 5 (the client's Loom of 2026-11-18, V3 0:26): step 01 shows his KI-Potenzialanalyse being worked through, "a
-  checklist ... with the question based on ... our AI potential analysis". A glass card on the photo carries his
-  KI-Potenzial-Check: its six questions, each as the short topic it asks about (read from his survey's own page on
-  2026-11-21), ticked one after another while the step is in focus, and a link that opens the real check. Under
-  reduced motion the ticks simply stand.
-
-  Round 5 (DE/EN, after the lead's cold read): two topics reworded ("Was KI verbessern soll", "Fördermöglichkeiten"),
-  and the check's length from its own start page ("2 bis 3 Minuten") stands quietly after the link: beside it from sm,
-  under it on phones. To keep the card inside the photo on phones (measured in General Sans: at 360px wide the photo
-  is about 204px tall and the card with four topics and the note would need about 208px), phones show the first three
-  topics, where they showed four; tablets and desktops show all six.
-*/
-const WORDS = {
-  de: {
-    title: "KI-Potenzial-Check",
-    topics: ["Größter KI-Hebel", "Größter Zeitfresser", "Genutzte Systeme", "Was KI verbessern soll", "Unternehmensgröße", "Fördermöglichkeiten"],
-    start: "Check starten",
-    time: "2 bis 3 Minuten",
-  },
-  en: {
-    title: "AI potential check",
-    topics: ["Biggest AI lever", "Biggest time sink", "Systems in use", "What AI should improve", "Company size", "Funding options"],
-    start: "Start the check",
-    time: "2 to 3 minutes",
-  },
-};
-
-function AnalysisCard({ active, href }: { active: boolean; href: string }) {
-  const words = useWords(WORDS);
-  return (
-    <div data-active={active || undefined} className="v11-check absolute right-3 bottom-3 z-[2] w-[min(232px,64%)] rounded-[14px] p-3.5 sm:right-4 sm:bottom-4 sm:w-[248px] sm:p-4">
-      <p className="text-[13px] leading-none font-medium text-white sm:text-[14px]">{words.title}</p>
-      <ul role="list" className="mt-3 space-y-2">
-        {words.topics.map((topic, i) => (
-          <li key={topic} className={cn("flex items-center gap-2.5 text-[12.5px] leading-none text-white/85 sm:text-[13px]", i > 2 && "max-sm:hidden")}>
-            <span aria-hidden className="v11-check-box relative grid size-4 shrink-0 place-items-center rounded-[5px]" style={{ "--i": i } as CSSProperties}>
-              <Check strokeWidth={2.5} className="v11-check-mark size-3 text-[#06142f]" />
-            </span>
-            {topic}
-          </li>
-        ))}
-      </ul>
-      <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener"
-          className="group inline-flex min-h-6 cursor-pointer items-center gap-1 text-[12.5px] font-medium text-sky transition-colors duration-200 hover:text-white sm:text-[13px]"
-        >
-          {words.start}
-          <ArrowUpRight aria-hidden className="size-3.5 transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-        </a>
-        <span className="text-[12.5px] leading-none text-white/55 sm:text-[13px]">{words.time}</span>
-      </div>
-    </div>
-  );
-}

@@ -63,12 +63,12 @@ export const REALITY: Shape<typeof DE.REALITY> = {
   accent: "never go live.",
   text: "Many companies invest in AI tools. Without a clear strategy and structure, the potential goes unused and the results never come.",
   items: [
-    { title: "No plan for AI", heading: { title: "No plan", accent: "for AI." }, text: "Every team tests its own tools. Nobody decides what comes first.", img: "/media/reality/r5-fahrplan.webp" },
-    { title: "Disconnected tools", heading: { title: "Disconnected", accent: "tools." }, text: "Your team copies data by hand between the CRM, email and spreadsheets.", img: "/media/reality/r5-tools.webp" },
-    { title: "Routine work costs time", heading: { title: "Routine work", accent: "costs time." }, text: "Your team still enters quotes, invoices and appointments by hand.", img: "/media/reality/r5-routine.webp" },
-    { title: "The team is unsure", heading: { title: "The team", accent: "is unsure." }, text: "Nobody knows which tools are allowed. So the AI sits unused.", img: "/media/reality/r5-unsicher.webp" },
-    { title: "Data protection comes too late", heading: { title: "Data protection", accent: "comes too late." }, text: "Just before launch, someone checks the rules. Then the project stops.", img: "/media/reality/r5-datenschutz.webp" },
-    { title: "Nobody measures the value", heading: { title: "Nobody measures", accent: "the value." }, text: "The AI is running. Nobody knows how much time and money it saves.", img: "/media/reality/r5-nutzen.webp" },
+    { title: "No plan for AI", heading: { title: "No plan", accent: "for AI." }, text: "Every team tests its own tools. Nobody decides what comes first.", img: "/media/reality/r6-fahrplan.webp" },
+    { title: "Disconnected tools", heading: { title: "Disconnected", accent: "tools." }, text: "Your team copies data by hand between the CRM, email and spreadsheets.", img: "/media/reality/r6-tools.webp" },
+    { title: "Routine work costs time", heading: { title: "Routine work", accent: "costs time." }, text: "Your team still enters quotes, invoices and appointments by hand.", img: "/media/reality/r6-routine.webp" },
+    { title: "The team is unsure", heading: { title: "The team", accent: "is unsure." }, text: "Nobody knows which tools are allowed. So the AI sits unused.", img: "/media/reality/r6-unsicher.webp" },
+    { title: "Data protection comes too late", heading: { title: "Data protection", accent: "comes too late." }, text: "Just before launch, someone checks the rules. Then the project stops.", img: "/media/reality/r6-datenschutz.webp" },
+    { title: "Nobody measures the value", heading: { title: "Nobody measures", accent: "the value." }, text: "The AI is running. Nobody knows how much time and money it saves.", img: "/media/reality/r6-nutzen.webp" },
   ],
 };
 
@@ -364,9 +364,9 @@ export const WORKSHOP: Shape<typeof DE.WORKSHOP> = {
   formatsLabel: "Our workshop formats",
   formats: [
     { title: "On-site workshops", text: "Interactive hands-on workshops, held right at your company.", img: "/media/workshop/vor-ort.webp" },
-    { title: "Online seminars", text: "Compact live online training with practical exercises and personal exchange.", img: "/media/workshop/r5-online-roman.webp" },
+    { title: "Online seminars", text: "Compact live online training with practical exercises and personal exchange.", img: "/media/workshop/r6-online.webp" },
     { title: "Leadership workshops", text: "Strategic decision skills and future readiness for managers and boards.", img: "/media/workshop/leadership.webp" },
-    { title: "Custom training", text: "Tailored training content for specific departments and concrete use cases.", img: "/media/workshop/r5-individuell-roman.webp" },
+    { title: "Custom training", text: "Tailored training content for specific departments and concrete use cases.", img: "/media/workshop/r6-individuell.webp" },
   ],
   topicsLabel: "Example topics",
   topics: [

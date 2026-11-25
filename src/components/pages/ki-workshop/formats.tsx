@@ -18,8 +18,9 @@ import { useCopy } from "@/i18n/client";
   circles stacked, so every name still fits inside its region on a phone). The names are HTML buttons laid over the
   drawing (a tab list), so they stay sharp and reachable by keyboard; the drawing itself is decorative.
 
-  The photos are Roman's: on site in a seminar room, online in his studio, both halves side by side for hybrid, and a
-  tailored session with a small team.
+  The photos: Roman on site in a seminar room, an online seminar, both halves side by side for hybrid, and a tailored
+  session with a small team. Round 6 (Roman, 2026-11-24, of the two generated pictures of him: "this is not me ...
+  remove that"): online and tailored show the format without him (GPT Image 2.5) until his own photos come.
   Round 5 (DE/EN): copy by language; the regions and photos key on the format's key, never its name.
 */
 
@@ -128,7 +129,7 @@ function Diagram({
   );
 }
 
-/** The photo for a format: Roman's own; for hybrid, the on-site and the online photo side by side. */
+/** The photo for a format; for hybrid, the on-site and the online photo side by side. */
 function FormatPhoto({ item }: { item: Format }) {
   const { KW_MEDIA } = useCopy().kiWorkshop;
   const sizes = "(min-width: 1280px) 490px, (min-width: 1024px) 38vw, calc(100vw - 40px)";
@@ -140,7 +141,7 @@ function FormatPhoto({ item }: { item: Format }) {
           <Image src={KW_MEDIA.onsite} alt={item.alt} fill quality={85} sizes={half} className="object-cover object-[44%_40%]" />
         </div>
         <div className="relative overflow-hidden">
-          <Image src={KW_MEDIA.online} alt="" fill quality={85} sizes={half} className="object-cover object-[30%_40%]" />
+          <Image src={KW_MEDIA.online} alt="" fill quality={85} sizes={half} className="object-cover object-[62%_40%]" />
         </div>
       </div>
     );

@@ -14,15 +14,20 @@ import { PromiseCard } from "./promise-card";
   and under it v1's four ticks beside the current figure's label. Each figure counts up from zero on the card as it
   arrives (v11).
 
-  Desktop (lg, at least 720px tall) as in v1, and phones and tablets at least 640px tall (the developer: "it should
-  do the same thing on mobile too"): a pinned scroll story. The section is a 320svh runway with a sticky one-screen
+  Every screen at least 600px tall, desktop as in v1 and phones and tablets too (the developer: "it should do the
+  same thing on mobile too"): a pinned scroll story. The section is a 320svh runway with a sticky one-screen
   stage; the runway is cut into four equal steps, scroll-linked and reversible, and the card turns with the scroll
   between them. A tick scrolls to its figure. Phones stack the card, the statement and the ticks with the label on
   the stage, sized to fit a 667px screen.
 
-  Short windows (phones on their side, desktop windows under 720px): the figures take turns on their own while the
+  Short windows (phones on their side, any window under 600px): the figures take turns on their own while the
   section is on screen, DWELL ms each; a tick picks one and stops the turns, hovering or focusing holds them.
   Reduced motion: no turns there, the ticks still pick.
+
+  Round 6 (the client's Loom of 2026-11-24, 1:34: "this is somehow not working ... if I scrolling down, this is not
+  working"): his laptop window is about 1280x630, under the old 720px gate, so he only ever saw the turns on a timer.
+  Desktop now pins from 600px, like the Realitaet slider; the card's height is capped by the window (v11.css), so the
+  stage fits a 600px window.
 
   Every figure is in the markup for screen readers as one list; the card and the changing label are hidden from them.
 
@@ -34,7 +39,7 @@ const DWELL = 4600;
 const EASE = [0.16, 1, 0.3, 1] as const;
 // Keep in step with v11.css (.v11-promise): desktop as in v1, and phones and tablets too (the developer: "it should do
 // the same thing on mobile too, scrolling").
-const PIN = "(min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px)";
+const PIN = "(min-height: 600px)";
 
 const stepAt = (progress: number, count: number) => Math.min(count - 1, Math.max(0, Math.floor(progress * count)));
 

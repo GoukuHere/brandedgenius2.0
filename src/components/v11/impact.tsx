@@ -36,12 +36,16 @@ import { CountUp } from "./count";
 */
 
 /* Round 5 (the client's Loom: a fitting picture for every heading): each tile has a picture generated for its title
-   (Figma AI, Gemini image model, 928x1152, the tile's own shape), the subject centred. */
+   (Figma AI, Gemini image model, 928x1152, the tile's own shape), the subject centred.
+   Round 6 (the client's Loom of 2026-11-24: "the report is empty", "a woman holding a laptop, makes no sense",
+   "looks like cheap stock pictures"): all four made again with GPT Image 2.5 (Figma AI, 1024x1280), each screen
+   showing its benefit in German (tasks done on their own and the hours saved, answers within seconds, a full
+   management dashboard, orders rising while the team stays the same); the lower third stays dark for the title. */
 const BENEFIT_PHOTOS: Record<string, { src: string; position?: string }> = {
-  effizienz: { src: "/media/v11/impact/r5-effizienz.webp" },
-  reaktionszeit: { src: "/media/v11/impact/r5-reaktionszeit.webp" },
-  reporting: { src: "/media/v11/impact/r5-reporting.webp" },
-  skalierbarkeit: { src: "/media/v11/impact/r5-skalierbarkeit.webp" },
+  effizienz: { src: "/media/v11/impact/r6-effizienz.webp" },
+  reaktionszeit: { src: "/media/v11/impact/r6-reaktionszeit.webp" },
+  reporting: { src: "/media/v11/impact/r6-reporting.webp" },
+  skalierbarkeit: { src: "/media/v11/impact/r6-skalierbarkeit.webp" },
 };
 const EASE = [0.16, 1, 0.3, 1] as const;
 const FILL = { duration: 1.4, delay: 0.2 };

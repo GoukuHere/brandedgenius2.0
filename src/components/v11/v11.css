@@ -332,10 +332,10 @@ body:has(.v11) {
 
 /*
   v1's pinned scroll story: a 320svh runway whose one-screen stage sticks while the four figures step with the
-  scroll. Desktop as in v1 (at least 720px tall), and phones and tablets too (at least 640px tall; the developer:
-  "it should do the same thing on mobile too"). Unlayered, so it wins over the section's Tailwind padding.
+  scroll. On every screen at least 600px tall (round 6: Roman's laptop window is about 1280x630; it used to need
+  720px on desktop). Unlayered, so it wins over the section's Tailwind padding.
 */
-@media (min-width: 1024px) and (min-height: 720px), (max-width: 1023px) and (min-height: 600px) {
+@media (min-height: 600px) {
   .v11-promise {
     height: 320svh;
     padding-top: 0;
@@ -399,6 +399,18 @@ body:has(.v11) {
   backface-visibility: hidden;
   /* Decorative: a card swiping away over the area list must never catch its clicks. */
   pointer-events: none;
+}
+/* Round 6: a card waiting behind the front one takes a click (cases.tsx turns its pointer events on); its name lights. */
+.v11-fan-layer {
+  cursor: pointer;
+}
+.v11-fan-name {
+  transition: color 0.25s ease;
+}
+@media (hover: hover) {
+  .v11-fan-layer:hover .v11-fan-name {
+    color: #69bff8;
+  }
 }
 /* The current layer's light: a royal corner, a sky rim and a glow, faded in (opacity only). */
 .v11-fan-layer::before {
@@ -465,6 +477,10 @@ body:has(.v11) {
     padding: 16px 32px 28px;
   }
 }
+/* Round 6: the small desktop deck (windows 600 to 700px tall) has 32px strips, so the label row sits higher. */
+.v11-fan[data-size="tiny"] .v11-fan-layer {
+  padding-top: 10px;
+}
 
 /*
   The held stage (cases.tsx, PIN): where it fits, the deck's runway is REST + 5 + REST half-screen steps long and its
@@ -478,8 +494,7 @@ body:has(.v11) {
     margin-top: 56px;
   }
 }
-@media (prefers-reduced-motion: no-preference) and (min-width: 1024px) and (min-height: 640px),
-  (prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 600px) {
+@media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
   .v11-cases {
     padding-bottom: 0;
   }
@@ -688,47 +703,6 @@ body:has(.v11) {
   }
   .v11-fan-layer::before {
     transition: none;
-  }
-}
-
-/* ---------- Ablauf 01: the KI-Potenzial-Check card on the photo (process.tsx, round 5) ---------- */
-.v11-check {
-  background: rgb(6 20 47 / 0.72);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  backdrop-filter: blur(14px) saturate(1.2);
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.14),
-    inset 0 1px 0 rgb(255 255 255 / 0.12),
-    0 18px 40px -18px rgb(1 4 12 / 0.9);
-}
-.v11-check-box {
-  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.55);
-  transition: background-color 0.3s ease;
-}
-.v11-check-mark {
-  opacity: 0;
-  scale: 0.5;
-  transition:
-    opacity 0.3s ease,
-    scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-/* In focus: the questions are ticked one after another. */
-.v11-check[data-active] .v11-check-box {
-  background-color: #69bff8;
-  transition-delay: calc(0.25s + var(--i) * 0.32s);
-}
-.v11-check[data-active] .v11-check-mark {
-  opacity: 1;
-  scale: 1;
-  transition-delay: calc(0.25s + var(--i) * 0.32s);
-}
-@media (prefers-reduced-motion: reduce) {
-  .v11-check .v11-check-box {
-    background-color: #69bff8;
-  }
-  .v11-check .v11-check-mark {
-    opacity: 1;
-    scale: 1;
   }
 }
 

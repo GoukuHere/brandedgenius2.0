@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { animate, motion, useMotionTemplate, useMotionValue, useMotionValueEvent, useSpring, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
@@ -23,7 +24,7 @@ import { CountUp } from "./count";
   already seen have swiped away: up and to the left, turning and fading. So the deck is always in order, from the
   card being read to the last one, with no gaps.
 
-  Scrolling (desktop at least 640px tall, phones at least 600px, sized for Safari's own screen height): the section holds on a sticky stage while you
+  Scrolling (every screen at least 600px tall; phones sized for Safari's own screen height): the section holds on a sticky stage while you
   scroll REST + 5 + REST steps of half a screen; each card rests in front for a while, then swipes away and the next
   comes forward, all on the scroll and reversible. Picking an area scrolls to its card. Beside the deck (desktop) a
   quiet list of the six areas marks the current one; on phones the areas are buttons under the deck.
@@ -38,6 +39,12 @@ import { CountUp } from "./count";
   scroll and Lenis used to fight: on a slowed CPU the old click took 5.8s and stopped on the wrong card). Extra
   will-change layers for the cards were measured and made it slower, so there are none.
 
+  Round 6 (the client's Loom of 2026-11-24, 1:50: "this scrolling animation also not working anymore, and nobody
+  knows you can click on it"): his laptop window is about 1280x630, under the old 640px gate, so the deck only took
+  turns on a timer for him. Desktop now holds from 600px, with a smaller deck for windows up to 700px tall (DESK_TINY).
+  And the deck says it can be clicked: each area in the list carries an arrow that moves on hover, and the cards
+  waiting behind the front one (their strips with number and name) take a click too, bringing that card forward.
+
   Round 5 (DE/EN): copy by language (useCopy); each case's photo and drawing are picked by its id, never its words.
 
   The pointer moves the point of view over the deck a little (its perspective origin). The cards move by transform
@@ -48,9 +55,7 @@ import { CountUp } from "./count";
 const DWELL = 6000;
 const REST = 0.5; // steps of rest before the first card leaves and after the last one has arrived
 const EASE = [0.16, 1, 0.3, 1] as const;
-const PIN =
-  "(prefers-reduced-motion: no-preference) and (min-width: 1024px) and (min-height: 640px), " +
-  "(prefers-reduced-motion: no-preference) and (max-width: 1023px) and (min-height: 600px)";
+const PIN = "(prefers-reduced-motion: no-preference) and (min-height: 600px)";
 
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -93,6 +98,8 @@ type Geo = {
 };
 const DESK: Geo = { w: 520, h: 380, fanH: 680, top: 90, dx: 30, dy: -50, dz: -48, ry: 20, rx: 4, ax: -52, ay: 44, az: 110, ary: 9, arx: 2 };
 const DESK_SHORT: Geo = { w: 460, h: 360, fanH: 588, top: 76, dx: 26, dy: -40, dz: -42, ry: 18, rx: 4, ax: -46, ay: 36, az: 90, ary: 8, arx: 2 };
+/* Round 6: desktop windows 600 to 700px tall (Roman's laptop, about 1280x630): the held stage leaves 504 to 604px. */
+const DESK_TINY: Geo = { w: 440, h: 312, fanH: 496, top: 52, dx: 24, dy: -32, dz: -38, ry: 18, rx: 4, ax: -40, ay: 28, az: 72, ary: 8, arx: 2 };
 const TABLET: Geo = { w: 440, h: 380, fanH: 640, top: 90, dx: 20, dy: -46, dz: -44, ry: 16, rx: 4, ax: -35, ay: 42, az: 90, ary: 7, arx: 2 };
 /* Phones: a compact card; under 660px of screen (an iPhone mini in Safari) the strips a little slimmer still. */
 const phoneGeo = (width: number, height: number): Geo => {
@@ -101,7 +108,10 @@ const phoneGeo = (width: number, height: number): Geo => {
   return { w, h: 288, fanH: short ? 416 : 436, top: 66, dx: 5, dy: short ? -24 : -28, dz: -30, ry: 14, rx: 4, ax: -8, ay: 22, az: 46, ary: 6, arx: 2 };
 };
 function geoFor(): Geo {
-  if (window.matchMedia("(min-width: 1024px)").matches) return window.matchMedia("(max-height: 780px)").matches ? DESK_SHORT : DESK;
+  if (window.matchMedia("(min-width: 1024px)").matches) {
+    if (window.matchMedia("(max-height: 700px)").matches) return DESK_TINY;
+    return window.matchMedia("(max-height: 780px)").matches ? DESK_SHORT : DESK;
+  }
   if (window.matchMedia("(min-width: 640px)").matches) return TABLET;
   return phoneGeo(window.innerWidth, window.innerHeight);
 }
@@ -306,7 +316,7 @@ export function CasesSection() {
                 <AreaList items={ITEMS} {...timing} />
               </div>
               <div data-reveal="up" data-rd="2" {...hold}>
-                <Deck items={ITEMS} deck={deck} geo={geo} size={size} active={active} live={onScreen} />
+                <Deck items={ITEMS} deck={deck} geo={geo} size={size} active={active} live={onScreen} onPick={pick} />
               </div>
               <div data-reveal="up" data-rd="3" className="lg:hidden" {...hold}>
                 <AreaGrid items={ITEMS} {...timing} />
@@ -353,7 +363,7 @@ function Line({ on, run, running, paused, onDone }: { on: boolean; run: number; 
   );
 }
 
-/** Desktop: the six areas as a quiet list, a small number and the area, hairlines between. */
+/** Desktop: the six areas as a quiet list, a small number, the area and an arrow that says it can be picked. */
 function AreaList({ items: ITEMS, active, run, running, paused, onPick, onDone }: Timing & { items: CaseStudy[] }) {
   return (
     <ol role="list" className="border-t border-white/10">
@@ -377,6 +387,14 @@ function AreaList({ items: ITEMS, active, run, running, paused, onPick, onDone }
               >
                 {item.area}
               </span>
+              <ArrowRight
+                aria-hidden
+                strokeWidth={1.75}
+                className={cn(
+                  "ml-auto size-[18px] shrink-0 transition-[color,translate] duration-300 ease-out group-hover:translate-x-1",
+                  on ? "text-sky" : "text-white/30 group-hover:text-white/85"
+                )}
+              />
             </button>
             <Line on={on} run={run} running={running} paused={paused} onDone={onDone} />
           </li>
@@ -414,8 +432,27 @@ function AreaGrid({ items: ITEMS, active, run, running, paused, onPick, onDone }
   );
 }
 
-/** The deck (see above). Decorative for screen readers; the list after the section carries it. */
-function Deck({ items: ITEMS, deck, geo, size, active, live }: { items: CaseStudy[]; deck: MotionValue<number>; geo: MotionValue<Geo>; size: Geo; active: number; live: boolean }) {
+/**
+ * The deck (see above). Decorative for screen readers; the list after the section carries it, and the area list is
+ * the keyboard's way in. A pointer can also pick a card waiting behind the front one by its strip.
+ */
+function Deck({
+  items: ITEMS,
+  deck,
+  geo,
+  size,
+  active,
+  live,
+  onPick,
+}: {
+  items: CaseStudy[];
+  deck: MotionValue<number>;
+  geo: MotionValue<Geo>;
+  size: Geo;
+  active: number;
+  live: boolean;
+  onPick: (i: number) => void;
+}) {
   // The pointer moves the point of view a little: the perspective origin follows it on a soft spring.
   const ox = useMotionValue(50);
   const oy = useMotionValue(42);
@@ -434,9 +471,16 @@ function Deck({ items: ITEMS, deck, geo, size, active, live }: { items: CaseStud
   };
 
   return (
-    <motion.div aria-hidden onPointerMove={onMove} onPointerLeave={onLeave} style={{ perspectiveOrigin: origin, height: size.fanH }} className="v11-fan">
+    <motion.div
+      aria-hidden
+      data-size={size === DESK_TINY ? "tiny" : undefined}
+      onPointerMove={onMove}
+      onPointerLeave={onLeave}
+      style={{ perspectiveOrigin: origin, height: size.fanH }}
+      className="v11-fan"
+    >
       {ITEMS.map((item, i) => (
-        <Card key={item.name} index={i} item={item} deck={deck} geo={geo} size={size} on={i === active} live={live} />
+        <Card key={item.name} index={i} item={item} deck={deck} geo={geo} size={size} on={i === active} live={live} onPick={onPick} />
       ))}
     </motion.div>
   );
@@ -450,6 +494,7 @@ function Card({
   size,
   on,
   live,
+  onPick,
 }: {
   index: number;
   item: CaseStudy;
@@ -458,6 +503,7 @@ function Card({
   size: Geo;
   on: boolean;
   live: boolean;
+  onPick: (i: number) => void;
 }) {
   // Every source is read on every frame, so the card follows the deck and the screen size alike.
   const transform = useTransform(() => pose(index - deck.get(), geo.get()));
@@ -468,11 +514,15 @@ function Card({
   });
   // The case itself is only on the card in front, fading as the card leaves or before it has arrived.
   const detail = useTransform(() => clamp(1 - Math.abs(index - deck.get()) * 2.6, 0, 1));
+  // Only a card waiting behind the front one takes a click (its strip is what shows); the front card and the cards
+  // that have swiped away never do (v11.css keeps every layer out of the pointer's way by default).
+  const pointerEvents = useTransform(() => (index - deck.get() > 0.5 ? "auto" : "none"));
 
   return (
     <motion.div
       data-on={on || undefined}
-      style={{ transform, opacity, zIndex, width: size.w, height: size.h, top: `calc(50% + ${size.top}px)` }}
+      onClick={() => onPick(index)}
+      style={{ transform, opacity, zIndex, pointerEvents, width: size.w, height: size.h, top: `calc(50% + ${size.top}px)` }}
       className="v11-fan-layer"
     >
       {PHOTOS[item.id] && (
@@ -490,8 +540,8 @@ function Card({
       {/* One line always: on phones the short area ("04 Backoffice"), from sm the case's full name. */}
       <div className="flex items-baseline gap-2.5 whitespace-nowrap sm:gap-3">
         <span className="num text-[13px] text-sky sm:text-[14px]">{pad(index)}</span>
-        <span className="text-[14px] leading-none font-medium tracking-[-0.005em] text-white sm:hidden">{item.area}</span>
-        <span className="hidden text-[16px] leading-none font-medium tracking-[-0.005em] text-white sm:inline">{item.name}</span>
+        <span className="v11-fan-name text-[14px] leading-none font-medium tracking-[-0.005em] text-white sm:hidden">{item.area}</span>
+        <span className="v11-fan-name hidden text-[16px] leading-none font-medium tracking-[-0.005em] text-white sm:inline">{item.name}</span>
       </div>
       {hasCaseArt(item.id) && <CaseArt id={item.id} play={on && live} />}
       <motion.div style={{ opacity: detail }} className="v11-fan-detail">
