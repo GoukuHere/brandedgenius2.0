@@ -41,14 +41,17 @@ type Step = (typeof Site.PROCESS.steps)[number];
   1280x960), every screen and wall in them showing real German content. 01 keeps its picture, and the
   KI-Potenzial-Check card that sat on it is gone ("the idea is good ... remove that ... that picture is completely
   enough").
+  Round 8 (the developer, 2026-11-25: "redo all images"): every generated step picture made again with GPT Image 2.5
+  Sunburst at 2K through higgscheap (2048x1536), each screen checked for correctly spelled German. 01 and 05, which
+  Roman liked, keep their scenes (the consultant showing the tablet; the developer with the project lead).
 */
 const V11_IMG: Partial<Record<string, string>> = {
-  "/media/process/analyse.webp": "/media/v11/process/r5-analyse.webp",
-  "/media/process/filtern.webp": "/media/v11/process/r6-filtern.webp",
-  "/media/process/roadmap.webp": "/media/v11/process/r6-roadmap.webp",
-  "/media/process/pilot.webp": "/media/v11/process/r6-pilot.webp",
-  "/media/process/implementierung.webp": "/media/v11/process/r5-implementierung.webp",
-  "/media/process/skalierung.webp": "/media/v11/process/r6-skalierung.webp",
+  "/media/process/analyse.webp": "/media/v11/process/r8-analyse.webp",
+  "/media/process/filtern.webp": "/media/v11/process/r8-filtern.webp",
+  "/media/process/roadmap.webp": "/media/v11/process/r8-roadmap.webp",
+  "/media/process/pilot.webp": "/media/v11/process/r8-pilot.webp",
+  "/media/process/implementierung.webp": "/media/v11/process/r8-implementierung.webp",
+  "/media/process/skalierung.webp": "/media/v11/process/r8-skalierung.webp",
 };
 
 /* Every photo crops well to 4:3 from its centre except two wide ones: "filtern", whose person stands at the right edge, and "analyse", whose left consultant sits at the left edge. */

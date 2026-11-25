@@ -40,12 +40,14 @@ import { CountUp } from "./count";
    Round 6 (the client's Loom of 2026-11-24: "the report is empty", "a woman holding a laptop, makes no sense",
    "looks like cheap stock pictures"): all four made again with GPT Image 2.5 (Figma AI, 1024x1280), each screen
    showing its benefit in German (tasks done on their own and the hours saved, answers within seconds, a full
-   management dashboard, orders rising while the team stays the same); the lower third stays dark for the title. */
+   management dashboard, orders rising while the team stays the same); the lower third stays dark for the title.
+   Round 8 (the developer, 2026-11-25: "redo all images"): all four made again with GPT Image 2.5 Sunburst at 2K
+   through higgscheap (1536x2048), the same ideas, every screen label in German. */
 const BENEFIT_PHOTOS: Record<string, { src: string; position?: string }> = {
-  effizienz: { src: "/media/v11/impact/r6-effizienz.webp" },
-  reaktionszeit: { src: "/media/v11/impact/r6-reaktionszeit.webp" },
-  reporting: { src: "/media/v11/impact/r6-reporting.webp" },
-  skalierbarkeit: { src: "/media/v11/impact/r6-skalierbarkeit.webp" },
+  effizienz: { src: "/media/v11/impact/r8-effizienz.webp" },
+  reaktionszeit: { src: "/media/v11/impact/r8-reaktionszeit.webp" },
+  reporting: { src: "/media/v11/impact/r8-reporting.webp" },
+  skalierbarkeit: { src: "/media/v11/impact/r8-skalierbarkeit.webp" },
 };
 const EASE = [0.16, 1, 0.3, 1] as const;
 const FILL = { duration: 1.4, delay: 0.2 };
@@ -77,10 +79,11 @@ export function ImpactSection() {
             The worked example, over a dashboard. Round 5 (the client's Loom of 2026-11-18: "take a normal picture so
             we are not to have too many videos ... the speed will be better"): a still picture in place of the clip,
             made for this card (a sales manager over his ranked leads, the phone ready; he sits right, where the
-            grade lets the picture through).
+            grade lets the picture through). Round 8: made again at 2K through higgscheap (2048x1152), the same
+            layout, his lead list in German.
           */}
           <Tile featured className="col-span-2 min-h-[380px] lg:col-span-7 lg:row-span-2" layout="relative flex h-full flex-col justify-between gap-12 overflow-hidden rounded-[24px] p-7 sm:p-9 lg:p-10">
-            <Image src="/media/v11/impact/r5-leads.webp" alt="" fill sizes="(min-width: 1024px) 760px, 100vw" className="object-cover opacity-60" />
+            <Image src="/media/v11/impact/r8-leads.webp" alt="" fill sizes="(min-width: 1024px) 760px, 100vw" className="object-cover opacity-60" />
             <span aria-hidden className="absolute inset-0 bg-[linear-gradient(90deg,rgb(7_22_52/0.94)_0%,rgb(7_22_52/0.72)_55%,rgb(7_22_52/0.35)_100%),linear-gradient(0deg,rgb(7_22_52/0.85)_0%,rgb(7_22_52/0)_55%)]" />
             <div className="relative">
               <h3 className="t-h3">{IMPACT.live.title}</h3>

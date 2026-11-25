@@ -14,8 +14,8 @@ export const KW_META = {
 export const KW_MEDIA = {
   hero: "/media/process/training.webp",
   onsite: "/media/workshop/vor-ort.webp",
-  online: "/media/workshop/r6-online.webp",
-  custom: "/media/workshop/r6-individuell.webp",
+  online: "/media/workshop/r8-online.webp",
+  custom: "/media/workshop/r8-individuell.webp",
   trainer: "/media/photos/roman-standing.webp",
   // A square crop of his face from photos/team.webp, for the small round portrait beside the quote.
   face: "/media/pages/ki-workshop/roman-portrait.webp",

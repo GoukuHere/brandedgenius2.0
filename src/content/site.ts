@@ -79,13 +79,15 @@ export const REALITY = {
   // each a concrete moment in one or two short sentences.
   // Round 6 (Roman, 2026-11-24: "create for the section an amazing fitting graphic"): each reason has its own picture
   // (GPT Image 2.5, 1536x1024) showing that moment, the people and screens near the middle for the square crop.
+  // Round 8 (the developer, 2026-11-25: "redo all images"): the same six moments made again with GPT Image 2.5
+  // Sunburst at 2K through higgscheap (2048x1360), each screen checked for its German text.
   items: [
-    { title: "Kein Fahrplan für KI", heading: { title: "Kein Fahrplan", accent: "für KI." }, text: "Jedes Team testet eigene Tools. Niemand legt fest, was zuerst kommt.", img: "/media/reality/r6-fahrplan.webp" },
-    { title: "Tools ohne Verbindung", heading: { title: "Tools ohne", accent: "Verbindung." }, text: "Ihr Team kopiert Daten von Hand zwischen CRM, E-Mail und Tabellen.", img: "/media/reality/r6-tools.webp" },
-    { title: "Routinearbeit kostet Zeit", heading: { title: "Routinearbeit", accent: "kostet Zeit." }, text: "Ihr Team tippt Angebote, Rechnungen und Termine immer noch von Hand ein.", img: "/media/reality/r6-routine.webp" },
-    { title: "Das Team ist unsicher", heading: { title: "Das Team", accent: "ist unsicher." }, text: "Niemand weiß, welche Tools erlaubt sind. Also bleibt die KI liegen.", img: "/media/reality/r6-unsicher.webp" },
-    { title: "Datenschutz kommt zu spät", heading: { title: "Datenschutz", accent: "kommt zu spät." }, text: "Kurz vor dem Start prüft jemand die Regeln. Dann steht das Projekt still.", img: "/media/reality/r6-datenschutz.webp" },
-    { title: "Niemand misst den Nutzen", heading: { title: "Niemand misst", accent: "den Nutzen." }, text: "Die KI läuft. Wie viel Zeit und Geld sie spart, weiß niemand.", img: "/media/reality/r6-nutzen.webp" },
+    { title: "Kein Fahrplan für KI", heading: { title: "Kein Fahrplan", accent: "für KI." }, text: "Jedes Team testet eigene Tools. Niemand legt fest, was zuerst kommt.", img: "/media/reality/r8-fahrplan.webp" },
+    { title: "Tools ohne Verbindung", heading: { title: "Tools ohne", accent: "Verbindung." }, text: "Ihr Team kopiert Daten von Hand zwischen CRM, E-Mail und Tabellen.", img: "/media/reality/r8-tools.webp" },
+    { title: "Routinearbeit kostet Zeit", heading: { title: "Routinearbeit", accent: "kostet Zeit." }, text: "Ihr Team tippt Angebote, Rechnungen und Termine immer noch von Hand ein.", img: "/media/reality/r8-routine.webp" },
+    { title: "Das Team ist unsicher", heading: { title: "Das Team", accent: "ist unsicher." }, text: "Niemand weiß, welche Tools erlaubt sind. Also bleibt die KI liegen.", img: "/media/reality/r8-unsicher.webp" },
+    { title: "Datenschutz kommt zu spät", heading: { title: "Datenschutz", accent: "kommt zu spät." }, text: "Kurz vor dem Start prüft jemand die Regeln. Dann steht das Projekt still.", img: "/media/reality/r8-datenschutz.webp" },
+    { title: "Niemand misst den Nutzen", heading: { title: "Niemand misst", accent: "den Nutzen." }, text: "Die KI läuft. Wie viel Zeit und Geld sie spart, weiß niemand.", img: "/media/reality/r8-nutzen.webp" },
   ],
 };
 
@@ -409,9 +411,9 @@ export const WORKSHOP = {
   formatsLabel: "Unsere Workshop-Formate",
   formats: [
     { title: "Vor-Ort Workshops", text: "Interaktive Hands-on-Workshops direkt in Ihrem Unternehmen vor Ort.", img: "/media/workshop/vor-ort.webp" },
-    { title: "Online Seminare", text: "Kompakte Live-Online-Trainings mit praxisnahen Übungen und individuellem Austausch.", img: "/media/workshop/r6-online.webp" },
+    { title: "Online Seminare", text: "Kompakte Live-Online-Trainings mit praxisnahen Übungen und individuellem Austausch.", img: "/media/workshop/r8-online.webp" },
     { title: "Leadership Workshops", text: "Strategische Entscheidungskompetenz und Zukunftssicherheit für Führungskräfte und Vorstände.", img: "/media/workshop/leadership.webp" },
-    { title: "Individuelle Trainings", text: "Maßgeschneiderte Schulungsinhalte für spezifische Fachabteilungen und konkrete Anwendungsfälle.", img: "/media/workshop/r6-individuell.webp" },
+    { title: "Individuelle Trainings", text: "Maßgeschneiderte Schulungsinhalte für spezifische Fachabteilungen und konkrete Anwendungsfälle.", img: "/media/workshop/r8-individuell.webp" },
   ],
   topicsLabel: "Themenbeispiele",
   topics: [

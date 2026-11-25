@@ -21,6 +21,7 @@ import { useCopy } from "@/i18n/client";
   The photos: Roman on site in a seminar room, an online seminar, both halves side by side for hybrid, and a tailored
   session with a small team. Round 6 (Roman, 2026-11-24, of the two generated pictures of him: "this is not me ...
   remove that"): online and tailored show the format without him (GPT Image 2.5) until his own photos come.
+  Round 8: both made again at 2K through higgscheap; the online slide now names each step of its workflow.
   Round 5 (DE/EN): copy by language; the regions and photos key on the format's key, never its name.
 */
 

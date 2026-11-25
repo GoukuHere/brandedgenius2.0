@@ -35,6 +35,7 @@ const HOVER_INTENT_MS = 80; // sweeping the pointer across the row does not flic
 // Round 6 (the client's Loom of 2026-11-24: of the two generated pictures of him, "this is not me ... remove that"):
 // 02 and 04 show the format without him until his own photos come (online seminar: the shared slide and a
 // participant; training: a sales team at work on its own AI process, the speaker left of the screen).
+// Round 8: both made again at 2K through higgscheap (GPT Image 2.5 Sunburst), the same scenes.
 const FOCUS = ["43% 50%", "62% 50%", "45% 50%", "40% 50%"];
 
 // The open panel is 2.4 / 5.4 of the row: about 520px inside the 1280px container.
