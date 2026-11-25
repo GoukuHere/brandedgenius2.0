@@ -2,30 +2,33 @@
 
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
-import { useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import type { FilterId, Project } from "@/content/pages/use-cases";
 import { useCopy } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import { caseStore } from "./case-store";
 import { CaseView } from "./case-view";
-import { CoverArt } from "./cover-art";
 import { layoutFor, type Boxes, type Layout } from "./poster-layout";
-import { useLive } from "./use-live";
 
 /*
-  Projekte (2026-11-16). His heading pair and line, his five filter chips, and the seven projects as tall posters on
-  one wall: an editorial arrangement of staggered columns (poster-layout.ts), each poster with its own cover art
-  (cover-art.tsx), his number and industry line at its head, his name, one line and "Case Study öffnen" at its foot.
+  Projekte (2026-11-16). His heading pair and line, his five filter chips, and the seven projects as posters on one
+  wall: an editorial arrangement of staggered columns (poster-layout.ts), each poster with his number and industry
+  line at its head, his name as its mark, one line and "Case Study öffnen" at its foot.
 
   Filtering: the posters that stay glide to their new places and the others fade out where they stood (CSS moves
   them: every place is known per screen size, so the wall needs no measuring). A poster opens the full case view
-  (case-view.tsx). On a mouse the poster lifts and tilts a little towards the pointer.
+  (case-view.tsx). On a mouse the poster lifts a little.
 
   His filter on brandedgenius.de assigns no project to a topic (its buttons carry no filter value), so each project
   lists its topics in the copy file, taken from its own tags and solution points.
   Round 5 (DE/EN): copy by language; the filter keys on the topic ids and the wall on the project slugs (the same in
   both languages).
+  Round 7 (Roman's Loom of 2026-11-24: "this is lagging a lot", the drawings are "not really fitting to the logos, the
+  brands", "normally here should be logos ... or make it clean, make it smaller, remove the animation"): the animated
+  cover drawings are gone (seven SVGs with 227 parts moving at once, repainted every frame while the page scrolled), and
+  so are the tilt and the on-screen watcher they needed. The posters are shorter, and each one's name stands in its
+  middle as its mark, where the client's logo goes once he sends them.
 */
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -94,11 +97,6 @@ export function ProjectsSection() {
 }
 
 function Poster({ project, open, boxes, order, hidden, moved }: { project: Project; open: string; boxes: Boxes; order: number; hidden: boolean; moved: boolean }) {
-  const slot = useRef<HTMLDivElement>(null);
-  const card = useRef<HTMLElement>(null);
-  const frame = useRef(0);
-  useLive(slot);
-
   const place = {
     "--pt": `${boxes.p.t}px`,
     "--ph": `${boxes.p.h}px`,
@@ -112,42 +110,20 @@ function Poster({ project, open, boxes, order, hidden, moved }: { project: Proje
     "--n": order,
   } as CSSProperties;
 
-  // The tilt follows a mouse only; touch keeps the plain lift.
-  const tilt = (event: PointerEvent<HTMLElement>) => {
-    if (event.pointerType !== "mouse") return;
-    const el = card.current;
-    if (!el) return;
-    const box = el.getBoundingClientRect();
-    const x = (event.clientX - box.left) / box.width - 0.5;
-    const y = (event.clientY - box.top) / box.height - 0.5;
-    cancelAnimationFrame(frame.current);
-    frame.current = requestAnimationFrame(() => {
-      el.style.setProperty("--ry", `${(x * 7).toFixed(2)}deg`);
-      el.style.setProperty("--rx", `${(-y * 5).toFixed(2)}deg`);
-    });
-  };
-  const settle = () => {
-    cancelAnimationFrame(frame.current);
-    card.current?.style.removeProperty("--rx");
-    card.current?.style.removeProperty("--ry");
-  };
-
   return (
-    <div ref={slot} className="uc-poster uc-live" style={place} data-hidden={hidden ? "" : undefined} inert={hidden}>
+    <div className="uc-poster" style={place} data-hidden={hidden ? "" : undefined} inert={hidden}>
       {/* Once the wall has been filtered, a poster coming back is shown at once (the wall fades it in itself). */}
-      <article ref={card} className="uc-card" data-reveal="up" data-shown={moved ? "" : undefined} onPointerMove={tilt} onPointerLeave={settle}>
-        <div className="uc-card-art">
-          <CoverArt slug={project.slug} />
-        </div>
-        <div aria-hidden className="uc-card-scrim" />
+      <article className="uc-card" data-reveal="up" data-shown={moved ? "" : undefined}>
         <div className="uc-card-head">
           <span className="num">{project.number}</span>
           <span className="uc-card-tag hidden md:block">{project.tag}</span>
         </div>
-        <div className="uc-card-foot">
+        <div className="uc-card-mark">
           <h3 className="uc-card-name">{project.name}</h3>
           <p className="uc-card-tag mt-1.5 md:hidden">{project.tag}</p>
-          <p className="uc-card-line hidden md:block">{project.summary}</p>
+        </div>
+        <div className="uc-card-foot hidden md:block">
+          <p className="uc-card-line">{project.summary}</p>
         </div>
         {/* The whole poster is this button's target (its ::after covers the card). */}
         <button

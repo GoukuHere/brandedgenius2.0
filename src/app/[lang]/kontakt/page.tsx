@@ -18,6 +18,8 @@ export async function generateMetadata(): Promise<Metadata> {
   beside his real contact form. Round 5 (2026-11-18, Roman: "remove everything ... in the contact, we need only the
   contact form"): the page is this one section; the doors, the questions and the close came off.
   Round 5 (DE/EN): copy by language; the English page is /en/contact.
+  Round 7 (Roman's Loom of 2026-11-24): two sections, his headline beside "Direkter Draht", then the form across the
+  page under them (hero.tsx).
 */
 export default function KontaktPage() {
   return (

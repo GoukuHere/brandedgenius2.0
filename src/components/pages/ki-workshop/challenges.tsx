@@ -19,6 +19,8 @@ import { useCopy } from "@/i18n/client";
   Round 5 (the client's Loom of 2026-11-18, 3:39: "cool AI pictures in their backgrounds"): the back of each tile
   carries a picture made for its challenge across its top, fading into the tile's navy above the line, so the text
   stays on a dark base. The turn reveals it; the front keeps the number and the title alone.
+  Round 7 (his Loom of 2026-11-24: "make the subtext smaller here ... one sentence, small one"): each line is one short
+  sentence of his (the copy file), in body size (ki-workshop.css).
 */
 
 const STEP_MS = 260; // between two tiles

@@ -8,13 +8,13 @@ import { PrimaryLink, SecondaryLink } from "@/components/system/primitives";
 import type { Project } from "@/content/pages/use-cases";
 import { useCopy } from "@/i18n/client";
 import { caseStore } from "./case-store";
-import { CoverArt } from "./cover-art";
 
 /*
-  The full case view (2026-11-16): his popup for one project, as a large panel over the page. Left (desktop) the
-  project's cover art stays in place with its number; right his text in order: Projektübersicht, Ausgangssituation &
-  Herausforderung, the solution points as a checklist, Mehrwert, then his question and his two buttons. Phones: one
-  sheet over the whole screen, the art as a band at its head.
+  The full case view (2026-11-16): his popup for one project, as a panel over the page with his text in order:
+  Projektübersicht, Ausgangssituation & Herausforderung, the solution points as a checklist, Mehrwert, then his
+  question and his two buttons. Phones: one sheet over the whole screen.
+  Round 7 (Roman's Loom of 2026-11-24): the animated cover drawing beside the text is gone with the posters' drawings
+  ("not really fitting to the logos, the brands"), so the panel is one column of his text.
 
   A modal dialog: focus moves to the close button, Tab stays inside, Escape, the cross and a click beside the panel
   close it, and focus returns to the poster (or button) that opened it. The page is held while it is open: the body
@@ -127,12 +127,6 @@ function CaseDialog({ project }: { project: Project }) {
         </button>
 
         <div className="uc-case-scroll" data-lenis-prevent>
-          <div className="uc-case-art uc-live" data-live="1" aria-hidden>
-            <CoverArt slug={project.slug} />
-            <div className="uc-case-art-shade" />
-            <span className="uc-case-num num">{project.number}</span>
-          </div>
-
           <div className="uc-case-body">
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.12, ease: EASE }}>
               <h2 id={titleId} className="uc-case-title">

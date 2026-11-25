@@ -1,44 +1,31 @@
 "use client";
 
-import { animate, motion, useMotionValue, useMotionValueEvent, useTransform, type AnimationPlaybackControls, type MotionValue } from "motion/react";
-import { Play, RotateCcw } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { motion, useMotionValue, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Container, Heading, Section } from "@/components/system/primitives";
 import { useCopy } from "@/i18n/client";
-import { cn } from "@/lib/utils";
-import { DemoButton, useMedia, useOnScreen, useReducedMotion, useTabVisible } from "./shared";
+import { useMedia, useOnScreen, useReducedMotion, useTabVisible } from "./shared";
 
 /*
   Vernetztes KI-Ökosystem: his heading and text centred, then his ten platforms as glass cards on a slowly turning
   ring, a cylinder seen from slightly above. Each card has its own 3D transform under one perspective (the ring is not
   one 3D space, so the drawing order is the z-index and no card ever cuts through another); a card that turns away
   shows its opaque back, never its mirrored face. The card in front stands exactly in the screen plane, so its text
-  is as sharp as any other text on the page.
-
-  His "Workflow abspielen" plays his seven-step example: for each step the ring turns to the platform it uses (to the
-  middle of two neighbours when a step uses both), those cards light up with his "Sync", and the readout shows
-  "Schritt N von 7" and the step's name. At the end everything rests on the last step, then returns to the idle turn,
-  as his demo does. His closing line follows.
+  is as sharp as any other text on the page. His closing line follows.
 
   Phones: a smaller ring whose sides fade into the page edges (nothing overflows). Off screen, in a hidden tab and with
-  reduced motion the ring holds still (reduced motion: the readout and lights still step, the ring jumps).
+  reduced motion the ring holds still.
   Round 5 (DE/EN): copy by language; the closing line's white-to-sky half starts at a word index from the copy.
+  Round 7 (Roman's Loom of 2026-11-24): "let it swiping like that, that is good", but "remove this in the middle, this
+  left and this right play button": his workflow demo under the ring is gone (the status line, the step readout and
+  "Workflow abspielen"), and the ring moves up under the text ("make a little bit more up, close to this one as one
+  section with the header and sub-header"). The stage's empty top, above the farthest cards, now sits under the text.
 */
 
 /** Idle: one turn in 80 seconds. */
 const IDLE_DEG_PER_MS = 360 / 80000;
-const STEP_MS = 2100;
-const HOLD_MS = 1700;
 
 const norm = (deg: number) => ((((deg + 180) % 360) + 360) % 360) - 180;
-
-/** The ring's angle that brings a step's platform (or the middle of two neighbours) to the front. */
-function frontFor(platforms: readonly number[], stepDeg: number) {
-  const [a, b] = platforms.map((p) => p * stepDeg);
-  if (b === undefined) return a;
-  const gap = norm(b - a);
-  return Math.abs(gap) <= 110 ? a + gap / 2 : a;
-}
 
 const subscribeNothing = () => () => {};
 const useMounted = () => useSyncExternalStore(subscribeNothing, () => true, () => false);
@@ -55,7 +42,7 @@ export function EcosystemSection() {
           </p>
         </div>
         <Ring />
-        <p data-reveal="up" className="ls-eco-closing mx-auto mt-14 max-w-[760px] text-center md:mt-16">
+        <p data-reveal="up" className="ls-eco-closing mx-auto max-w-[760px] text-center">
           {closingParts(ECOSYSTEM.closing, ECOSYSTEM.closingAccentAt)}
         </p>
       </Container>
@@ -76,7 +63,6 @@ function closingParts(line: string, at: number) {
 function Ring() {
   const { ECOSYSTEM } = useCopy().leistungen;
   const PLATFORMS = ECOSYSTEM.platforms;
-  const STEPS = ECOSYSTEM.steps;
   const stepDeg = 360 / PLATFORMS.length;
   const mounted = useMounted();
   const stage = useRef<HTMLDivElement>(null);
@@ -91,13 +77,8 @@ function Ring() {
     radius.set(phone ? 236 : 500);
   }, [phone, radius]);
 
-  const [playing, setPlaying] = useState(false);
-  /** The step being shown (-1: none yet). */
-  const [step, setStep] = useState(-1);
-  const timers = useRef<{ ids: number[]; spin: AnimationPlaybackControls | null }>({ ids: [], spin: null });
-
-  // The idle turn: only on screen, in a visible tab, with motion allowed, and not while the workflow plays.
-  const idle = onScreen && visible && !reduced && !playing;
+  // The idle turn: only on screen, in a visible tab and with motion allowed.
+  const idle = onScreen && visible && !reduced;
   useEffect(() => {
     if (!idle) return undefined;
     let frame = 0;
@@ -111,58 +92,8 @@ function Ring() {
     return () => cancelAnimationFrame(frame);
   }, [idle, rot]);
 
-  const turnTo = useCallback(
-    (deg: number) => {
-      const list = timers.current;
-      list.spin?.stop();
-      const from = rot.get();
-      const to = from + norm(deg - from);
-      if (reduced) {
-        rot.set(to);
-        return;
-      }
-      list.spin = animate(rot, to, { duration: 1.15, ease: [0.65, 0, 0.35, 1] });
-    },
-    [rot, reduced]
-  );
-
-  const reset = useCallback(() => {
-    const list = timers.current;
-    list.ids.forEach((id) => window.clearTimeout(id));
-    list.ids = [];
-    list.spin?.stop();
-    setPlaying(false);
-    setStep(-1);
-  }, []);
-
-  const play = useCallback(() => {
-    reset();
-    const list = timers.current;
-    setPlaying(true);
-    STEPS.forEach((_, i) => {
-      list.ids.push(
-        window.setTimeout(() => {
-          setStep(i);
-          turnTo(frontFor(STEPS[i].platforms, stepDeg));
-        }, i * STEP_MS)
-      );
-    });
-    list.ids.push(window.setTimeout(reset, (STEPS.length - 1) * STEP_MS + STEP_MS + HOLD_MS));
-  }, [reset, turnTo, STEPS, stepDeg]);
-
-  useEffect(() => {
-    const list = timers.current;
-    return () => {
-      list.ids.forEach((id) => window.clearTimeout(id));
-      list.spin?.stop();
-    };
-  }, []);
-
-  const lit = new Set<number>(step >= 0 ? STEPS[step].platforms : []);
-  const shownStep = Math.max(0, step);
-
   return (
-    <div className="mt-8 md:mt-10">
+    <div className="ls-eco-ring">
       {/* His ten platforms for screen readers; the turning ring below is their picture. */}
       <ul role="list" aria-label={ECOSYSTEM.ready} className="sr-only">
         {PLATFORMS.map((platform) => (
@@ -176,31 +107,10 @@ function Ring() {
         <div className="ls-ring-stage">
           {mounted
             ? PLATFORMS.map((platform, i) => (
-                <RingCard key={platform.title} i={i} stepDeg={stepDeg} rot={rot} radius={radius} lit={lit.has(i)} title={platform.title} tools={platform.tools} sync={ECOSYSTEM.sync} />
+                <RingCard key={platform.title} i={i} stepDeg={stepDeg} rot={rot} radius={radius} title={platform.title} tools={platform.tools} sync={ECOSYSTEM.sync} />
               ))
             : null}
         </div>
-      </div>
-
-      <div data-reveal="up" data-rd="1" className="ls-eco-bar">
-        <p className="ls-eco-status" aria-live="polite">
-          <span aria-hidden className={cn("ls-status-dot", playing && "ls-status-dot-live")} />
-          {playing ? ECOSYSTEM.live : ECOSYSTEM.ready}
-        </p>
-        <div className="ls-eco-readout">
-          <p className="text-[14px] text-white/55">{ECOSYSTEM.stepOf(shownStep + 1, STEPS.length)}</p>
-          <p key={shownStep} className="ls-eco-step mt-1 text-[19px] leading-snug font-medium text-balance text-white md:text-[21px]">
-            {STEPS[shownStep].name}
-          </p>
-          <span aria-hidden className="ls-eco-segments">
-            {STEPS.map((s, i) => (
-              <span key={s.name} data-on={playing && i <= step ? "" : undefined} />
-            ))}
-          </span>
-        </div>
-        <DemoButton tone="primary" icon={playing ? RotateCcw : Play} onClick={playing ? reset : play} className="ls-eco-button">
-          {playing ? ECOSYSTEM.reset : ECOSYSTEM.play}
-        </DemoButton>
       </div>
     </div>
   );
@@ -211,7 +121,6 @@ function RingCard({
   stepDeg,
   rot,
   radius,
-  lit,
   title,
   tools,
   sync,
@@ -221,7 +130,6 @@ function RingCard({
   stepDeg: number;
   rot: MotionValue<number>;
   radius: MotionValue<number>;
-  lit: boolean;
   title: string;
   tools: string;
   /** His "Sync" label. */
@@ -251,7 +159,7 @@ function RingCard({
   });
 
   return (
-    <motion.div className="ls-ring-card" style={{ transform, zIndex }} data-lit={lit ? "" : undefined} data-away={away ? "" : undefined}>
+    <motion.div className="ls-ring-card" style={{ transform, zIndex }} data-away={away ? "" : undefined}>
       {away ? (
         <div aria-hidden className="ls-ring-face ls-ring-back">
           {/* eslint-disable-next-line @next/next/no-img-element -- a small static vector mark; next/image adds nothing */}

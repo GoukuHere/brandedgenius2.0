@@ -1,5 +1,7 @@
 /*
   /use-cases (2026-11-16). Everything here is prefixed uc- and only this page imports it.
+  Round 7 (Roman's Loom of 2026-11-24): the posters' animated cover drawings and their styles are gone (they made the
+  page lag while scrolling, and he found they did not fit the brands); each poster carries the client's name as its mark.
   Motion rules, as on the homepage: only opacity, the individual transform properties (translate, scale, rotate) and
   SVG strokes animate; every loop pauses off screen (.uc-live, see use-live.ts); nothing is hidden without script or
   with reduced motion, where each drawing stands finished.
@@ -13,19 +15,6 @@
     .uc-live:not([data-live="1"]) :not([data-reveal]),
     .uc-live:not([data-live="1"]) :not([data-reveal])::after {
       animation-play-state: paused !important;
-    }
-  }
-
-  /* A stroke that draws itself once (pathLength 1), when its drawing first comes on screen. */
-  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-    .uc-draw {
-      stroke-dasharray: 1;
-      animation: uc-draw 2.2s var(--ease-out-expo) var(--d, 0s) backwards;
-    }
-  }
-  @keyframes uc-draw {
-    from {
-      stroke-dashoffset: 1;
     }
   }
 
@@ -264,25 +253,34 @@
     scale: 0.94;
   }
 
+  /*
+    Round 7: the poster is one column: his number and industry line at its head, his name as its mark in the middle
+    (the client's logo takes this place once he sends them), his line and "Case Study öffnen" at its foot. Nothing in
+    it moves but the lift on hover.
+  */
   .uc-card {
     position: relative;
     isolation: isolate;
+    display: flex;
+    flex-direction: column;
     height: 100%;
     overflow: hidden;
     border-radius: 18px;
+    padding: 13px 14px 14px;
     background:
       radial-gradient(120% 70% at 100% 0%, rgb(26 111 224 / 0.24), rgb(26 111 224 / 0) 60%),
       linear-gradient(172deg, #0c2658 0%, #08193f 55%, #061331 100%);
     box-shadow: 0 30px 60px -34px rgb(1 4 12 / 0.95);
-    transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+    transform: translateY(var(--lift, 0px));
     transition:
-      transform 0.6s var(--ease-out-expo),
-      box-shadow 0.6s var(--ease-out-expo),
+      transform 0.5s var(--ease-out-expo),
+      box-shadow 0.5s var(--ease-out-expo),
       scale 0.5s var(--ease-out-expo);
   }
   @media (min-width: 768px) {
     .uc-card {
       border-radius: 24px;
+      padding: 22px 24px 20px;
     }
   }
   .uc-card::after {
@@ -301,48 +299,13 @@
     outline: 2px solid var(--color-sky);
     outline-offset: 4px;
   }
-  /* The art fills the poster above its text (so the text never covers the drawing) and fades out into the foot. */
-  .uc-card-art {
-    position: absolute;
-    inset: 0 0 76px;
-    z-index: 0;
-    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
-    mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
-    transition: scale 1.4s var(--ease-out-expo);
-  }
-  @media (min-width: 768px) {
-    .uc-card-art {
-      bottom: 150px;
-    }
-  }
-  .uc-art {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-  .uc-card-scrim {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background: linear-gradient(
-      180deg,
-      rgb(5 14 36 / 0.62) 0%,
-      rgb(5 14 36 / 0) 22%,
-      rgb(5 14 36 / 0) 44%,
-      rgb(5 14 36 / 0.82) 72%,
-      rgb(5 14 36 / 0.96) 100%
-    );
-  }
   .uc-card-head {
-    position: absolute;
-    inset: 0 0 auto;
+    position: relative;
     z-index: 2;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
-    padding: 13px 14px 0;
   }
   .uc-card-head .num {
     font-size: 13px;
@@ -358,22 +321,29 @@
     max-width: 64%;
     text-align: right;
   }
-  .uc-card-foot {
-    position: absolute;
-    inset: auto 0 0;
+  .uc-card-mark {
+    position: relative;
     z-index: 2;
-    padding: 0 14px 14px;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+    padding: 10px 0 2px;
   }
   .uc-card-name {
-    font-size: 16px;
-    line-height: 1.22;
+    font-size: 18px;
+    line-height: 1.15;
     font-weight: 500;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     color: #fff;
     text-wrap: balance;
   }
+  .uc-card-foot {
+    position: relative;
+    z-index: 2;
+  }
   .uc-card-line {
-    margin-top: 10px;
     font-size: 15px;
     line-height: 1.55;
     color: rgb(241 241 238 / 0.72);
@@ -414,30 +384,28 @@
   @media (max-width: 767px) {
     /* On phones the number sits where the arrow is not. */
     .uc-card-head {
-      padding-right: 48px;
+      padding-right: 34px;
     }
   }
   @media (min-width: 768px) {
-    .uc-card-head {
-      padding: 22px 24px 0;
-    }
     .uc-card-head .num {
       font-size: 15px;
     }
+    .uc-card-name {
+      font-size: 25px;
+    }
+    /* Room under his line for the hairline and "Case Study öffnen". */
     .uc-card-foot {
-      padding: 0 24px 70px;
+      padding-bottom: 44px;
     }
     .uc-card-foot::after {
       content: "";
       position: absolute;
-      left: 24px;
-      right: 24px;
-      bottom: 52px;
+      left: 0;
+      right: 0;
+      bottom: 32px;
       height: 1px;
       background: rgb(255 255 255 / 0.1);
-    }
-    .uc-card-name {
-      font-size: 22px;
     }
     .uc-card-open {
       top: auto;
@@ -453,12 +421,12 @@
   }
   @media (min-width: 1024px) {
     .uc-card-name {
-      font-size: 24px;
+      font-size: 29px;
     }
   }
   @media (hover: hover) and (pointer: fine) {
     .uc-card:hover {
-      --lift: -8px;
+      --lift: -6px;
       box-shadow: 0 46px 80px -34px rgb(1 4 12 / 0.95);
     }
     .uc-card:hover::after {
@@ -466,229 +434,11 @@
         inset 0 1px 0 rgb(255 255 255 / 0.18),
         inset 0 0 0 1px rgb(105 191 248 / 0.5);
     }
-    .uc-card:hover .uc-card-art {
-      scale: 1.045;
-    }
     .uc-card:hover .uc-card-open {
       color: #fff;
     }
     .uc-card:hover .uc-card-open svg {
       translate: 2px -2px;
-    }
-  }
-
-  /* ---------- The cover arts ---------- */
-
-  /* 01 the LED wall: a ripple running through the pixels (still: one ring of it). */
-  .uc-led {
-    opacity: var(--s);
-  }
-  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-    .uc-led {
-      opacity: var(--b);
-      animation: uc-led 4.8s linear var(--d, 0s) infinite;
-    }
-  }
-  /* Two thin rings, like a ripple on water: a bright one and a weaker echo. */
-  @keyframes uc-led {
-    0% {
-      opacity: var(--b);
-    }
-    3% {
-      opacity: 0.95;
-    }
-    7% {
-      opacity: calc(var(--b) + 0.04);
-    }
-    10% {
-      opacity: 0.5;
-    }
-    15%,
-    100% {
-      opacity: var(--b);
-    }
-  }
-
-  /* 02 the wrap film: one soft gloss sweeps across it (still: the gloss rests in the middle of the film). */
-  .uc-gloss {
-    translate: 300px 0;
-    opacity: 0.8;
-  }
-  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-    .uc-gloss {
-      translate: 0 0;
-      opacity: 1;
-      animation: uc-gloss 6.4s cubic-bezier(0.45, 0, 0.25, 1) 0.6s infinite;
-    }
-  }
-  @keyframes uc-gloss {
-    0% {
-      translate: 0 0;
-    }
-    55%,
-    100% {
-      translate: 720px 0;
-    }
-  }
-
-  /* 03 the candles rise in, the last one keeps breathing, the line's end pings. */
-  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-    .uc-candle {
-      transform-box: fill-box;
-      transform-origin: 50% 100%;
-      animation: uc-rise 1s var(--ease-out-expo) var(--d, 0s) backwards;
-    }
-    .uc-breathe rect {
-      transform-box: fill-box;
-      transform-origin: 50% 100%;
-      animation: uc-breathe 4.6s ease-in-out 1.6s infinite;
-    }
-  }
-  @keyframes uc-rise {
-    from {
-      opacity: 0;
-      scale: 1 0.2;
-    }
-  }
-  @keyframes uc-breathe {
-    50% {
-      scale: 1 1.4;
-    }
-  }
-  .uc-ping {
-    opacity: 0;
-  }
-  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-    .uc-ping {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: uc-ping 3.6s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0s) infinite;
-    }
-    /* Cryptotransfer: the target node pings as the value arrives (62% of the packet's 3.6s). */
-    .uc-ping-transfer {
-      --d: 2.23s;
-    }
-  }
-  @keyframes uc-ping {
-    0% {
-      opacity: 0.85;
-      scale: 1;
-    }
-    45%,
-    100% {
-      opacity: 0;
-      scale: 2.6;
-    }
-  }
-
-  /* 04 the transfer: a packet of light travels the arc; the outer rings turn slowly. */
-  .uc-packet {
-    opacity: 0;
-  }
-  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-    .uc-packet {
-      opacity: 1;
-      stroke-dasharray: 0.1 1.3;
-      stroke-dashoffset: 0.1;
-      animation: uc-packet 3.6s cubic-bezier(0.45, 0, 0.25, 1) infinite;
-    }
-    .uc-spin {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: uc-spin 60s linear infinite;
-    }
-    .uc-spin-back {
-      animation-direction: reverse;
-    }
-  }
-  @keyframes uc-packet {
-    0% {
-      stroke-dashoffset: 0.1;
-    }
-    62%,
-    100% {
-      stroke-dashoffset: -1.2;
-    }
-  }
-  @keyframes uc-spin {
-    to {
-      rotate: 360deg;
-    }
-  }
-
-  /* 05 the mark: one light circles its rim. */
-  .uc-orbit {
-    opacity: 0;
-  }
-  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-    .uc-orbit {
-      opacity: 1;
-      stroke-dasharray: 0.05 0.95;
-      animation: uc-orbit 16s linear infinite;
-    }
-  }
-  @keyframes uc-orbit {
-    to {
-      stroke-dashoffset: -1;
-    }
-  }
-
-  /* 06 the chip: signals run in along three traces; its core answers each one. */
-  .uc-pulse {
-    opacity: 0;
-  }
-  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-    .uc-pulse {
-      opacity: 1;
-      stroke-dasharray: 0.12 1.4;
-      stroke-dashoffset: 0.12;
-      animation: uc-pulse 4.2s cubic-bezier(0.45, 0, 0.25, 1) var(--d, 0s) infinite;
-    }
-    /* The signals arrive every 1.4s, the first after 2.6s. */
-    .uc-die {
-      animation: uc-die 1.4s ease-out 2.6s infinite;
-    }
-  }
-  @keyframes uc-pulse {
-    0% {
-      stroke-dashoffset: 0.12;
-    }
-    62%,
-    100% {
-      stroke-dashoffset: -1.3;
-    }
-  }
-  @keyframes uc-die {
-    0% {
-      fill-opacity: 0.6;
-    }
-    70%,
-    100% {
-      fill-opacity: 0.1;
-    }
-  }
-
-  /* 07 the skyline: windows light one after another (still: they stay lit). */
-  .uc-window {
-    opacity: 0.9;
-  }
-  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-    .uc-window {
-      opacity: 0;
-      animation: uc-window 8.4s ease-in-out var(--d, 0s) infinite;
-    }
-  }
-  @keyframes uc-window {
-    0%,
-    100% {
-      opacity: 0;
-    }
-    12%,
-    55% {
-      opacity: 0.95;
-    }
-    70% {
-      opacity: 0;
     }
   }
 
@@ -709,7 +459,7 @@
   }
   .uc-case-panel {
     position: relative;
-    width: min(1120px, 100%);
+    width: min(780px, 100%);
     height: min(820px, calc(100dvh - 48px));
     overflow: hidden;
     border-radius: 28px;
@@ -722,43 +472,14 @@
       inset 0 0 0 1px rgb(255 255 255 / 0.1);
   }
   .uc-case-scroll {
-    display: grid;
-    grid-template-columns: minmax(0, 0.74fr) minmax(0, 1.26fr);
     height: 100%;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
     scrollbar-color: rgb(255 255 255 / 0.18) transparent;
   }
-  .uc-case-art {
-    position: sticky;
-    top: 0;
-    height: min(820px, calc(100dvh - 48px));
-    overflow: hidden;
-    background: linear-gradient(172deg, #0c2658 0%, #08193f 60%, #061331 100%);
-  }
-  .uc-case-art .uc-art {
-    position: absolute;
-    inset: 0;
-  }
-  .uc-case-art-shade {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(90deg, rgb(7 23 51 / 0) 70%, rgb(7 23 51 / 0.55) 100%),
-      linear-gradient(180deg, rgb(5 14 36 / 0) 55%, rgb(5 14 36 / 0.85) 100%);
-  }
-  .uc-case-num {
-    position: absolute;
-    left: 32px;
-    bottom: 22px;
-    font-size: 120px;
-    line-height: 1;
-    color: transparent;
-    -webkit-text-stroke: 1px rgb(220 236 255 / 0.4);
-  }
   .uc-case-body {
-    padding: 60px 56px 64px 48px;
+    padding: 56px 56px 64px;
   }
   .uc-case-title {
     padding-right: 40px;
@@ -862,21 +583,21 @@
       gap: 28px;
     }
   }
-  /* More text below: the panel's foot fades (desktop, where the art stands still and the text scrolls). */
+  /* More text below: the panel's foot fades (desktop, where the panel stands still and the text scrolls). */
   @media (min-width: 1024px) {
     .uc-case-panel::after {
       content: "";
       position: absolute;
       inset: auto 0 0 auto;
       z-index: 4;
-      width: 60%;
+      width: 100%;
       height: 56px;
       border-bottom-right-radius: inherit;
       background: linear-gradient(180deg, rgb(7 23 51 / 0), rgb(7 23 51 / 0.95));
       pointer-events: none;
     }
   }
-  /* Below 1024px: one sheet over the whole screen, the art as a band at its head. */
+  /* Below 1024px: one sheet over the whole screen. */
   @media (max-width: 1023px) {
     .uc-case {
       padding: 0;
@@ -886,23 +607,8 @@
       height: 100dvh;
       border-radius: 0;
     }
-    .uc-case-scroll {
-      display: block;
-    }
-    .uc-case-art {
-      position: relative;
-      height: 240px;
-    }
-    .uc-case-art-shade {
-      background: linear-gradient(180deg, rgb(5 14 36 / 0.35) 0%, rgb(5 14 36 / 0) 30%, rgb(5 14 36 / 0) 55%, rgb(7 23 51 / 1) 100%);
-    }
-    .uc-case-num {
-      left: 20px;
-      bottom: 10px;
-      font-size: 72px;
-    }
     .uc-case-body {
-      padding: 20px 20px 48px;
+      padding: 64px 20px 48px;
     }
     .uc-case-title {
       padding-right: 0;
@@ -913,11 +619,8 @@
     }
   }
   @media (min-width: 768px) and (max-width: 1023px) {
-    .uc-case-art {
-      height: 300px;
-    }
     .uc-case-body {
-      padding: 28px 40px 56px;
+      padding: 72px 40px 56px;
     }
   }
 

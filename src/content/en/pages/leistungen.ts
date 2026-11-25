@@ -45,18 +45,9 @@ export const POTENZIAL: Shape<typeof DE.POTENZIAL> = {
 export const AGENTS: Shape<typeof DE.AGENTS> = {
   title: "AI agents that understand, act",
   accent: "and communicate naturally",
-  text: "We build AI agents that understand information, support decisions, trigger actions and work with your existing systems. They communicate in context and become an active part of your business processes.",
+  text: "We build AI agents that understand information, support decisions, trigger actions and work with your existing systems.",
   usesLabel: "Possible applications",
-  uses: [
-    "Lead qualification and routing",
-    "Automated research",
-    "Internal knowledge assistants",
-    "Reporting and notifications",
-    "Document and data processing",
-    "CRM updates and task creation",
-    "Customer service workflows",
-    "Multi-step business processes",
-  ],
+  uses: ["Lead qualification and routing", "Internal knowledge assistants", "CRM updates and task creation", "Customer service workflows"],
   cta: "Explore AI agents",
   console: {
     ready: "Autonomous process ready",
@@ -182,11 +173,7 @@ export const ECOSYSTEM: Shape<typeof DE.ECOSYSTEM> = {
   accent: "Connected into one smart system.",
   text: "AI adds the most value when it communicates naturally with people and works with your existing systems. We connect AI agents, chatbots and callbots with your systems to build automated, smart processes.",
   ready: "10 connected platforms & interfaces",
-  live: "Live workflow simulation active",
-  play: "Play workflow",
-  reset: "Reset",
   sync: "Sync",
-  stepOf: (step: number, total: number) => `Step ${step} of ${total}`,
   platforms: [
     { title: "CRM", tools: "HubSpot / Salesforce / Pipedrive" },
     { title: "Email", tools: "Outlook / Gmail / Klaviyo" },
@@ -198,16 +185,6 @@ export const ECOSYSTEM: Shape<typeof DE.ECOSYSTEM> = {
     { title: "Databases", tools: "PostgreSQL / SQL / Notion" },
     { title: "Marketing platforms", tools: "Meta / Google Ads / LinkedIn" },
     { title: "Internal tools", tools: "Slack / Teams / ERP / Asana" },
-  ],
-  // The same seven steps and platform indexes as the German.
-  steps: [
-    { name: "New lead", platforms: [3, 8] },
-    { name: "AI qualification", platforms: [6, 7] },
-    { name: "CRM", platforms: [0] },
-    { name: "Natural follow-up via WhatsApp or Telegram", platforms: [4, 5] },
-    { name: "AI call", platforms: [6, 9] },
-    { name: "Appointment", platforms: [2] },
-    { name: "Sales team", platforms: [0, 9] },
   ],
   // The German opens with "Statt" (instead of); the English says the result plainly.
   closing: "The result is one connected system that communicates intelligently.",

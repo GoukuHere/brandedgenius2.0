@@ -60,15 +60,6 @@
   }
 }
 
-/* The left column stays beside the long form on desktop, where the whole column fits under the header (it is about
-   780px tall with its 24px top padding; the header needs 112px). Shorter screens scroll it with the page. */
-@media (min-width: 1024px) and (min-height: 900px) {
-  .kt-left {
-    position: sticky;
-    top: 112px;
-  }
-}
-
 /* ---------- The form panel: his LeadConnector form and our panel as one surface ---------- */
 /*
   Round 5 (the client's Loom of 2026-11-18, V4 1:52: "instead of black, maybe ... transparent or something which is
@@ -94,20 +85,26 @@
   container-type: inline-size;
   mix-blend-mode: lighten;
 }
+/*
+  Round 7 (Roman: "remove the logo here inside"): his form opens with his logo, a 150px picture (18px to 168px from the
+  frame's top in his phone style, 2px to 152px in his wide style), then "Ihr vollständiger Name" 10px under it. The
+  crop takes the logo off the top, so the form starts at its first label. Measured 2026-11-25 in his form as it is: if
+  he takes the logo out of the form himself, these two numbers go back to -4px and 0.
+*/
 .kt-form-frame {
   display: block;
   width: calc(100% + 8px);
   max-width: none;
-  margin: -4px -4px -20px;
+  margin: -168px -4px -20px;
   border: 0;
   /* Our page is color-scheme dark and his form's page is not. When the two differ, Chrome paints the frame's
      background white behind his card, so the frame takes his page's scheme and stays see-through. */
   color-scheme: light;
 }
 /* From a 500px frame (this crop plus its 8px) his form uses its wide style: the card starts 10px above the frame, so its
-   top edge is already out of sight, and his logo's glow begins 2px from the top. No top crop there. */
+   top edge is already out of sight, and his logo runs from 2px to 152px. */
 @container (min-width: 492px) {
   .kt-form-frame {
-    margin-top: 0;
+    margin-top: -152px;
   }
 }

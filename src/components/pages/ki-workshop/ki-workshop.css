@@ -212,16 +212,16 @@
   font-weight: 500;
   color: rgb(241 241 238 / 0.92);
 }
+/* Round 7 (Roman: "make the subtext smaller ... one sentence, small one"): one short line in body size. */
 .kw-flip-text {
-  font-size: 18px;
-  line-height: 1.45;
-  letter-spacing: -0.005em;
-  color: rgb(241 241 238 / 0.9);
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgb(241 241 238 / 0.86);
   text-wrap: pretty;
 }
 @media (min-width: 1024px) {
   .kw-flip-text {
-    font-size: 20px;
+    font-size: 17px;
   }
 }
 
@@ -369,7 +369,7 @@
 }
 @media (min-width: 1024px) {
   .kw-module {
-    padding: 24px 24px 20px;
+    padding: 17px 22px 18px;
   }
 }
 .kw-module:hover {
@@ -439,99 +439,19 @@
   opacity: 1;
   scale: 1;
 }
-.kw-module-pick {
-  transition: color 0.3s ease;
-}
-.kw-module[aria-pressed="true"] .kw-module-pick {
-  color: var(--kw-sky);
-}
 .kw-module[aria-pressed="true"] .kw-module-num {
   color: var(--kw-sky);
 }
 
-/* The tray that collects the chosen modules. */
-.kw-tray {
-  border-radius: 26px;
-  padding: 24px 20px 20px;
-  background:
-    radial-gradient(90% 60% at 100% 0%, rgb(0 75 160 / 0.45), rgb(0 75 160 / 0) 70%),
-    linear-gradient(165deg, #0a2150 0%, #061331 100%);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.12),
-    inset 0 0 0 1px rgb(255 255 255 / 0.09),
-    0 30px 60px -30px rgb(1 4 12 / 0.95);
-}
-@media (min-width: 1024px) {
-  .kw-tray {
-    padding: 30px 28px 28px;
-  }
-}
-.kw-tray-seg {
-  height: 4px;
-  flex: 1 1 0;
-  border-radius: 999px;
-  background-color: rgb(241 241 238 / 0.12);
-  transition:
-    background-color 0.35s ease,
-    box-shadow 0.35s ease;
-}
-.kw-tray-seg[data-on] {
-  background-color: var(--kw-sky);
-  box-shadow: 0 0 12px -2px rgb(105 191 248 / 0.7);
-}
-.kw-chip {
-  display: inline-flex;
-  max-width: 100%;
-  align-items: center;
-  gap: 10px;
-  border-radius: 999px;
-  padding: 9px 10px 9px 16px;
-  font-size: 14px;
-  line-height: 1.25;
-  text-align: left;
-  color: #f1f1ee;
-  cursor: pointer;
-  background-color: rgb(105 191 248 / 0.1);
-  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.38);
-  transition:
-    background-color 0.25s ease,
-    box-shadow 0.25s ease;
-}
-.kw-chip:hover {
-  background-color: rgb(105 191 248 / 0.18);
-  box-shadow: inset 0 0 0 1px rgb(105 191 248 / 0.7);
-}
-.kw-chip svg {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-  color: rgb(241 241 238 / 0.7);
-}
-@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
-  .kw-chip {
-    animation: kw-chip-in 420ms var(--kw-ease) both;
-  }
-}
-@keyframes kw-chip-in {
-  from {
-    opacity: 0;
-    scale: 0.86;
-    translate: 0 6px;
-  }
-  to {
-    opacity: 1;
-    scale: 1;
-    translate: 0 0;
-  }
-}
-/* A long button label may wrap inside the tray (phones). */
+/* His long button label may wrap on a narrow phone (round 7: centred under the module keys). */
 .kw-wrap-button.specular-button {
   height: auto;
   min-height: 52px;
+  max-width: 100%;
   padding-top: 14px;
   padding-bottom: 14px;
   white-space: normal;
-  text-align: left;
+  text-align: center;
   line-height: 1.3;
 }
 

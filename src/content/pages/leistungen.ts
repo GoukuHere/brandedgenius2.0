@@ -46,21 +46,14 @@ export const POTENZIAL = {
   ],
 };
 
+// Round 7 (Roman's Loom of 2026-11-24, "it's too much with text, text, text"): his first sentence only, and four of
+// his eight use cases.
 export const AGENTS = {
   title: "KI-Agenten, die verstehen, handeln",
   accent: "und natürlich kommunizieren",
-  text: "Wir entwickeln KI-Agenten, die Informationen verstehen, Entscheidungen unterstützen, Aktionen auslösen und mit bestehenden Systemen interagieren. Sie kommunizieren kontextbezogen und werden zum aktiven Bestandteil Ihrer Geschäftsprozesse.",
+  text: "Wir entwickeln KI-Agenten, die Informationen verstehen, Entscheidungen unterstützen, Aktionen auslösen und mit bestehenden Systemen interagieren.",
   usesLabel: "Mögliche Einsatzbereiche",
-  uses: [
-    "Lead-Qualifizierung und Weiterleitung",
-    "Automatisierte Recherche",
-    "Interne Wissensassistenten",
-    "Reporting und Benachrichtigungen",
-    "Dokumenten- und Datenverarbeitung",
-    "CRM-Aktualisierungen und Aufgabenerstellung",
-    "Kundenservice-Workflows",
-    "Mehrstufige Geschäftsprozesse",
-  ],
+  uses: ["Lead-Qualifizierung und Weiterleitung", "Interne Wissensassistenten", "CRM-Aktualisierungen und Aufgabenerstellung", "Kundenservice-Workflows"],
   cta: "KI-Agenten entdecken",
   // His agent console and the states his own script shows.
   console: {
@@ -195,13 +188,11 @@ export const ECOSYSTEM = {
   title: "Ihre Tools.",
   accent: "Verbunden zu einem intelligenten System.",
   text: "KI entfaltet ihren größten Mehrwert, wenn sie natürlich mit Menschen kommuniziert und mit bestehenden Systemen interagiert. Wir verbinden KI-Agenten, Chatbots und Callbots mit Ihrer Systemlandschaft zu automatisierten, intelligenten Prozessen.",
-  // The states and buttons of his own workflow demo.
+  // Round 7 (Roman's Loom of 2026-11-24: "remove this in the middle, this left and this right play button"): his workflow
+  // demo under the ring is gone (its status line, the step readout and "Workflow abspielen"). His status line is still
+  // the name of the platform list for screen readers, and his "Sync" stays on each card.
   ready: "10 vernetzte Plattformen & Schnittstellen",
-  live: "Live-Workflow-Simulation aktiv",
-  play: "Workflow abspielen",
-  reset: "Zurücksetzen",
   sync: "Sync",
-  stepOf: (step: number, total: number) => `Schritt ${step} von ${total}`,
   platforms: [
     { title: "CRM", tools: "HubSpot / Salesforce / Pipedrive" },
     { title: "E-Mail", tools: "Outlook / Gmail / Klaviyo" },
@@ -213,16 +204,6 @@ export const ECOSYSTEM = {
     { title: "Datenbanken", tools: "PostgreSQL / SQL / Notion" },
     { title: "Marketing-Plattformen", tools: "Meta / Google Ads / LinkedIn" },
     { title: "Interne Tools", tools: "Slack / Teams / ERP / Asana" },
-  ],
-  // His seven example steps, each with the platforms (indexes above) his own script lights for it.
-  steps: [
-    { name: "Neuer Lead", platforms: [3, 8] },
-    { name: "KI-Qualifizierung", platforms: [6, 7] },
-    { name: "CRM", platforms: [0] },
-    { name: "Natürliches Follow-up per WhatsApp oder Telegram", platforms: [4, 5] },
-    { name: "KI-Anruf", platforms: [6, 9] },
-    { name: "Termin", platforms: [2] },
-    { name: "Vertriebsteam", platforms: [0, 9] },
   ],
   closing: "Statt isolierter Einzellösungen entsteht ein vernetztes, intelligent kommunizierendes Gesamtsystem.",
   // Round 5 (DE/EN): the word of `closing` where its white-to-sky half starts (his line break), as an index, so the

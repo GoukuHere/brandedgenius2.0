@@ -35,11 +35,12 @@ export const KW_CHALLENGES = {
   title: "Viele Unternehmen nutzen bereits KI –",
   accent: "aber noch ohne klare Struktur.",
   text: "KI-Tools sind verfügbar, doch häufig fehlt das Wissen, wie sie sicher, produktiv und einheitlich im Unternehmen eingesetzt werden können.",
+  // Round 7 (Roman's Loom of 2026-11-24: "one sentence, small one"): each line is his own, shortened by leaving words out.
   items: [
-    { title: "Unsicherheit im Team", text: "Mitarbeiter wissen nicht, welche KI-Tools sie nutzen dürfen und wie sie richtig damit arbeiten.", img: "/media/pages/ki-workshop/r5-problem-team.webp" },
-    { title: "Tool-Chaos", text: "Verschiedene Anwendungen werden getestet, aber nicht sinnvoll in bestehende Prozesse integriert.", img: "/media/pages/ki-workshop/r5-problem-tools.webp" },
-    { title: "Fehlende Richtlinien", text: "Datenschutz, Freigaben und interne Regeln sind noch nicht eindeutig definiert.", img: "/media/pages/ki-workshop/r5-problem-regeln.webp" },
-    { title: "Zu wenig Praxis", text: "Viele Schulungen erklären nur die Theorie und schaffen keine Veränderung im Arbeitsalltag.", img: "/media/pages/ki-workshop/r5-problem-praxis.webp" },
+    { title: "Unsicherheit im Team", text: "Mitarbeiter wissen nicht, welche KI-Tools sie nutzen dürfen.", img: "/media/pages/ki-workshop/r5-problem-team.webp" },
+    { title: "Tool-Chaos", text: "Anwendungen werden getestet, aber nicht in Prozesse integriert.", img: "/media/pages/ki-workshop/r5-problem-tools.webp" },
+    { title: "Fehlende Richtlinien", text: "Datenschutz und interne Regeln sind noch nicht definiert.", img: "/media/pages/ki-workshop/r5-problem-regeln.webp" },
+    { title: "Zu wenig Praxis", text: "Viele Schulungen erklären nur die Theorie.", img: "/media/pages/ki-workshop/r5-problem-praxis.webp" },
   ],
 };
 

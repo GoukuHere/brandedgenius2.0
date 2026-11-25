@@ -11,6 +11,7 @@ import type { Project, ProjectSlug } from "@/content/pages/use-cases";
   so the wall reads as an editorial arrangement, never as rows of cards. Fewer than three columns sit centred.
   Phones and tablets: two columns, the right one starting lower (a zig-zag).
   Each project keeps a slight height of its own (WEIGHT), so no two neighbours are cut to the same size.
+  Round 7 (Roman: "make it smaller"): with the cover drawings gone, every poster is about a third shorter.
 */
 
 export type Mode = "p" | "m" | "d";
@@ -29,8 +30,8 @@ const WEIGHT: Record<ProjectSlug, number> = {
 };
 
 const GAP: Record<Mode, number> = { p: 12, m: 20, d: 28 };
-const CAP = 680;
-const STAGGER = [-48, 0, 48];
+const CAP = 390;
+const STAGGER = [-36, 0, 36];
 
 type Placed = { slug: ProjectSlug; t: number; h: number; c: number };
 
@@ -48,7 +49,7 @@ function desktop(list: Project[]): Placed[] {
   const gap = GAP.d;
   const cols = columns(list, k);
   const most = Math.max(...cols.map((col) => col.length));
-  const average = most >= 3 ? 500 : most === 2 ? 600 : 640;
+  const average = most >= 3 ? 330 : most === 2 ? 380 : 420;
   const length = most * average + (most - 1) * gap;
   const stagger = k === 3 ? STAGGER : k === 2 ? [0, 96] : [0];
   const shift = (3 - k) / 2;
@@ -72,8 +73,8 @@ function desktop(list: Project[]): Placed[] {
 function twoColumns(list: Project[], mode: "p" | "m"): Placed[] {
   const k = Math.min(2, list.length);
   const gap = GAP[mode];
-  const average = mode === "p" ? 272 : 470;
-  const offset = mode === "p" ? 108 : 196;
+  const average = mode === "p" ? 210 : 320;
+  const offset = mode === "p" ? 80 : 132;
   const placed: Placed[] = [];
   columns(list, k).forEach((col, ci) => {
     let top = ci === 1 ? offset : 0;
