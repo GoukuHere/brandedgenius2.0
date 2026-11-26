@@ -409,11 +409,15 @@ export const WORKSHOP = {
   quote: "Mein Ziel ist es, Ihr Team so zu befähigen, dass KI nicht nur verstanden, sondern wirklich im Unternehmen genutzt wird.",
   author: "Roman Tränkle",
   formatsLabel: "Unsere Workshop-Formate",
+  // Round 9 (2026-11-26): Online Seminare and Individuelle Trainings show Roman's own pictures from his Drive folder
+  // "Website" (Card 2, 03: a participant with him on her screen; Card 4: him coaching a small team at a laptop), the
+  // ones he asked for in round 6 ("take the pictures from my Google Drive"). Vor-Ort and Leadership keep his real
+  // photos, which he called fine on 2026-11-18.
   formats: [
     { title: "Vor-Ort Workshops", text: "Interaktive Hands-on-Workshops direkt in Ihrem Unternehmen vor Ort.", img: "/media/workshop/vor-ort.webp" },
-    { title: "Online Seminare", text: "Kompakte Live-Online-Trainings mit praxisnahen Übungen und individuellem Austausch.", img: "/media/workshop/r8-online.webp" },
+    { title: "Online Seminare", text: "Kompakte Live-Online-Trainings mit praxisnahen Übungen und individuellem Austausch.", img: "/media/workshop/r9-roman-online.webp" },
     { title: "Leadership Workshops", text: "Strategische Entscheidungskompetenz und Zukunftssicherheit für Führungskräfte und Vorstände.", img: "/media/workshop/leadership.webp" },
-    { title: "Individuelle Trainings", text: "Maßgeschneiderte Schulungsinhalte für spezifische Fachabteilungen und konkrete Anwendungsfälle.", img: "/media/workshop/r8-individuell.webp" },
+    { title: "Individuelle Trainings", text: "Maßgeschneiderte Schulungsinhalte für spezifische Fachabteilungen und konkrete Anwendungsfälle.", img: "/media/workshop/r9-roman-individuell.webp" },
   ],
   topicsLabel: "Themenbeispiele",
   topics: [

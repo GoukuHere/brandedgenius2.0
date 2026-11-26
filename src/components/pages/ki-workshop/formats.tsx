@@ -20,12 +20,14 @@ import { useCopy } from "@/i18n/client";
 
   The photos: Roman on site in a seminar room, an online seminar, a hybrid session and a tailored session with a small
   team. Round 6 (Roman, 2026-11-24, of the two generated pictures of him: "this is not me ... remove that"): online
-  and tailored show the format without him (GPT Image 2.5) until his own photos come.
+  and tailored showed the format without him (GPT Image 2.5) until his own photos came; round 9 (2026-11-26) puts in
+  his own pictures from his Drive (KW_MEDIA).
   Round 8: both made again at 2K through higgscheap; the online slide now names each step of its workflow.
   Round 9 (the developer, 2026-11-26: "looks very blurry and doesnt makes sense"): hybrid was the on-site and the
   online photo cut in half side by side, each half loaded at 245px and stretched to about 400px to fill its tall
-  frame. It is now one picture made for it (GPT Image 2.5 Sunburst, 2K): the group at the table, the trainer from
-  behind, the remote participants and his workflow slide on the wall display.
+  frame. It is now one picture made for it (GPT Image 2.5 Sunburst, 2K): the group at the table, the remote
+  participants and a workflow slide on the wall display, and no trainer in the frame, because every other format
+  shows Roman as the trainer (r9-hybrid-group.webp; a new name, so no image cache serves the earlier version).
   Round 5 (DE/EN): copy by language; the regions and photos key on the format's key, never its name.
 */
 

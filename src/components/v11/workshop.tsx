@@ -36,7 +36,10 @@ const HOVER_INTENT_MS = 80; // sweeping the pointer across the row does not flic
 // 02 and 04 show the format without him until his own photos come (online seminar: the shared slide and a
 // participant; training: a sales team at work on its own AI process, the speaker left of the screen).
 // Round 8: both made again at 2K through higgscheap (GPT Image 2.5 Sunburst), the same scenes.
-const FOCUS = ["43% 50%", "62% 50%", "45% 50%", "40% 50%"];
+// Round 9 (2026-11-26): 02 and 04 are Roman's own pictures from his Drive (02: him leading the seminar on a
+// participant's screen, the screen left of centre; 04: him coaching a small team, he and the woman at the laptop
+// right of centre), so the collapsed strips hold on him.
+const FOCUS = ["43% 50%", "14% 50%", "45% 50%", "88% 50%"];
 
 // The open panel is 2.4 / 5.4 of the row: about 520px inside the 1280px container.
 const PANEL_SIZES = "(min-width: 1280px) 520px, 44vw";
