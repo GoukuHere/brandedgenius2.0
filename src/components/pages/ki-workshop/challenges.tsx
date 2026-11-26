@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { Container, Heading, Section } from "@/components/system/primitives";
+import { Container, Heading, keepCompounds, Section } from "@/components/system/primitives";
 import { useCopy } from "@/i18n/client";
 
 /*
@@ -13,8 +13,9 @@ import { useCopy } from "@/i18n/client";
   are opaque navy, so nothing shows through mid-turn. At rest the card stands at exactly 0 or 180 degrees, so the text
   is drawn flat and sharp.
 
-  Desktop: four in a row, turning 260ms apart once the row is well in view. Phones: one column, each tile turns as it
-  enters. A tile turns once and stays turned. Reduced motion: the turn is instant (the end state).
+  From 1280px: four in a row, turning 260ms apart once the row is well in view. From 640px to 1279px: two by two
+  (round 9: four in a row are too narrow there for each line to stay at two lines). Phones: one column, each tile
+  turns as it enters. A tile turns once and stays turned. Reduced motion: the turn is instant (the end state).
   Round 5 (DE/EN): copy by language.
   Round 5 (the client's Loom of 2026-11-18, 3:39: "cool AI pictures in their backgrounds"): the back of each tile
   carries a picture made for its challenge across its top, fading into the tile's navy above the line, so the text
@@ -76,7 +77,7 @@ export function KwChallenges() {
           </p>
         </div>
 
-        <ol ref={list} role="list" className="mt-12 grid gap-4 sm:grid-cols-2 md:mt-16 lg:mt-20 lg:grid-cols-4 lg:gap-5">
+        <ol ref={list} role="list" className="mt-12 grid gap-4 sm:grid-cols-2 md:mt-16 lg:mt-20 lg:gap-5 xl:grid-cols-4">
           {KW_CHALLENGES.items.map((item, i) => (
             <li key={item.title} data-tile={i} data-turned={turned[i] ? "" : undefined} className="kw-flip">
               <div className="kw-flip-card">
@@ -88,13 +89,14 @@ export function KwChallenges() {
                 </div>
                 <div className="kw-face kw-face-back">
                   <span aria-hidden className="kw-flip-photo">
-                    <Image src={item.img} alt="" fill sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw" className="object-cover" />
+                    <Image src={item.img} alt="" fill sizes="(min-width: 1280px) 300px, (min-width: 640px) 50vw, 100vw" className="object-cover" />
                   </span>
                   <p aria-hidden className="kw-flip-mini">
                     <span className="num text-sky">{pad(i + 1)}</span>
                     {item.title}
                   </p>
-                  <p className="kw-flip-text">{item.text}</p>
+                  {/* "KI-Tools" stays whole: on the wider tiles the line broke after "KI-". */}
+                  <p className="kw-flip-text">{keepCompounds(item.text)}</p>
                 </div>
               </div>
             </li>

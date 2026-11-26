@@ -212,17 +212,19 @@
   font-weight: 500;
   color: rgb(241 241 238 / 0.92);
 }
-/* Round 7 (Roman: "make the subtext smaller ... one sentence, small one"): one short line in body size. */
+/*
+  Round 7 (Roman: "make the subtext smaller ... one sentence, small one"): one short line in body size.
+  Round 9 (the developer, 2026-11-26: "make all card bottom text two liner as in the last card"): 16px at every width
+  (at 17px the first three took three lines in a 289px tile) and at most 260px wide, so the shortest one also breaks
+  into two lines on the wider tiles of tablets and phones. Measured from 360px to 1920px wide: each of the four, in
+  German and in English, takes two lines (a 233px text box four across, 248px to 260px elsewhere).
+*/
 .kw-flip-text {
+  max-width: 260px;
   font-size: 16px;
   line-height: 1.5;
   color: rgb(241 241 238 / 0.86);
   text-wrap: pretty;
-}
-@media (min-width: 1024px) {
-  .kw-flip-text {
-    font-size: 17px;
-  }
 }
 
 /* ---------- 3 Ergebnisse: the course ring ---------- */

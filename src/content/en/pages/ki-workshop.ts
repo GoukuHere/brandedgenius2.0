@@ -32,7 +32,8 @@ export const KW_CHALLENGES: Shape<typeof DE.KW_CHALLENGES> = {
   text: "AI tools are available. What is often missing is the know-how to use them safely, productively and consistently across the company.",
   items: [
     { title: "Uncertainty in the team", text: "Employees do not know which AI tools they are allowed to use.", img: "/media/pages/ki-workshop/r8-problem-team.webp" },
-    { title: "Tool chaos", text: "Teams test apps without building them into existing processes.", img: "/media/pages/ki-workshop/r8-problem-tools.webp" },
+    // Round 9: "existing" left out (his German has no such word), so the line keeps to two lines like the others.
+    { title: "Tool chaos", text: "Teams test apps without building them into processes.", img: "/media/pages/ki-workshop/r8-problem-tools.webp" },
     { title: "Missing guidelines", text: "Data protection and internal rules are not defined yet.", img: "/media/pages/ki-workshop/r8-problem-regeln.webp" },
     { title: "Too little practice", text: "Many training courses only explain the theory.", img: "/media/pages/ki-workshop/r8-problem-praxis.webp" },
   ],

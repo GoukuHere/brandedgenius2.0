@@ -17,8 +17,8 @@ export function Container({ className, children }: { className?: string; childre
   return <div className={cn("mx-auto w-full max-w-[1280px] px-5 md:px-8", className)}>{children}</div>;
 }
 
-/** Keeps hyphenated German compounds (KI-Potenzialanalyse) whole, so a heading never breaks after "KI-". */
-function keepCompounds(text: string): ReactNode {
+/** Keeps hyphenated German compounds (KI-Potenzialanalyse) whole, so a heading or a line never breaks after "KI-". */
+export function keepCompounds(text: string): ReactNode {
   return text.split(/(\s+)/).map((part, i) =>
     part.includes("-") && part.trim() ? (
       <span key={i} className="whitespace-nowrap">
