@@ -1,19 +1,21 @@
 "use client";
 
-import { Check, LoaderCircle, Play, RotateCcw } from "lucide-react";
+import { Check } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Container, Section } from "@/components/system/primitives";
 import { useCopy } from "@/i18n/client";
-import { cn } from "@/lib/utils";
-import { DemoButton, ServiceText, useReducedMotion, useSeenOnce } from "./shared";
+import { ServiceText, useReducedMotion, useSeenOnce } from "./shared";
 
 /*
   KI-Agenten & Workflows: his text on the left, his agent console on the right, working. The console is a window with
-  his status line and his "Workflow starten" button; pressing it runs his five steps in turn, each lighting up while
-  it is processed and then turning "Erledigt" with a check, while a progress line runs down beside them; his three
-  facts sit in the footer. The states and labels are the ones his own console shows. It runs once by itself when it
-  first comes into view; the button replays it. Reduced motion: the finished console, and the button still runs it.
+  his status line over his five steps. It runs once by itself when it first comes into view: each step lights up
+  while it is processed, then its dot fills with a check, while a progress line runs down beside them. The states
+  and step titles are the ones his own console shows. Reduced motion: the finished console.
   Round 5 (DE/EN): copy by language.
+  Round 9 (2026-11-26, Roman's Loom of 2026-11-24, 0:03 to 0:13, "it's too much with text, text, text"): his cursor
+  was on this console as well as on the text, so the console lost its words too: the line under each step, the
+  "Erledigt" labels (the filled dot says it), the replay button (he called the same play button on the tools ring
+  useless) and the three facts in the footer.
 */
 
 /** His own timing: a step is worked on for 900ms, ticks for 350ms, then the next starts 180ms later. */
@@ -98,7 +100,6 @@ function AgentConsole() {
   // Reduced motion and nothing pressed yet: the finished console.
   const shown = reduced && phase === "idle" ? { phase: "finished" as Phase, current: -1, done: STEPS.length } : { phase, current, done };
   const status = shown.phase === "running" ? C.active : shown.phase === "finished" ? C.finished : C.ready;
-  const label = shown.phase === "running" ? C.running : shown.phase === "finished" ? C.again : C.start;
 
   return (
     <div ref={box} data-reveal="up" className="ls-console" data-phase={shown.phase}>
@@ -107,15 +108,6 @@ function AgentConsole() {
           <span aria-hidden className="ls-status-dot" />
           <span className="truncate text-[15px] text-white/85">{status}</span>
         </p>
-        <DemoButton
-          tone="primary"
-          icon={shown.phase === "running" ? LoaderCircle : shown.phase === "finished" ? RotateCcw : Play}
-          onClick={run}
-          disabled={shown.phase === "running"}
-          className="ls-console-button shrink-0"
-        >
-          {label}
-        </DemoButton>
       </div>
 
       <ol className="ls-steps">
@@ -134,22 +126,16 @@ function AgentConsole() {
                 {state === "done" ? <Check strokeWidth={2.25} className="size-3.5" /> : null}
               </span>
               <div className="min-w-0">
-                <h3 className="text-[16px] leading-snug font-medium text-white">{step.title}</h3>
-                <p className="mt-0.5 text-[14px] leading-snug text-white/58">{step.text}</p>
+                <h3 className="text-[16px] leading-7 font-medium text-white">{step.title}</h3>
                 {typeof step.score === "number" ? (
                   <span aria-hidden className="ls-score">
                     <span className="ls-score-fill" style={{ "--score": step.score / 100 } as CSSProperties} />
                   </span>
                 ) : null}
               </div>
-              <span className={cn("ls-step-state", state === "done" && "text-sky")}>
-                {state === "done" ? (
-                  <>
-                    <Check aria-hidden strokeWidth={2} className="size-4" />
-                    {C.done}
-                  </>
-                ) : state === "active" ? (
-                  <span aria-hidden className="ls-working">
+              <span aria-hidden className="ls-step-state">
+                {state === "active" ? (
+                  <span className="ls-working">
                     <span />
                     <span />
                     <span />
@@ -160,12 +146,6 @@ function AgentConsole() {
           );
         })}
       </ol>
-
-      <ul role="list" className="ls-console-foot">
-        {C.facts.map((fact) => (
-          <li key={fact}>{fact}</li>
-        ))}
-      </ul>
     </div>
   );
 }

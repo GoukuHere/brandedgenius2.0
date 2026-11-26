@@ -55,23 +55,21 @@ export const AGENTS = {
   usesLabel: "Mögliche Einsatzbereiche",
   uses: ["Lead-Qualifizierung und Weiterleitung", "Interne Wissensassistenten", "CRM-Aktualisierungen und Aufgabenerstellung", "Kundenservice-Workflows"],
   cta: "KI-Agenten entdecken",
-  // His agent console and the states his own script shows.
+  // His agent console and the states his own script shows. Round 9 (the developer, 2026-11-26: "You have skipped this
+  // from loom"; Roman's cursor was on this console too while he said "text, text, text"): only his status line and
+  // his five step titles stay. The line under each step, the "Erledigt" labels, the replay button and the three facts
+  // in the footer are gone.
   console: {
     ready: "Autonomer Prozess bereit",
     active: "Workflow aktiv",
     finished: "Workflow erfolgreich abgeschlossen",
-    start: "Workflow starten",
-    running: "Workflow läuft...",
-    again: "Erneut starten",
-    done: "Erledigt",
     steps: [
-      { title: "1. Neuer Lead", text: "Eingang via Website / Formular" },
-      { title: "2. KI-Analyse", text: "Bedarf & Relevanzprüfung" },
-      { title: "3. Qualifizierung", text: "Score: 94% / High Priority", score: 94 },
-      { title: "4. CRM-Aktualisierung", text: "HubSpot / Pipedrive Sync" },
-      { title: "5. Aufgabe & Follow-up", text: "Terminvorschlag & Benachrichtigung" },
+      { title: "1. Neuer Lead" },
+      { title: "2. KI-Analyse" },
+      { title: "3. Qualifizierung", score: 94 },
+      { title: "4. CRM-Aktualisierung" },
+      { title: "5. Aufgabe & Follow-up" },
     ],
-    facts: ["Latenz: <1.2 Sek.", "100% DSGVO-konform", "CRM Real-time Sync"],
   },
 };
 

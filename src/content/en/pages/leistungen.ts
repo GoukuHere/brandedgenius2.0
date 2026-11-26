@@ -53,18 +53,13 @@ export const AGENTS: Shape<typeof DE.AGENTS> = {
     ready: "Autonomous process ready",
     active: "Workflow active",
     finished: "Workflow completed successfully",
-    start: "Start workflow",
-    running: "Workflow running...",
-    again: "Run again",
-    done: "Done",
     steps: [
-      { title: "1. New lead", text: "Received via website / form" },
-      { title: "2. AI analysis", text: "Needs & relevance check" },
-      { title: "3. Qualification", text: "Score: 94% / High priority", score: 94 },
-      { title: "4. CRM update", text: "HubSpot / Pipedrive sync" },
-      { title: "5. Task & follow-up", text: "Meeting suggestion & notification" },
+      { title: "1. New lead" },
+      { title: "2. AI analysis" },
+      { title: "3. Qualification", score: 94 },
+      { title: "4. CRM update" },
+      { title: "5. Task & follow-up" },
     ],
-    facts: ["Latency: <1.2 sec.", "100% GDPR compliant", "CRM real-time sync"],
   },
 };
 
