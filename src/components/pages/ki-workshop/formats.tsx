@@ -18,10 +18,14 @@ import { useCopy } from "@/i18n/client";
   circles stacked, so every name still fits inside its region on a phone). The names are HTML buttons laid over the
   drawing (a tab list), so they stay sharp and reachable by keyboard; the drawing itself is decorative.
 
-  The photos: Roman on site in a seminar room, an online seminar, both halves side by side for hybrid, and a tailored
-  session with a small team. Round 6 (Roman, 2026-11-24, of the two generated pictures of him: "this is not me ...
-  remove that"): online and tailored show the format without him (GPT Image 2.5) until his own photos come.
+  The photos: Roman on site in a seminar room, an online seminar, a hybrid session and a tailored session with a small
+  team. Round 6 (Roman, 2026-11-24, of the two generated pictures of him: "this is not me ... remove that"): online
+  and tailored show the format without him (GPT Image 2.5) until his own photos come.
   Round 8: both made again at 2K through higgscheap; the online slide now names each step of its workflow.
+  Round 9 (the developer, 2026-11-26: "looks very blurry and doesnt makes sense"): hybrid was the on-site and the
+  online photo cut in half side by side, each half loaded at 245px and stretched to about 400px to fill its tall
+  frame. It is now one picture made for it (GPT Image 2.5 Sunburst, 2K): the group at the table, the trainer from
+  behind, the remote participants and his workflow slide on the wall display.
   Round 5 (DE/EN): copy by language; the regions and photos key on the format's key, never its name.
 */
 
@@ -130,24 +134,11 @@ function Diagram({
   );
 }
 
-/** The photo for a format; for hybrid, the on-site and the online photo side by side. */
+/** The photo for a format: one picture each. */
 function FormatPhoto({ item }: { item: Format }) {
   const { KW_MEDIA } = useCopy().kiWorkshop;
   const sizes = "(min-width: 1280px) 490px, (min-width: 1024px) 38vw, calc(100vw - 40px)";
-  if (item.key === "hybrid") {
-    const half = "(min-width: 1280px) 245px, (min-width: 1024px) 19vw, 50vw";
-    return (
-      <div className="absolute inset-0 grid grid-cols-2 gap-[2px] bg-sky/60">
-        <div className="relative overflow-hidden">
-          <Image src={KW_MEDIA.onsite} alt={item.alt} fill quality={85} sizes={half} className="object-cover object-[44%_40%]" />
-        </div>
-        <div className="relative overflow-hidden">
-          <Image src={KW_MEDIA.online} alt="" fill quality={85} sizes={half} className="object-cover object-[62%_40%]" />
-        </div>
-      </div>
-    );
-  }
-  const src = item.key === "onsite" ? KW_MEDIA.onsite : item.key === "online" ? KW_MEDIA.online : KW_MEDIA.custom;
+  const src = KW_MEDIA[item.key];
   return <Image src={src} alt={item.alt} fill quality={85} sizes={sizes} className="object-cover object-[50%_38%]" />;
 }
 

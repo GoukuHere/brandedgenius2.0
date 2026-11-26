@@ -15,6 +15,9 @@ export const KW_MEDIA = {
   hero: "/media/process/training.webp",
   onsite: "/media/workshop/vor-ort.webp",
   online: "/media/workshop/r8-online.webp",
+  // Round 9 (the developer, 2026-11-26: the two halves side by side "looks very blurry and doesnt makes sense"): one
+  // picture of a hybrid session, the group in the room and the remote participants on the wall display.
+  hybrid: "/media/workshop/r9-hybrid.webp",
   custom: "/media/workshop/r8-individuell.webp",
   trainer: "/media/photos/roman-standing.webp",
   // A square crop of his face from photos/team.webp, for the small round portrait beside the quote.
